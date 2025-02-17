@@ -1,0 +1,4 @@
+node_modules/
+flake.lock
+.env
+.env.*
