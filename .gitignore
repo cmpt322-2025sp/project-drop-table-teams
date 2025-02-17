@@ -3,3 +3,10 @@ flake.lock
 .env
 .env.*
 .svelte-kit/
+.output
+.vercel
+.netlify
+.wrangler
+build/
+
+.DS_Store
