@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { generateMaze, Cell } from './Maze';
+  import { generateMaze } from '$lib/Maze';
+  import type { Cell } from '$lib/Maze';
+  
 
   let maze: Cell[][] = [];
   const rows = 10;
