@@ -13,8 +13,11 @@
 	let canvas: HTMLCanvasElement;
 
 	// Player starting position (center of maze for now).
-	let playerRow = Math.floor(rows / 2);
-	let playerCol = Math.floor(cols / 2);
+	let targetRow = Math.floor(rows / 2);
+	let targetCol = Math.floor(cols / 2);
+	// The "displayed" position is used for animation (in grid units, as a float).
+	let displayedRow = targetRow;
+	let displayedCol = targetCol;
 
 	// Zoom setting: this is how much we want to zoom into the maze.
 	const zoom = 3;
@@ -24,6 +27,10 @@
 	// These wil be used in the transform style.
 	let offsetX = 0;
 	let offsetY = 0;
+
+	// Animation settings.
+	const animationSpeed = 0.2; // Adjust between 0 (slow) and 1 (instant).
+	let animating = false;
 
 	onMount(() => {
 		if (typeof window !== 'undefined') {
@@ -84,18 +91,14 @@
 				}
 			}
 		}
-		drawPlayer();
+		drawPlayer(ctx);
 	}
 
 	// Draws a red square representing the player.
-	function drawPlayer() {
-		if (!canvas) return;
-		const ctx = canvas.getContext('2d');
-		if (!ctx) return;
-
+	function drawPlayer(ctx: CanvasRenderingContext2D) {
 		// Compute the top-left corner of the player's cell.
-		const x = wallThickness + playerCol * (cellSize + wallThickness);
-		const y = wallThickness + playerRow * (cellSize + wallThickness);
+		const x = wallThickness + displayedCol * (cellSize + wallThickness);
+		const y = wallThickness + displayedRow * (cellSize + wallThickness);
 
 		// Size of player square.
 		const playerSize = cellSize * 0.8;
@@ -111,8 +114,8 @@
 
 		// Compute the center of the player's cell in the full maze (in canvas pixels).
 		// We add half the cell's width/height to center within the cell.
-		const playerCenterX = wallThickness + playerCol * (cellSize + wallThickness) + cellSize / 2;
-		const playerCenterY = wallThickness + playerRow * (cellSize + wallThickness) + cellSize / 2;
+		const playerCenterX = wallThickness + displayedCol * (cellSize + wallThickness) + cellSize / 2;
+		const playerCenterY = wallThickness + displayedRow * (cellSize + wallThickness) + cellSize / 2;
 
 		// Define the viewport dimensions. Here we use 80% of the window dimensions.
 		const viewportWidth = window.innerWidth * 0.8;
@@ -129,27 +132,54 @@
 		}
 	}
 
+	// Animate the transition from the current displayed position to the target.
+	function animate() {
+		// Linear interpolation helper.
+		const lerp = (start: number, end: number, t: number) => start + (end - start) * t;
+
+		// Update displayed positions.
+		displayedRow = lerp(displayedRow, targetRow, animationSpeed);
+		displayedCol = lerp(displayedCol, targetCol, animationSpeed);
+
+		// Redraw and update transform.
+		draw();
+		updateTransform();
+
+		// If the displayed position is nearly at the target, finish animating.
+		if (Math.abs(displayedRow - targetRow) < 0.01 && Math.abs(displayedCol - targetCol) < 0.01) {
+			displayedRow = targetRow;
+			displayedCol = targetCol;
+			animating = false;
+		} else {
+			requestAnimationFrame(animate);
+		}
+	}
+
 	// Handle arrow keys or WASD presses to move the player.
 	function handleKeyDown(e: KeyboardEvent) {
-		let newRow = playerRow;
-		let newCol = playerCol;
+		let newRow = targetRow;
+		let newCol = targetCol;
 		if (e.key === 'ArrowUp' || e.key === 'W') {
-			newRow = playerRow - 1;
+			newRow = targetRow - 1;
 		} else if (e.key === 'ArrowDown' || e.key === 'S') {
-			newRow = playerRow + 1;
+			newRow = targetRow + 1;
 		} else if (e.key === 'ArrowLeft' || e.key === 'A') {
-			newCol = playerCol - 1;
+			newCol = targetCol - 1;
 		} else if (e.key === 'ArrowRight' || e.key === 'D') {
-			newCol = playerCol + 1;
+			newCol = targetCol + 1;
 		}
 		// Check boundries
 		// TODO: Wall collision detection
 		if (newRow < 0 || newRow >= rows || newCol < 0 || newCol >= cols) return;
 
-		playerRow = newRow;
-		playerCol = newCol;
-		draw();
-		updateTransform();
+		targetRow = newRow;
+		targetCol = newCol;
+
+		// Start animating if not already.
+		if (!animating) {
+			animating = true;
+			requestAnimationFrame(animate);
+		}
 	}
 </script>
 
