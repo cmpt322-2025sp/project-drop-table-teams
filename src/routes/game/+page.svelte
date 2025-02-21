@@ -1,24 +1,23 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { generateMaze } from '$lib/Maze';
 	import type { Cell } from '$lib/Maze';
 
 	// Maze settings
 	const rows = 10;
 	const cols = 10;
-	const cellSize = 40;
+	const cellSize = 40; // Path size in pixels
 	const wallThickness = 40;
 
 	let maze: Cell[][] = [];
 	let canvas: HTMLCanvasElement;
 
-	// Assume player's current position for testing.
+	// Player starting position (center of maze for now).
 	let playerRow = Math.floor(rows / 2);
 	let playerCol = Math.floor(cols / 2);
 
 	// Zoom setting: this is how much we want to zoom into the maze.
 	const zoom = 3;
-
 	// We'll compute offsets based on the full canvas dimensions.
 	let canvasWidth = 0;
 	let canvasHeight = 0;
@@ -27,12 +26,22 @@
 	let offsetY = 0;
 
 	onMount(() => {
-		maze = generateMaze(rows, cols);
-		drawMaze();
-		updateTransform();
+		if (typeof window !== 'undefined') {
+			maze = generateMaze(rows, cols);
+			draw();
+			updateTransform();
+			window.addEventListener('keydown', handleKeyDown);
+		}
 	});
 
-	function drawMaze() {
+	onDestroy(() => {
+		if (typeof window !== 'undefined') {
+			window.removeEventListener('keydown', handleKeyDown);
+		}
+	});
+
+	// Draws the entire maze and the player.
+	function draw() {
 		if (!canvas) return;
 		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
@@ -75,9 +84,31 @@
 				}
 			}
 		}
+		drawPlayer();
+	}
+
+	// Draws a red square representing the player.
+	function drawPlayer() {
+		if (!canvas) return;
+		const ctx = canvas.getContext('2d');
+		if (!ctx) return;
+
+		// Compute the top-left corner of the player's cell.
+		const x = wallThickness + playerCol * (cellSize + wallThickness);
+		const y = wallThickness + playerRow * (cellSize + wallThickness);
+
+		// Size of player square.
+		const playerSize = cellSize * 0.8;
+		const inset = (cellSize - playerSize) / 2;
+
+		ctx.fillStyle = 'red';
+		ctx.fillRect(x + inset, y + inset, playerSize, playerSize);
 	}
 
 	function updateTransform() {
+		// Check if window exists (i.e. code is running in the browser)
+		if (typeof window === 'undefined') return;
+
 		// Compute the center of the player's cell in the full maze (in canvas pixels).
 		// We add half the cell's width/height to center within the cell.
 		const playerCenterX = wallThickness + playerCol * (cellSize + wallThickness) + cellSize / 2;
@@ -92,6 +123,33 @@
 		// by the zoom factor.
 		offsetX = (viewportWidth / 2 - playerCenterX * zoom) / zoom;
 		offsetY = (viewportHeight / 2 - playerCenterY * zoom) / zoom;
+
+		if (canvas) {
+			canvas.style.transform = `scale(${zoom}) translate(${offsetX}px, ${offsetY}px)`;
+		}
+	}
+
+	// Handle arrow keys or WASD presses to move the player.
+	function handleKeyDown(e: KeyboardEvent) {
+		let newRow = playerRow;
+		let newCol = playerCol;
+		if (e.key === 'ArrowUp' || e.key === 'W') {
+			newRow = playerRow - 1;
+		} else if (e.key === 'ArrowDown' || e.key === 'S') {
+			newRow = playerRow + 1;
+		} else if (e.key === 'ArrowLeft' || e.key === 'A') {
+			newCol = playerCol - 1;
+		} else if (e.key === 'ArrowRight' || e.key === 'D') {
+			newCol = playerCol + 1;
+		}
+		// Check boundries
+		// TODO: Wall collision detection
+		if (newRow < 0 || newRow >= rows || newCol < 0 || newCol >= cols) return;
+
+		playerRow = newRow;
+		playerCol = newCol;
+		draw();
+		updateTransform();
 	}
 </script>
 
