@@ -155,17 +155,17 @@
 		}
 	}
 
-	// Handle arrow keys or WASD presses to move the player.
+	// Handle arrow keys or WASD key presses to move the player.
 	function handleKeyDown(e: KeyboardEvent) {
 		let newRow = targetRow;
 		let newCol = targetCol;
-		if (e.key === 'ArrowUp' || e.key === 'W') {
+		if (e.key === 'ArrowUp' || e.key === 'w') {
 			newRow = targetRow - 1;
-		} else if (e.key === 'ArrowDown' || e.key === 'S') {
+		} else if (e.key === 'ArrowDown' || e.key === 's') {
 			newRow = targetRow + 1;
-		} else if (e.key === 'ArrowLeft' || e.key === 'A') {
+		} else if (e.key === 'ArrowLeft' || e.key === 'a') {
 			newCol = targetCol - 1;
-		} else if (e.key === 'ArrowRight' || e.key === 'D') {
+		} else if (e.key === 'ArrowRight' || e.key === 'd') {
 			newCol = targetCol + 1;
 		}
 		// Check boundries
