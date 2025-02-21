@@ -33,6 +33,7 @@
               bun
               supabase-cli
               svelte-language-server
+              typescript-language-server
             ];
           };
         }
