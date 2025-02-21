@@ -32,6 +32,7 @@
             packages = with pkgs; [
               bun
               supabase-cli
+              svelte-language-server
             ];
           };
         }
