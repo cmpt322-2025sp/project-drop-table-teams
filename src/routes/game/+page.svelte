@@ -16,9 +16,20 @@
   let playerRow = Math.floor(rows / 2);
   let playerCol = Math.floor(cols / 2);
 
+  // Zoom setting: this is how much we want to zoom into the maze.
+  const zoom = 3;
+
+  // We'll compute offsets based on the full canvas dimensions.
+  let canvasWidth = 0;
+  let canvasHeight = 0;
+  // These wil be used in the transform style.
+  let offsetX = 0;
+  let offsetY = 0;
+
   onMount(() => {
     maze = generateMaze(rows, cols);
     drawMaze();
+    updateTransform();
   });
 
   function drawMaze() {
@@ -28,8 +39,8 @@
 
     // Calculate overall canvas dimensions.
     // There will be an extra wall on each boundry:
-    const canvasWidth = cols * cellSize + (cols + 1) * wallThickness
-    const canvasHeight = rows * cellSize + (rows + 1) * wallThickness
+    canvasWidth = cols * cellSize + (cols + 1) * wallThickness
+    canvasHeight = rows * cellSize + (rows + 1) * wallThickness
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 
@@ -65,14 +76,45 @@
       }
     }
   }
+
+  function updateTransform() {
+    // Compute the center of the player's cell in the full maze (in canvas pixels).
+    // We add half the cell's width/height to center within the cell.
+    const playerCenterX =
+      wallThickness + playerCol * (cellSize + wallThickness) + cellSize / 2;
+    const playerCenterY =
+      wallThickness + playerRow * (cellSize + wallThickness) + cellSize / 2;
+
+    // Define the viewport dimensions. Here we use 80% of the window dimensions.
+    const viewportWidth = window.innerWidth * 0.8;
+    const viewportHeight = window.innerHeight * 0.8;
+
+    // To center the player in the viewport computer the offset needed.
+    // Note: Because we apply a scale transform, we need to divide the offset
+    // by the zoom factor.
+    offsetX = (viewportWidth / 2 - playerCenterX * zoom) / zoom;
+    offsetY = (viewportHeight / 2 - playerCenterY * zoom) / zoom;
+  }
 </script>
 
 <style>
+  .viewport {
+    width: 80vw;
+    height: 80vh;
+    overflow: hidden;
+    border: 2px solid #333;
+    margin: auto;
+  }
   canvas {
-    width: 100%;
-    height: auto;
-    border: 1px solid #333;
+    transform-origin: top left;
   }
 </style>
 
-<canvas bind:this={canvas}></canvas>
+<!-- Wrap the canvas in a viewport container -->
+<div class="viewport">
+  <canvas
+    bind:this={canvas}
+    style="transform: scale({zoom}) translate({offsetX}px, {offsetY}px);"
+  ></canvas>
+</div>
+
