@@ -1,5 +1,5 @@
 tap "Homebrew/bundle"
-tap "homebrew/cask"
+tap "supabase/tap"
 brew "supabase/tap/supabase"
 brew "bun"
 brew "git"
