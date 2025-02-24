@@ -5,7 +5,7 @@
 // Define the shape of a math problem.
 export interface MathProblem {
   question: string;
-  answer: number;
+  answer: number | string;
 }
 
 /**
@@ -48,4 +48,50 @@ export function generateRandomProblem(): MathProblem {
   return Math.random() < 0.5 
     ? generateAdditionProblem() 
     : generateSubtractionProblem();
+}
+/**
+ * Generates either a place value problem or a number place identification problem.
+ * @param min - The minimum number (default is 10).
+ * @param max - The maximum number (default is 999).
+ * @returns A MathProblem object.
+ */
+export function generateRandomPlaceValueProblem(min = 10, max = 999): MathProblem {
+  const number = Math.floor(Math.random() * (max - min + 1)) + min;
+  const numberStr = number.toString();
+  const placeValues = ["ones", "tens", "hundreds"];
+
+  if (Math.random() < 0.5) {
+    // Place value question (What is the digit in the X place?)
+    const index = Math.floor(Math.random() * placeValues.length);
+    const place = placeValues[index];
+
+    let answer: number = 0;
+    switch (place) {
+      case "ones":
+        answer = number % 10;
+        break;
+      case "tens":
+        answer = Math.floor((number / 10) % 10);
+        break;
+      case "hundreds":
+        answer = Math.floor(number / 100);
+        break;
+    }
+
+    return {
+      question: `What is the digit in the ${place} place of ${number}?`,
+      answer: answer.toString(),
+    };
+  } else {
+    // Number place identification question (What number place is this?)
+    const digitIndex = Math.floor(Math.random() * numberStr.length); // Randomly select a digit
+    const caretLine = " ".repeat(digitIndex) + "^"; // Create the ^ pointer below the digit
+
+    const place = placeValues[numberStr.length - digitIndex - 1]; // Determine the place name
+
+    return {
+      question: `What number place is this?\n${numberStr}\n${caretLine}`,
+      answer: place, // Answer is "ones", "tens", or "hundreds"
+    };
+  }
 }
