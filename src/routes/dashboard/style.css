@@ -1,0 +1,159 @@
+.property-1-default,
+.property-1-default * {
+  box-sizing: border-box;
+}
+.property-1-default {
+  height: 64rem;
+  position: relative;
+}
+.dashboard {
+  background: #769576;
+  width: 90rem;
+  height: 64rem;
+  position: absolute;
+  left: 0rem;
+  top: 0rem;
+  overflow: hidden;
+}
+.navigation {
+  background: #769576;
+  height: 10.25rem;
+  position: absolute;
+  right: 0rem;
+  left: 0rem;
+  top: 0rem;
+  overflow: hidden;
+}
+.math-maze {
+  color: #000000;
+  text-align: left;
+  font-family: "NovaCut-Book", sans-serif;
+  font-size: 6rem;
+  line-height: 150%;
+  font-weight: 400;
+  position: absolute;
+  left: 28.0625rem;
+  top: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.navigation-footer {
+  background: #769576;
+  height: 16.5rem;
+  position: absolute;
+  right: 0rem;
+  left: 0rem;
+  bottom: -8.6875rem;
+  overflow: hidden;
+}
+.math-maze2 {
+  color: #000000;
+  text-align: left;
+  font-family: "NovaCut-Book", sans-serif;
+  font-size: 1.5rem;
+  line-height: 150%;
+  font-weight: 400;
+  position: absolute;
+  left: 5rem;
+  top: 3.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.divider {
+  margin-top: -0.0625rem;
+  border-style: solid;
+  border-color: #e6e6e6;
+  border-width: 0.0625rem 0 0 0;
+  width: 80rem;
+  height: 0rem;
+  position: absolute;
+  left: 5rem;
+  top: 0.0625rem;
+  transform-origin: 0 0;
+  transform: rotate(0deg) scale(1, 1);
+}
+.button {
+  background: #ff9d00;
+  border-radius: 0.5rem;
+  padding: 0.875rem 1.5rem 0.875rem 1.5rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  width: 44.375rem;
+  height: 12.125rem;
+  position: absolute;
+  left: 22.8125rem;
+  top: 19.875rem;
+  box-shadow: var(
+    --button-shadow-box-shadow,
+    0rem 0.0625rem 0.125rem 0rem rgba(0, 0, 0, 0.05)
+  );
+}
+.start-game {
+  color: #000000;
+  text-align: left;
+  font-family: "NovaFlat-Book", sans-serif;
+  font-size: 4rem;
+  line-height: 150%;
+  font-weight: 400;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.union {
+  width: 10.80375rem;
+  height: 4rem;
+  position: absolute;
+  left: 2.265625rem;
+  top: 3rem;
+  transform: translate(-0.039375rem, 0.03875rem);
+  overflow: visible;
+}
+.button2 {
+  background: #f38f47;
+  border-radius: 0.5rem;
+  padding: 0.875rem 1.5rem 0.875rem 1.5rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  width: 32.1875rem;
+  position: absolute;
+  left: 28.875rem;
+  top: 34rem;
+  box-shadow: var(
+    --button-shadow-box-shadow,
+    0rem 0.0625rem 0.125rem 0rem rgba(0, 0, 0, 0.05)
+  );
+}
+.view-progress {
+  color: #000000;
+  text-align: left;
+  font-family: "CrimsonText-SemiBold", sans-serif;
+  font-size: 1rem;
+  line-height: 150%;
+  font-weight: 600;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.top {
+    color: #000000;
+  text-align: left;
+  font-family: "NovaFlat-Book", sans-serif;
+  font-size: 4rem;
+  line-height: 150%;
+  font-weight: 400;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
