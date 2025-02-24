@@ -155,6 +155,21 @@
 		}
 	}
 
+	// Check if the move is valid based on walls
+	function isMoveValid(newRow: number, newCol: number): boolean {
+		if (newRow < 0 || newRow >= rows || newCol < 0 || newCol >= cols) {
+			return false; // Out of bounds
+		}
+
+		const currentCell = maze[targetRow][targetCol];
+		if (newRow < targetRow && currentCell.walls.top) return false; // Moving up
+		if (newRow > targetRow && currentCell.walls.bottom) return false; // Moving down
+		if (newCol < targetCol && currentCell.walls.left) return false; // Moving left
+		if (newCol > targetCol && currentCell.walls.right) return false; // Moving right
+
+		return true; // Move is valid
+	}
+
 	// Handle arrow keys or WASD key presses to move the player.
 	function handleKeyDown(e: KeyboardEvent) {
 		let newRow = targetRow;
@@ -168,17 +183,17 @@
 		} else if (e.key === 'ArrowRight' || e.key === 'd') {
 			newCol = targetCol + 1;
 		}
-		// Check boundries
-		// TODO: Wall collision detection
-		if (newRow < 0 || newRow >= rows || newCol < 0 || newCol >= cols) return;
 
-		targetRow = newRow;
-		targetCol = newCol;
+		// Check boundaries and wall collision
+		if (isMoveValid(newRow, newCol)) {
+			targetRow = newRow;
+			targetCol = newCol;
 
-		// Start animating if not already.
-		if (!animating) {
-			animating = true;
-			requestAnimationFrame(animate);
+			// Start animating if not already.
+			if (!animating) {
+				animating = true;
+				requestAnimationFrame(animate);
+			}
 		}
 	}
 </script>
