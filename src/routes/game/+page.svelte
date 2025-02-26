@@ -305,16 +305,32 @@
 				<h2>Solve this problem to continue</h2>
 				<p class="question">{currentProblem.question}</p>
 
-				<div class="answer-section">
-					<input
-						type="text"
-						bind:value={userAnswer}
-						placeholder="Your answer"
-						on:keydown={(e) => e.key === 'Enter' && checkAnswer()}
-						autofocus
-					/>
-					<button on:click={checkAnswer}>Submit</button>
-				</div>
+				{#if currentProblem.answer === "ones" || currentProblem.answer === "tens" || currentProblem.answer === "hundreds"}
+					<!-- Multiple choice for place value questions -->
+					<div class="multiple-choice">
+						<button class="choice-btn" on:click={() => { userAnswer = "ones"; checkAnswer(); }}>
+							Ones
+						</button>
+						<button class="choice-btn" on:click={() => { userAnswer = "tens"; checkAnswer(); }}>
+							Tens
+						</button>
+						<button class="choice-btn" on:click={() => { userAnswer = "hundreds"; checkAnswer(); }}>
+							Hundreds
+						</button>
+					</div>
+				{:else}
+					<!-- Regular input for other question types -->
+					<div class="answer-section">
+						<input
+							type="text"
+							bind:value={userAnswer}
+							placeholder="Your answer"
+							on:keydown={(e) => e.key === 'Enter' && checkAnswer()}
+							autofocus
+						/>
+						<button on:click={checkAnswer}>Submit</button>
+					</div>
+				{/if}
 
 				{#if problemResult === 'correct'}
 					<p class="result correct">Correct! You may proceed.</p>
@@ -372,6 +388,20 @@
 		justify-content: center;
 		gap: 1rem;
 		margin: 1.5rem 0;
+	}
+
+	.multiple-choice {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.75rem;
+		margin: 1.5rem 0;
+	}
+
+	.choice-btn {
+		width: 200px;
+		padding: 0.75rem 1rem;
+		font-size: 1.1rem;
 	}
 
 	input {
