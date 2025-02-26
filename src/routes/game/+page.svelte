@@ -9,6 +9,7 @@
 	const cellSize = 40; // Path size in pixels
 	const wallThickness = 40;
 
+	let goalCell: Cell;
 	let maze: Cell[][] = [];
 	let canvas: HTMLCanvasElement;
 
@@ -34,7 +35,9 @@
 
 	onMount(() => {
 		if (typeof window !== 'undefined') {
-			maze = generateMaze(rows, cols);
+			const mazeData = generateMaze(rows, cols);
+			maze = mazeData.maze;
+			goalCell = mazeData.goal;
 			draw();
 			updateTransform();
 			window.addEventListener('keydown', handleKeyDown);
@@ -64,12 +67,18 @@
 		ctx.fillStyle = 'black';
 		ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-		// Draw each cell's path (white rectangle).
-		ctx.fillStyle = 'white';
+		// Draw each cell's path (white rectangle or green for goal).
 		for (let r = 0; r < rows; r++) {
 			for (let c = 0; c < cols; c++) {
+				const cell = maze[r][c];
 				const x = wallThickness + c * (cellSize + wallThickness);
 				const y = wallThickness + r * (cellSize + wallThickness);
+
+				if (cell.isGoal) {
+					ctx.fillStyle = 'green';
+				} else {
+					ctx.fillStyle = 'white';
+				}
 				ctx.fillRect(x, y, cellSize, cellSize);
 			}
 		}
@@ -188,6 +197,11 @@
 		if (isMoveValid(newRow, newCol)) {
 			targetRow = newRow;
 			targetCol = newCol;
+			// Check if player reached the goal
+			if (maze[newRow][newCol].isGoal) {
+				alert('Congratulations! You reached the goal!');
+				// You can add more code here to handle winning
+			}
 
 			// Start animating if not already.
 			if (!animating) {
