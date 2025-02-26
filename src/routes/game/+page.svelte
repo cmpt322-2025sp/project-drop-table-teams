@@ -2,6 +2,11 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { generateMaze } from '$lib/Maze';
 	import type { Cell } from '$lib/Maze';
+	import {
+		generateRandomProblem,
+		generateRandomPlaceValueProblem,
+		type MathProblem
+	} from '$lib/mathproblems';
 
 	// Maze settings
 	const rows = 10;
@@ -12,6 +17,13 @@
 	let goalCell: Cell;
 	let maze: Cell[][] = [];
 	let canvas: HTMLCanvasElement;
+
+	// Math problem state
+	let showMathProblem = false;
+	let currentProblem: MathProblem | null = null;
+	let userAnswer = '';
+	let attemptedCell: Cell | null = null;
+	let problemResult: 'correct' | 'incorrect' | null = null;
 
 	// Player starting position (center of maze for now).
 	let targetRow = Math.floor(rows / 2);
@@ -67,7 +79,7 @@
 		ctx.fillStyle = 'black';
 		ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-		// Draw each cell's path (white rectangle or green for goal).
+		// Draw each cell's path (white rectangle, green for goal, or brown for intersections).
 		for (let r = 0; r < rows; r++) {
 			for (let c = 0; c < cols; c++) {
 				const cell = maze[r][c];
@@ -76,6 +88,8 @@
 
 				if (cell.isGoal) {
 					ctx.fillStyle = 'green';
+				} else if (cell.isIntersection && !cell.mathProblemSolved) {
+					ctx.fillStyle = 'brown'; // Mark unsolved intersections as brown
 				} else {
 					ctx.fillStyle = 'white';
 				}
@@ -179,8 +193,62 @@
 		return true; // Move is valid
 	}
 
+	// Generate a math problem for the intersection
+	function generateMathProblem(): MathProblem {
+		// Randomly choose between regular math problems and place value problems
+		return Math.random() < 0.5 ? generateRandomProblem() : generateRandomPlaceValueProblem();
+	}
+
+	// Check the user's answer to the math problem
+	function checkAnswer() {
+		if (!currentProblem || !attemptedCell) return;
+
+		// Convert both to strings for comparison (handles both number and string answers)
+		const isCorrect = userAnswer.trim() === currentProblem.answer.toString();
+
+		if (isCorrect) {
+			problemResult = 'correct';
+			// Mark the problem as solved
+			if (attemptedCell) {
+				attemptedCell.mathProblemSolved = true;
+				// Allow movement to the cell
+				targetRow = attemptedCell.row;
+				targetCol = attemptedCell.col;
+
+				// Check if player reached the goal
+				if (attemptedCell.isGoal) {
+					setTimeout(() => {
+						alert('Congratulations! You reached the goal!');
+					}, 500);
+				}
+
+				// Start animating
+				if (!animating) {
+					animating = true;
+					requestAnimationFrame(animate);
+				}
+
+				// Close the math problem modal after a short delay
+				setTimeout(() => {
+					showMathProblem = false;
+					currentProblem = null;
+					userAnswer = '';
+					attemptedCell = null;
+					problemResult = null;
+				}, 1000);
+			}
+		} else {
+			problemResult = 'incorrect';
+			// Clear the answer for another attempt
+			userAnswer = '';
+		}
+	}
+
 	// Handle arrow keys or WASD key presses to move the player.
 	function handleKeyDown(e: KeyboardEvent) {
+		// If math problem is showing, don't allow movement
+		if (showMathProblem) return;
+
 		let newRow = targetRow;
 		let newCol = targetCol;
 		if (e.key === 'ArrowUp' || e.key === 'w') {
@@ -195,18 +263,31 @@
 
 		// Check boundaries and wall collision
 		if (isMoveValid(newRow, newCol)) {
-			targetRow = newRow;
-			targetCol = newCol;
-			// Check if player reached the goal
-			if (maze[newRow][newCol].isGoal) {
-				alert('Congratulations! You reached the goal!');
-				// You can add more code here to handle winning
-			}
+			const targetCell = maze[newRow][newCol];
 
-			// Start animating if not already.
-			if (!animating) {
-				animating = true;
-				requestAnimationFrame(animate);
+			// Check if the cell has an unsolved math problem
+			if (targetCell.hasMathProblem && !targetCell.mathProblemSolved) {
+				// Show math problem
+				showMathProblem = true;
+				currentProblem = generateMathProblem();
+				attemptedCell = targetCell;
+				userAnswer = '';
+				problemResult = null;
+			} else {
+				// Normal movement
+				targetRow = newRow;
+				targetCol = newCol;
+
+				// Check if player reached the goal
+				if (targetCell.isGoal) {
+					alert('Congratulations! You reached the goal!');
+				}
+
+				// Start animating if not already.
+				if (!animating) {
+					animating = true;
+					requestAnimationFrame(animate);
+				}
 			}
 		}
 	}
@@ -216,6 +297,32 @@
 <div class="viewport">
 	<canvas bind:this={canvas} style="transform: scale({zoom}) translate({offsetX}px, {offsetY}px);"
 	></canvas>
+
+	<!-- Math problem modal -->
+	{#if showMathProblem && currentProblem}
+		<div class="math-problem-modal">
+			<div class="math-problem-content">
+				<h2>Solve this problem to continue</h2>
+				<p class="question">{currentProblem.question}</p>
+
+				<div class="answer-section">
+					<input
+						type="text"
+						bind:value={userAnswer}
+						placeholder="Your answer"
+						on:keydown={(e) => e.key === 'Enter' && checkAnswer()}
+					/>
+					<button on:click={checkAnswer}>Submit</button>
+				</div>
+
+				{#if problemResult === 'correct'}
+					<p class="result correct">Correct! You may proceed.</p>
+				{:else if problemResult === 'incorrect'}
+					<p class="result incorrect">Incorrect. Try again.</p>
+				{/if}
+			</div>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -225,8 +332,78 @@
 		overflow: hidden;
 		border: 2px solid #333;
 		margin: auto;
+		position: relative;
 	}
 	canvas {
 		transform-origin: top left;
+	}
+
+	.math-problem-modal {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.7);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		z-index: 10;
+	}
+
+	.math-problem-content {
+		background-color: white;
+		padding: 2rem;
+		border-radius: 8px;
+		width: 80%;
+		max-width: 500px;
+		text-align: center;
+	}
+
+	.question {
+		font-size: 1.5rem;
+		margin: 1.5rem 0;
+		white-space: pre-line; /* Preserves line breaks in questions */
+	}
+
+	.answer-section {
+		display: flex;
+		justify-content: center;
+		gap: 1rem;
+		margin: 1.5rem 0;
+	}
+
+	input {
+		padding: 0.5rem;
+		font-size: 1rem;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+	}
+
+	button {
+		padding: 0.5rem 1rem;
+		background-color: #4caf50;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 1rem;
+	}
+
+	button:hover {
+		background-color: #45a049;
+	}
+
+	.result {
+		font-weight: bold;
+		margin-top: 1rem;
+	}
+
+	.correct {
+		color: green;
+	}
+
+	.incorrect {
+		color: red;
 	}
 </style>

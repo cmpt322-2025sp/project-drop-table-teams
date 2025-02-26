@@ -10,6 +10,10 @@ export interface Cell {
 		bottom: boolean;
 		left: boolean;
 	};
+	isIntersection?: boolean; // Add a property to mark intersections
+	hasMathProblem?: boolean; // Whether this cell has a math problem
+	mathProblemSolved?: boolean; // Whether the math problem has been solved
+	mathProblemType?: string; // Could be 'addition', 'subtraction', etc.
 	isGoal?: boolean; // Add a property to mark the goal cell
 }
 
@@ -54,7 +58,10 @@ export function generateMaze(rows: number, cols: number): { maze: Cell[][]; goal
 				row: r,
 				col: c,
 				walls: { top: true, right: true, bottom: true, left: true },
-				isGoal: false
+				isGoal: false,
+				isIntersection: false,
+				hasMathProblem: false,
+				mathProblemSolved: false
 			});
 		}
 		grid.push(row);
@@ -129,6 +136,33 @@ export function generateMaze(rows: number, cols: number): { maze: Cell[][]; goal
 	const randomIndex = Math.floor(Math.random() * borderCells.length);
 	goal = borderCells[randomIndex];
 	goal.isGoal = true; // Mark the goal cell
+
+	// Identify intersections (cells with 3 or more passages)
+	for (let r = 0; r < rows; r++) {
+		for (let c = 0; c < cols; c++) {
+			const cell = grid[r][c];
+
+			// Skip the goal cell - we don't want to put a math problem there
+			if (cell.isGoal) continue;
+
+			// Count passages (openings without walls)
+			let passages = 0;
+			if (!cell.walls.top) passages++;
+			if (!cell.walls.right) passages++;
+			if (!cell.walls.bottom) passages++;
+			if (!cell.walls.left) passages++;
+
+			// If there are 3 or more passages, it's an intersection
+			if (passages >= 3) {
+				cell.isIntersection = true;
+				cell.hasMathProblem = true;
+
+				// Assign a random math problem type
+				const problemTypes = ['addition', 'subtraction', 'multiplication'];
+				cell.mathProblemType = problemTypes[Math.floor(Math.random() * problemTypes.length)];
+			}
+		}
+	}
 
 	return { maze: grid, goal };
 }
