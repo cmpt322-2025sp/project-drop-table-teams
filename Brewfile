@@ -1,4 +1,4 @@
-tap "homebrew/bundle"
+tap "Homebrew/bundle"
 tap "supabase/tap"
 brew "supabase/tap/supabase"
 brew "bun"
