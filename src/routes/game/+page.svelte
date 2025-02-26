@@ -311,6 +311,7 @@
 						bind:value={userAnswer}
 						placeholder="Your answer"
 						on:keydown={(e) => e.key === 'Enter' && checkAnswer()}
+						autofocus
 					/>
 					<button on:click={checkAnswer}>Submit</button>
 				</div>
