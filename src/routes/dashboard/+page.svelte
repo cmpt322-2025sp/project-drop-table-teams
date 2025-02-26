@@ -12,7 +12,7 @@
     </div>
     <div class="top">Math Maze</div>
     <div class="button">
-      <div class="start-game">START GAME</div>
+      <button><a href="http://localhost:5173/game">START GAME</a></button>
     </div>
     <svg
       class="union"
@@ -50,7 +50,7 @@
       left: 0px !important;
       top: 0px !important;
     }
-    .property-1-default .button {
+    button {
       background: #ff9d00;
       border-radius: 8px;
       padding: 14px 24px 14px 24px;
@@ -69,7 +69,7 @@
         0px 1px 2px 0px rgba(0, 0, 0, 0.05)
       );
     }
-    .property-1-default .start-game {
+    a:link {
       color: #000000;
       text-align: left;
       font-family: "NovaFlat-Book", sans-serif;
