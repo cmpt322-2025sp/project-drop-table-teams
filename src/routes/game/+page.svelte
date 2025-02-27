@@ -244,8 +244,14 @@
 			}
 		} else {
 			problemResult = 'incorrect';
-			// Clear the answer for another attempt
-			userAnswer = '';
+			
+			// Show the correct answer and generate a new problem after a delay
+			setTimeout(() => {
+				// Generate a new problem after showing the correct answer
+				currentProblem = generateMathProblem();
+				userAnswer = '';
+				problemResult = null;
+			}, 1500);
 		}
 	}
 
@@ -345,7 +351,7 @@
 				{#if problemResult === 'correct'}
 					<p class="result correct">Correct! You may proceed.</p>
 				{:else if problemResult === 'incorrect'}
-					<p class="result incorrect">Incorrect. Try again.</p>
+					<p class="result incorrect">Incorrect. The correct answer is {currentProblem.answer}.</p>
 				{/if}
 			</div>
 		</div>
