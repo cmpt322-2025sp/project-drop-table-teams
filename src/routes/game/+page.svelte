@@ -156,7 +156,7 @@
 	}
 
 	// Animate the transition from the current displayed position to the target.
-	function animate() {
+	function animate(onComplete?: () => void) {
 		// Linear interpolation helper.
 		const lerp = (start: number, end: number, t: number) => start + (end - start) * t;
 
@@ -173,8 +173,11 @@
 			displayedRow = targetRow;
 			displayedCol = targetCol;
 			animating = false;
+			
+			// Call the completion callback if provided
+			if (onComplete) onComplete();
 		} else {
-			requestAnimationFrame(animate);
+			requestAnimationFrame(() => animate(onComplete));
 		}
 	}
 
@@ -211,21 +214,21 @@
 			// Mark the problem as solved
 			if (attemptedCell) {
 				attemptedCell.mathProblemSolved = true;
-				// Allow movement to the cell
-				targetRow = attemptedCell.row;
-				targetCol = attemptedCell.col;
-
-				// Check if player reached the goal
-				if (attemptedCell.isGoal) {
+				
+				// The player is already at the correct position, just keep them there
+				// We don't need to change targetRow and targetCol
+                
+				// Immediately redraw the maze to update the block appearance
+				draw();
+				
+				// Handle goal check and close math problem
+				const isGoalCell = attemptedCell.isGoal;
+				
+				// Display goal message if needed (after closing the problem dialog)
+				if (isGoalCell) {
 					setTimeout(() => {
 						alert('Congratulations! You reached the goal!');
-					}, 500);
-				}
-
-				// Start animating
-				if (!animating) {
-					animating = true;
-					requestAnimationFrame(animate);
+					}, 1200); // Slightly longer than the modal closing timeout
 				}
 
 				// Close the math problem modal after a short delay
@@ -235,6 +238,8 @@
 					userAnswer = '';
 					attemptedCell = null;
 					problemResult = null;
+					// Redraw one more time to ensure everything is updated
+					draw();
 				}, 1000);
 			}
 		} else {
@@ -246,8 +251,8 @@
 
 	// Handle arrow keys or WASD key presses to move the player.
 	function handleKeyDown(e: KeyboardEvent) {
-		// If math problem is showing, don't allow movement
-		if (showMathProblem) return;
+		// If math problem is showing or currently animating, don't allow movement
+		if (showMathProblem || animating) return;
 
 		let newRow = targetRow;
 		let newCol = targetCol;
@@ -265,30 +270,32 @@
 		if (isMoveValid(newRow, newCol)) {
 			const targetCell = maze[newRow][newCol];
 
-			// Check if the cell has an unsolved math problem
-			if (targetCell.hasMathProblem && !targetCell.mathProblemSolved) {
-				// Show math problem
-				showMathProblem = true;
-				currentProblem = generateMathProblem();
-				attemptedCell = targetCell;
-				userAnswer = '';
-				problemResult = null;
-			} else {
-				// Normal movement
-				targetRow = newRow;
-				targetCol = newCol;
+			// Normal movement first, then check for special cases after animation
+			targetRow = newRow;
+			targetCol = newCol;
 
-				// Check if player reached the goal
-				if (targetCell.isGoal) {
+			// Start animating
+			animating = true;
+			
+			// Handle math problems or goal after animation completes
+			requestAnimationFrame(() => animate(() => {
+				// After animation completes, check if cell has math problem
+				if (targetCell.hasMathProblem && !targetCell.mathProblemSolved) {
+					// Show math problem after movement completes
+					showMathProblem = true;
+					currentProblem = generateMathProblem();
+					attemptedCell = targetCell;
+					userAnswer = '';
+					problemResult = null;
+					
+					// Keep the player at the current position when showing math problem
+					// This prevents the view from jumping around when the math problem appears
+				} 
+				// Check if player reached the goal after animation completes
+				else if (targetCell.isGoal) {
 					alert('Congratulations! You reached the goal!');
 				}
-
-				// Start animating if not already.
-				if (!animating) {
-					animating = true;
-					requestAnimationFrame(animate);
-				}
-			}
+			}));
 		}
 	}
 </script>
