@@ -9,8 +9,8 @@
 	} from '$lib/mathproblems';
 
 	// Maze settings
-	const rows = 10;
-	const cols = 10;
+	const rows = 5;
+	const cols = 5;
 	const cellSize = 40; // Path size in pixels
 	const wallThickness = 40;
 
@@ -501,4 +501,3 @@
 		color: red;
 	}
 </style>
-
