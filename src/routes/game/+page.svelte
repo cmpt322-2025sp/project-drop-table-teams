@@ -303,9 +303,9 @@
 		<div class="math-problem-modal">
 			<div class="math-problem-content">
 				<h2>Solve this problem to continue</h2>
-				<p class="question">{currentProblem.question}</p>
+				<p class="question">{@html currentProblem.question}</p>
 
-				{#if currentProblem.answer === "ones" || currentProblem.answer === "tens" || currentProblem.answer === "hundreds"}
+				{#if currentProblem.answer === "ones" || currentProblem.answer === "tens" || currentProblem.answer === "hundreds" || currentProblem.answer === "thousands"}
 					<!-- Multiple choice for place value questions -->
 					<div class="multiple-choice">
 						<button class="choice-btn" on:click={() => { userAnswer = "ones"; checkAnswer(); }}>
@@ -316,6 +316,9 @@
 						</button>
 						<button class="choice-btn" on:click={() => { userAnswer = "hundreds"; checkAnswer(); }}>
 							Hundreds
+						</button>
+						<button class="choice-btn" on:click={() => { userAnswer = "thousands"; checkAnswer(); }}>
+							Thousands
 						</button>
 					</div>
 				{:else}
@@ -381,6 +384,30 @@
 		font-size: 1.5rem;
 		margin: 1.5rem 0;
 		white-space: pre-line; /* Preserves line breaks in questions */
+	}
+	
+	:global(.number-place-display) {
+		display: inline-block;
+		text-align: left;
+		margin: 1rem auto;
+	}
+	
+	:global(.number-place-display pre) {
+		margin: 0;
+		font-size: 2rem;
+		line-height: 1.2;
+		font-family: monospace;
+	}
+	
+	:global(.digit) {
+		display: inline-block;
+		width: 1em;
+		text-align: center;
+	}
+	
+	:global(.highlight) {
+		color: #ff3e00;
+		font-weight: bold;
 	}
 
 	.answer-section {

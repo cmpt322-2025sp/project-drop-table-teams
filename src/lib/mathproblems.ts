@@ -58,11 +58,13 @@ export function generateRandomProblem(): MathProblem {
 export function generateRandomPlaceValueProblem(min = 10, max = 999): MathProblem {
   const number = Math.floor(Math.random() * (max - min + 1)) + min;
   const numberStr = number.toString();
-  const placeValues = ["ones", "tens", "hundreds"];
+  const placeValues = ["ones", "tens", "hundreds", "thousands"];
 
   if (Math.random() < 0.5) {
     // Place value question (What is the digit in the X place?)
-    const index = Math.floor(Math.random() * placeValues.length);
+    // Only use place values that actually exist in the current number
+    const maxPlaceIndex = Math.min(numberStr.length - 1, placeValues.length - 1);
+    const index = Math.floor(Math.random() * (maxPlaceIndex + 1));
     const place = placeValues[index];
 
     let answer: number = 0;
@@ -74,7 +76,10 @@ export function generateRandomPlaceValueProblem(min = 10, max = 999): MathProble
         answer = Math.floor((number / 10) % 10);
         break;
       case "hundreds":
-        answer = Math.floor(number / 100);
+        answer = Math.floor((number / 100) % 10);
+        break;
+      case "thousands":
+        answer = Math.floor((number / 1000) % 10);
         break;
     }
 
@@ -84,14 +89,30 @@ export function generateRandomPlaceValueProblem(min = 10, max = 999): MathProble
     };
   } else {
     // Number place identification question (What number place is this?)
-    const digitIndex = Math.floor(Math.random() * numberStr.length); // Randomly select a digit
-    const caretLine = " ".repeat(digitIndex) + "^"; // Create the ^ pointer below the digit
-
-    const place = placeValues[numberStr.length - digitIndex - 1]; // Determine the place name
+    // First randomly select a place value (ones, tens, hundreds, etc.)
+    const maxPlaceIndex = Math.min(numberStr.length - 1, placeValues.length - 1);
+    const placeIndex = Math.floor(Math.random() * (maxPlaceIndex + 1));
+    const place = placeValues[placeIndex];
+    
+    // Then calculate which digit position corresponds to that place value
+    // Example: for "ones" in "123", we want index 2
+    //          for "tens" in "123", we want index 1
+    //          for "hundreds" in "123", we want index 0
+    const digitIndex = numberStr.length - placeIndex - 1;
+    
+    // Create our display as HTML with precise positioning
+    // We'll use a table-like structure to ensure alignment
+    // It's important to use a pre tag to preserve our spacing
+    const alignedDisplay = `<div class="number-place-display">
+  <pre>
+${numberStr.split('').map((digit, i) => `<span class="digit${i === digitIndex ? ' highlight' : ''}">${digit}</span>`).join('')}
+${numberStr.split('').map((digit, i) => `<span class="digit">${i === digitIndex ? '⬆' : ' '}</span>`).join('')}
+  </pre>
+</div>`;
 
     return {
-      question: `What number place is this?\n${numberStr}\n${caretLine}`,
-      answer: place, // Answer is "ones", "tens", or "hundreds"
+      question: `What number place is this?\n${alignedDisplay}`,
+      answer: place, // Answer is "ones", "tens", "hundreds", or "thousands"
     };
   }
 }
