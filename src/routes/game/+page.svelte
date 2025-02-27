@@ -173,7 +173,7 @@
 			displayedRow = targetRow;
 			displayedCol = targetCol;
 			animating = false;
-			
+
 			// Call the completion callback if provided
 			if (onComplete) onComplete();
 		} else {
@@ -214,16 +214,13 @@
 			// Mark the problem as solved
 			if (attemptedCell) {
 				attemptedCell.mathProblemSolved = true;
-				
-				// The player is already at the correct position, just keep them there
-				// We don't need to change targetRow and targetCol
-                
+
 				// Immediately redraw the maze to update the block appearance
 				draw();
-				
+
 				// Handle goal check and close math problem
 				const isGoalCell = attemptedCell.isGoal;
-				
+
 				// Display goal message if needed (after closing the problem dialog)
 				if (isGoalCell) {
 					setTimeout(() => {
@@ -244,7 +241,7 @@
 			}
 		} else {
 			problemResult = 'incorrect';
-			
+
 			// Show the correct answer and generate a new problem after a delay
 			setTimeout(() => {
 				// Generate a new problem after showing the correct answer
@@ -282,26 +279,28 @@
 
 			// Start animating
 			animating = true;
-			
+
 			// Handle math problems or goal after animation completes
-			requestAnimationFrame(() => animate(() => {
-				// After animation completes, check if cell has math problem
-				if (targetCell.hasMathProblem && !targetCell.mathProblemSolved) {
-					// Show math problem after movement completes
-					showMathProblem = true;
-					currentProblem = generateMathProblem();
-					attemptedCell = targetCell;
-					userAnswer = '';
-					problemResult = null;
-					
-					// Keep the player at the current position when showing math problem
-					// This prevents the view from jumping around when the math problem appears
-				} 
-				// Check if player reached the goal after animation completes
-				else if (targetCell.isGoal) {
-					alert('Congratulations! You reached the goal!');
-				}
-			}));
+			requestAnimationFrame(() =>
+				animate(() => {
+					// After animation completes, check if cell has math problem
+					if (targetCell.hasMathProblem && !targetCell.mathProblemSolved) {
+						// Show math problem after movement completes
+						showMathProblem = true;
+						currentProblem = generateMathProblem();
+						attemptedCell = targetCell;
+						userAnswer = '';
+						problemResult = null;
+
+						// Keep the player at the current position when showing math problem
+						// This prevents the view from jumping around when the math problem appears
+					}
+					// Check if player reached the goal after animation completes
+					else if (targetCell.isGoal) {
+						alert('Congratulations! You reached the goal!');
+					}
+				})
+			);
 		}
 	}
 </script>
@@ -318,19 +317,43 @@
 				<h2>Solve this problem to continue</h2>
 				<p class="question">{@html currentProblem.question}</p>
 
-				{#if currentProblem.answer === "ones" || currentProblem.answer === "tens" || currentProblem.answer === "hundreds" || currentProblem.answer === "thousands"}
+				{#if currentProblem.answer === 'ones' || currentProblem.answer === 'tens' || currentProblem.answer === 'hundreds' || currentProblem.answer === 'thousands'}
 					<!-- Multiple choice for place value questions -->
 					<div class="multiple-choice">
-						<button class="choice-btn" on:click={() => { userAnswer = "ones"; checkAnswer(); }}>
+						<button
+							class="choice-btn"
+							on:click={() => {
+								userAnswer = 'ones';
+								checkAnswer();
+							}}
+						>
 							Ones
 						</button>
-						<button class="choice-btn" on:click={() => { userAnswer = "tens"; checkAnswer(); }}>
+						<button
+							class="choice-btn"
+							on:click={() => {
+								userAnswer = 'tens';
+								checkAnswer();
+							}}
+						>
 							Tens
 						</button>
-						<button class="choice-btn" on:click={() => { userAnswer = "hundreds"; checkAnswer(); }}>
+						<button
+							class="choice-btn"
+							on:click={() => {
+								userAnswer = 'hundreds';
+								checkAnswer();
+							}}
+						>
 							Hundreds
 						</button>
-						<button class="choice-btn" on:click={() => { userAnswer = "thousands"; checkAnswer(); }}>
+						<button
+							class="choice-btn"
+							on:click={() => {
+								userAnswer = 'thousands';
+								checkAnswer();
+							}}
+						>
 							Thousands
 						</button>
 					</div>
@@ -398,26 +421,26 @@
 		margin: 1.5rem 0;
 		white-space: pre-line; /* Preserves line breaks in questions */
 	}
-	
+
 	:global(.number-place-display) {
 		display: inline-block;
 		text-align: left;
 		margin: 1rem auto;
 	}
-	
+
 	:global(.number-place-display pre) {
 		margin: 0;
 		font-size: 2rem;
 		line-height: 1.2;
 		font-family: monospace;
 	}
-	
+
 	:global(.digit) {
 		display: inline-block;
 		width: 1em;
 		text-align: center;
 	}
-	
+
 	:global(.highlight) {
 		color: #ff3e00;
 		font-weight: bold;
@@ -478,3 +501,4 @@
 		color: red;
 	}
 </style>
+
