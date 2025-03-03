@@ -15,6 +15,7 @@ Thumbs.db
 # Env
 .env
 .env.*
+<<<<<<< HEAD
 !.env.example
 !.env.test
 
@@ -27,3 +28,6 @@ flake.lock
 
 # Claude code
 CLAUDE.md
+
+# svelte data
+.svelte-kit/
