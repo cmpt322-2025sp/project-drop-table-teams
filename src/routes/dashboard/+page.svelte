@@ -1,4 +1,6 @@
-  <div class="property-1-default">
+
+<div class="property-1-default">
+  
     <div class="dashboard">
       <!--
       <div class="navigation">
@@ -10,10 +12,12 @@
       </div>
       -->
     </div>
-    <div class="top">Math Maze</div>
+    
     <div class="button">
-      <button><a href="http://localhost:5173/game">START GAME</a></button>
+      <!-- <button><a href="http://localhost:5173/game">START GAME</a></button> -->
+      <a href="http://localhost:5173/game"><button>START GAME</button></a>
     </div>
+    
     <svg
       class="union"
       width="175"
@@ -32,24 +36,36 @@
     <div class="button2">
       <div class="view-progress">View Progress</div>
     </div>
+    <div class="top">Math Maze</div>
   </div>
 
   <style>
-    .property-1-default,
-    .property-1-default * {
-      box-sizing: border-box;
-    }
-    .property-1-default {
-      height: 1024px;
-      position: relative;
-    }
-    .property-1-default :global(.dashboard-instance) {
-      width: 1440px !important;
-      height: 1024px !important;
-      position: absolute !important;
-      left: 0px !important;
-      top: 0px !important;
-    }
+    
+    .top {
+    color: #000000;
+  text-align: center;
+  font-family: "NovaFlat-Book", sans-serif;
+  font-size: 650%;
+  line-height: 150%;
+  font-weight: 400;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 14px 400px 14px 400px;
+}
+
+    .dashboard {
+  background: #769576;
+  width: 90rem;
+  height: 64rem;
+  position: absolute;
+  left: 0rem;
+  top: 0rem;
+  overflow: hidden;
+}
+
+    /* Start button for now */
     button {
       background: #ff9d00;
       border-radius: 8px;
@@ -68,19 +84,41 @@
         --button-shadow-box-shadow,
         0px 1px 2px 0px rgba(0, 0, 0, 0.05)
       );
-    }
-    a:link {
+      text-align: center;
+      font-size: 300%;
+      font-weight: bold;
       color: #000000;
-      text-align: left;
       font-family: "NovaFlat-Book", sans-serif;
-      font-size: 64px;
-      line-height: 150%;
-      font-weight: 400;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
     }
+
+    button:hover {
+		transform: translateY(-3px);
+		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+	}
+
+    button:active {
+		transform: translateY(1px);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	}
+
+    button::after {
+		content: '';
+		position: absolute;
+		background: rgba(255, 255, 255, 0.3);
+		width: 100%;
+		height: 100%;
+		left: -100%;
+		top: 0;
+		border-radius: 50px;
+		z-index: -1;
+		transition: all 0.4s ease;
+	}
+
+    button:hover::after {
+		left: 0;
+	}
+    
+  /* Other random properities */
     .property-1-default .union {
       width: 172.86px;
       height: 64px;
@@ -121,11 +159,54 @@
       justify-content: flex-start;
     }
 
-  .top {
-  color: #000000;
-  text-align: center;
-  font-size: 72px;
-  line-height: 150%;
-  font-weight: 400;
-}
+  
+
+
+/* Theme button from Game
+.theme-button {
+		background-color: #FFEB3B;
+		color: #333;
+		border: none;
+		border-radius: 50px;
+		padding: 0.75rem 1.5rem;
+		font-size: 1.1rem;
+		font-weight: bold;
+		margin-bottom: 1rem;
+		cursor: pointer;
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+		transition: all 0.2s ease;
+		font-family: 'Comic Sans MS', cursive, sans-serif;
+		position: relative;
+		overflow: hidden;
+		z-index: 1;
+	}
+	
+	.theme-button:hover {
+		transform: translateY(-3px);
+		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+	}
+	
+	.theme-button:active {
+		transform: translateY(1px);
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	}
+	
+	.theme-button::after {
+		content: '';
+		position: absolute;
+		background: rgba(255, 255, 255, 0.3);
+		width: 100%;
+		height: 100%;
+		left: -100%;
+		top: 0;
+		border-radius: 50px;
+		z-index: -1;
+		transition: all 0.4s ease;
+	}
+	
+	.theme-button:hover::after {
+		left: 0;
+	}
+
+  */
   </style>
