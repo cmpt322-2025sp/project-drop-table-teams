@@ -54,7 +54,7 @@
 
 	// Add celebration visuals
 	let showCelebration = false;
-	
+
 	// Add background theme
 	const themes = ['space', 'ocean', 'jungle', 'candy'];
 	let currentTheme = themes[Math.floor(Math.random() * themes.length)];
@@ -64,18 +64,18 @@
 			const mazeData = generateMaze(rows, cols);
 			maze = mazeData.maze;
 			goalCell = mazeData.goal;
-			
+
 			// Initialize the maze renderer
 			mazeRenderer = new MazeRenderer(canvas, cellSize, wallThickness, currentTheme);
 			const dimensions = mazeRenderer.calculateCanvasDimensions(rows, cols);
 			mazeRenderer.setCanvasDimensions(dimensions.width, dimensions.height);
 			canvasWidth = dimensions.width;
 			canvasHeight = dimensions.height;
-			
+
 			// Initial render
 			draw();
 			updateTransform();
-			
+
 			window.addEventListener('keydown', handleKeyDown);
 		}
 	});
@@ -86,13 +86,11 @@
 		}
 	});
 
-
 	// Draw the maze and player using the MazeRenderer
 	function draw() {
 		if (!canvas || !mazeRenderer) return;
 		mazeRenderer.render(maze, displayedRow, displayedCol);
 	}
-	
 
 	function updateTransform() {
 		// Check if window exists (i.e. code is running in the browser)
@@ -223,7 +221,7 @@
 
 		let newRow = targetRow;
 		let newCol = targetCol;
-		
+
 		if (direction === 'up') {
 			newRow = targetRow - 1;
 		} else if (direction === 'down') {
@@ -256,7 +254,7 @@
 						attemptedCell = targetCell;
 						userAnswer = '';
 						problemResult = null;
-						
+
 						// Focus the input element after the modal opens
 						setTimeout(() => {
 							if (answerInput) answerInput.focus();
@@ -295,7 +293,7 @@
 			movePlayer('right');
 		}
 	}
-	
+
 	// Change the maze theme
 	function changeTheme() {
 		const nextIndex = (themes.indexOf(currentTheme) + 1) % themes.length;
@@ -310,58 +308,60 @@
 <!-- Colorful background for the game page -->
 <div class="game-container {currentTheme}-theme">
 	<h1 class="game-title">Math Maze Adventure!</h1>
-	
+
 	<!-- Theme selection button -->
-	<Button 
-		variant="primary" 
-		rounded={true} 
-		size="md" 
+	<Button
+		variant="primary"
+		rounded={true}
+		size="md"
 		onClick={changeTheme}
 		style="background-color: #FFEB3B; color: #333; font-family: 'Comic Sans MS', cursive, sans-serif; margin-bottom: 1rem;"
 	>
 		Change Theme
 	</Button>
-	
+
 	<!-- Wrap the canvas in a viewport container -->
 	<div class="viewport">
-		<canvas bind:this={canvas} style="transform: scale({zoom}) translate({offsetX}px, {offsetY}px);"></canvas>
-		
+		<canvas bind:this={canvas} style="transform: scale({zoom}) translate({offsetX}px, {offsetY}px);"
+		></canvas>
+
 		<!-- On-screen controls for touchscreens or younger kids -->
 		{#if showControls}
 			<div class="control-buttons">
-				<Button 
-					variant="default" 
-					onClick={() => movePlayer('up')} 
+				<Button
+					variant="default"
+					onClick={() => movePlayer('up')}
 					icon={true}
 					style="background-color: rgba(255, 255, 255, 0.7); color: #333; margin-bottom: 0.5rem;"
-				>↑</Button>
+					>↑</Button
+				>
 				<div class="control-row">
-					<Button 
-						variant="default" 
-						onClick={() => movePlayer('left')} 
+					<Button
+						variant="default"
+						onClick={() => movePlayer('left')}
 						icon={true}
 						style="background-color: rgba(255, 255, 255, 0.7); color: #333; margin-right: 1rem;"
-					>←</Button>
-					<Button 
-						variant="default" 
-						onClick={() => movePlayer('right')} 
+						>←</Button
+					>
+					<Button
+						variant="default"
+						onClick={() => movePlayer('right')}
 						icon={true}
-						style="background-color: rgba(255, 255, 255, 0.7); color: #333;"
-					>→</Button>
+						style="background-color: rgba(255, 255, 255, 0.7); color: #333;">→</Button
+					>
 				</div>
-				<Button 
-					variant="default" 
-					onClick={() => movePlayer('down')} 
+				<Button
+					variant="default"
+					onClick={() => movePlayer('down')}
 					icon={true}
 					style="background-color: rgba(255, 255, 255, 0.7); color: #333; margin-top: 0.5rem;"
-				>↓</Button>
+					>↓</Button
+				>
 			</div>
 		{/if}
-		
+
 		<!-- Invalid move indicator -->
-		<div id="invalid-move" class="invalid-move">
-			Can't go that way!
-		</div>
+		<div id="invalid-move" class="invalid-move">Can't go that way!</div>
 
 		<!-- Math problem modal -->
 		{#if showMathProblem && currentProblem}
@@ -432,13 +432,13 @@
 								placeholder="Your answer"
 								on:keydown={(e) => e.key === 'Enter' && checkAnswer()}
 							/>
-							<Button 
-								variant="primary" 
-								size="md" 
+							<Button
+								variant="primary"
+								size="md"
 								rounded={true}
 								onClick={checkAnswer}
-								style="background-color: #9C27B0; color: white; margin-left: 0.5rem;"
-							>Submit</Button>
+								style="background-color: #9C27B0; color: white; margin-left: 0.5rem;">Submit</Button
+							>
 						</div>
 					{/if}
 
@@ -454,7 +454,7 @@
 				</div>
 			</div>
 		{/if}
-		
+
 		<!-- Celebration overlay when reaching the goal -->
 		{#if showCelebration}
 			<div class="celebration" role="dialog" aria-modal="true">
@@ -466,9 +466,9 @@
 						<div class="star">⭐</div>
 					</div>
 					<p>Great job solving the maze!</p>
-					<Button 
-						variant="primary" 
-						size="lg" 
+					<Button
+						variant="primary"
+						size="lg"
 						rounded={true}
 						onClick={() => window.location.reload()}
 						style="background-color: #FFEB3B; color: #333; font-weight: bold;"
@@ -495,28 +495,28 @@
 		overflow: hidden;
 		position: relative;
 	}
-	
+
 	/* Different theme backgrounds */
 	.space-theme {
 		background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
 		color: white;
 	}
-	
+
 	.ocean-theme {
-		background: linear-gradient(135deg, #1A237E, #0277BD, #00BCD4);
+		background: linear-gradient(135deg, #1a237e, #0277bd, #00bcd4);
 		color: white;
 	}
-	
+
 	.jungle-theme {
-		background: linear-gradient(135deg, #004D40, #00796B, #8BC34A);
+		background: linear-gradient(135deg, #004d40, #00796b, #8bc34a);
 		color: white;
 	}
-	
+
 	.candy-theme {
-		background: linear-gradient(135deg, #880E4F, #C2185B, #F06292);
+		background: linear-gradient(135deg, #880e4f, #c2185b, #f06292);
 		color: white;
 	}
-	
+
 	/* Game title */
 	.game-title {
 		font-size: 2.5rem;
@@ -526,21 +526,37 @@
 		animation: rainbow 6s linear infinite;
 		font-weight: bold;
 	}
-	
+
 	@keyframes rainbow {
-		0% { color: #ff5757; }
-		15% { color: #ffbd59; }
-		30% { color: #ffff47; }
-		45% { color: #7cff73; }
-		60% { color: #67d7ff; }
-		75% { color: #ae86ff; }
-		90% { color: #ff65e0; }
-		100% { color: #ff5757; }
+		0% {
+			color: #ff5757;
+		}
+		15% {
+			color: #ffbd59;
+		}
+		30% {
+			color: #ffff47;
+		}
+		45% {
+			color: #7cff73;
+		}
+		60% {
+			color: #67d7ff;
+		}
+		75% {
+			color: #ae86ff;
+		}
+		90% {
+			color: #ff65e0;
+		}
+		100% {
+			color: #ff5757;
+		}
 	}
-	
+
 	/* Theme button */
 	.theme-button {
-		background-color: #FFEB3B;
+		background-color: #ffeb3b;
 		color: #333;
 		border: none;
 		border-radius: 50px;
@@ -556,17 +572,17 @@
 		overflow: hidden;
 		z-index: 1;
 	}
-	
+
 	.theme-button:hover {
 		transform: translateY(-3px);
 		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
 	}
-	
+
 	.theme-button:active {
 		transform: translateY(1px);
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 	}
-	
+
 	.theme-button::after {
 		content: '';
 		position: absolute;
@@ -579,7 +595,7 @@
 		z-index: -1;
 		transition: all 0.4s ease;
 	}
-	
+
 	.theme-button:hover::after {
 		left: 0;
 	}
@@ -595,7 +611,7 @@
 		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 		background: rgba(255, 255, 255, 0.1);
 	}
-	
+
 	canvas {
 		transform-origin: top left;
 		transition: transform 0.3s ease;
@@ -612,12 +628,12 @@
 		gap: 0.5rem;
 		z-index: 5;
 	}
-	
+
 	.control-row {
 		display: flex;
 		gap: 1rem;
 	}
-	
+
 	.control-btn {
 		width: 3.5rem;
 		height: 3.5rem;
@@ -634,24 +650,24 @@
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 		transition: all 0.2s ease;
 	}
-	
+
 	.control-btn:hover {
 		background-color: rgba(255, 255, 255, 0.9);
 		transform: scale(1.1);
 	}
-	
+
 	.control-btn:active {
 		background-color: rgba(200, 200, 200, 0.9);
 		transform: scale(0.95);
 	}
-	
+
 	/* Invalid move indicator */
 	.invalid-move {
 		position: absolute;
 		bottom: 5rem;
 		left: 50%;
 		transform: translateX(-50%) translateY(100px);
-		background-color: #F44336;
+		background-color: #f44336;
 		color: white;
 		padding: 0.75rem 1.5rem;
 		border-radius: 50px;
@@ -660,7 +676,7 @@
 		transition: all 0.3s ease;
 		pointer-events: none;
 	}
-	
+
 	.invalid-move.show {
 		transform: translateX(-50%) translateY(0);
 		opacity: 1;
@@ -689,42 +705,50 @@
 		max-width: 500px;
 		text-align: center;
 		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-		border: 6px solid #9C27B0;
+		border: 6px solid #9c27b0;
 		position: relative;
 		overflow: hidden;
 	}
-	
+
 	/* Different theme styles for math problem modals */
 	.math-problem-content.space-theme {
-		border-color: #3F51B5;
-		background-color: #E8EAF6;
+		border-color: #3f51b5;
+		background-color: #e8eaf6;
 	}
-	
+
 	.math-problem-content.ocean-theme {
-		border-color: #0288D1;
-		background-color: #E1F5FE;
+		border-color: #0288d1;
+		background-color: #e1f5fe;
 	}
-	
+
 	.math-problem-content.jungle-theme {
-		border-color: #388E3C;
-		background-color: #E8F5E9;
+		border-color: #388e3c;
+		background-color: #e8f5e9;
 	}
-	
+
 	.math-problem-content.candy-theme {
-		border-color: #D81B60;
-		background-color: #FCE4EC;
+		border-color: #d81b60;
+		background-color: #fce4ec;
 	}
-	
+
 	.math-problem-content h2 {
 		font-size: 1.8rem;
 		margin-bottom: 1rem;
-		color: #673AB7;
+		color: #673ab7;
 	}
-	
-	.math-problem-content.space-theme h2 { color: #3F51B5; }
-	.math-problem-content.ocean-theme h2 { color: #0288D1; }
-	.math-problem-content.jungle-theme h2 { color: #388E3C; }
-	.math-problem-content.candy-theme h2 { color: #D81B60; }
+
+	.math-problem-content.space-theme h2 {
+		color: #3f51b5;
+	}
+	.math-problem-content.ocean-theme h2 {
+		color: #0288d1;
+	}
+	.math-problem-content.jungle-theme h2 {
+		color: #388e3c;
+	}
+	.math-problem-content.candy-theme h2 {
+		color: #d81b60;
+	}
 
 	.question {
 		font-size: 1.6rem;
@@ -758,10 +782,14 @@
 		font-weight: bold;
 		animation: pulse 1s infinite alternate;
 	}
-	
+
 	@keyframes pulse {
-		0% { transform: scale(1); }
-		100% { transform: scale(1.2); }
+		0% {
+			transform: scale(1);
+		}
+		100% {
+			transform: scale(1.2);
+		}
 	}
 
 	.answer-section {
@@ -791,17 +819,29 @@
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 		font-family: 'Comic Sans MS', cursive, sans-serif;
 	}
-	
-	.ones-btn { background-color: #FFC107; color: #333; }
-	.tens-btn { background-color: #4CAF50; color: white; }
-	.hundreds-btn { background-color: #2196F3; color: white; }
-	.thousands-btn { background-color: #9C27B0; color: white; }
-	
+
+	.ones-btn {
+		background-color: #ffc107;
+		color: #333;
+	}
+	.tens-btn {
+		background-color: #4caf50;
+		color: white;
+	}
+	.hundreds-btn {
+		background-color: #2196f3;
+		color: white;
+	}
+	.thousands-btn {
+		background-color: #9c27b0;
+		color: white;
+	}
+
 	.choice-btn:hover {
 		transform: translateY(-3px);
 		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 	}
-	
+
 	.choice-btn:active {
 		transform: translateY(1px);
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -810,26 +850,34 @@
 	input {
 		padding: 0.75rem 1rem;
 		font-size: 1.2rem;
-		border: 3px solid #9C27B0;
+		border: 3px solid #9c27b0;
 		border-radius: 50px;
 		outline: none;
 		text-align: center;
 		width: 150px;
 		font-family: 'Comic Sans MS', cursive, sans-serif;
 	}
-	
-	.space-theme input { border-color: #3F51B5; }
-	.ocean-theme input { border-color: #0288D1; }
-	.jungle-theme input { border-color: #388E3C; }
-	.candy-theme input { border-color: #D81B60; }
-	
+
+	.space-theme input {
+		border-color: #3f51b5;
+	}
+	.ocean-theme input {
+		border-color: #0288d1;
+	}
+	.jungle-theme input {
+		border-color: #388e3c;
+	}
+	.candy-theme input {
+		border-color: #d81b60;
+	}
+
 	input:focus {
 		box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.3);
 	}
 
 	.submit-btn {
 		padding: 0.75rem 1.5rem;
-		background-color: #9C27B0;
+		background-color: #9c27b0;
 		color: white;
 		border: none;
 		border-radius: 50px;
@@ -840,17 +888,25 @@
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 		font-family: 'Comic Sans MS', cursive, sans-serif;
 	}
-	
-	.space-theme .submit-btn { background-color: #3F51B5; }
-	.ocean-theme .submit-btn { background-color: #0288D1; }
-	.jungle-theme .submit-btn { background-color: #388E3C; }
-	.candy-theme .submit-btn { background-color: #D81B60; }
-	
+
+	.space-theme .submit-btn {
+		background-color: #3f51b5;
+	}
+	.ocean-theme .submit-btn {
+		background-color: #0288d1;
+	}
+	.jungle-theme .submit-btn {
+		background-color: #388e3c;
+	}
+	.candy-theme .submit-btn {
+		background-color: #d81b60;
+	}
+
 	.submit-btn:hover {
 		transform: translateY(-3px);
 		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 	}
-	
+
 	.submit-btn:active {
 		transform: translateY(1px);
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -864,33 +920,43 @@
 		border-radius: 50px;
 		animation: fadeIn 0.5s;
 	}
-	
+
 	@keyframes fadeIn {
-		from { opacity: 0; transform: translateY(10px); }
-		to { opacity: 1; transform: translateY(0); }
+		from {
+			opacity: 0;
+			transform: translateY(10px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 
 	.correct {
 		color: white;
-		background-color: #4CAF50;
+		background-color: #4caf50;
 	}
 
 	.incorrect {
 		color: white;
-		background-color: #F44336;
+		background-color: #f44336;
 	}
-	
+
 	.emoji {
 		font-size: 1.5rem;
 		display: inline-block;
 		animation: bounce 0.5s infinite alternate;
 	}
-	
+
 	@keyframes bounce {
-		from { transform: translateY(0); }
-		to { transform: translateY(-5px); }
+		from {
+			transform: translateY(0);
+		}
+		to {
+			transform: translateY(-5px);
+		}
 	}
-	
+
 	/* Celebration overlay */
 	.celebration {
 		position: absolute;
@@ -906,66 +972,76 @@
 		animation: fadeIn 0.5s;
 		backdrop-filter: blur(5px);
 	}
-	
+
 	.celebration-content {
-		background: linear-gradient(135deg, #FF9800, #F44336);
+		background: linear-gradient(135deg, #ff9800, #f44336);
 		padding: 2rem;
 		border-radius: 20px;
 		text-align: center;
 		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 		color: white;
-		border: 6px solid #FFC107;
+		border: 6px solid #ffc107;
 		max-width: 400px;
 		width: 90%;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 	}
-	
+
 	.celebration-content h2 {
 		font-size: 2.5rem;
 		margin-bottom: 1rem;
 		animation: celebrate 1s infinite alternate;
 	}
-	
+
 	@keyframes celebrate {
-		0% { transform: scale(1); }
-		100% { transform: scale(1.1); }
+		0% {
+			transform: scale(1);
+		}
+		100% {
+			transform: scale(1.1);
+		}
 	}
-	
+
 	.stars {
 		display: flex;
 		justify-content: center;
 		margin: 1rem 0;
 	}
-	
+
 	.star {
 		font-size: 3rem;
 		margin: 0 0.5rem;
 		animation: spin 2s infinite linear;
 	}
-	
+
 	.star:nth-child(2) {
 		animation-delay: 0.3s;
 	}
-	
+
 	.star:nth-child(3) {
 		animation-delay: 0.6s;
 	}
-	
+
 	@keyframes spin {
-		0% { transform: rotate(0deg) scale(1); }
-		50% { transform: rotate(180deg) scale(1.2); }
-		100% { transform: rotate(360deg) scale(1); }
+		0% {
+			transform: rotate(0deg) scale(1);
+		}
+		50% {
+			transform: rotate(180deg) scale(1.2);
+		}
+		100% {
+			transform: rotate(360deg) scale(1);
+		}
 	}
-	
+
 	.celebration-content p {
 		font-size: 1.3rem;
 		margin-bottom: 1.5rem;
 	}
-	
+
 	.new-game-btn {
-		background-color: #FFEB3B;
+		background-color: #ffeb3b;
 		color: #333;
 		border: none;
 		border-radius: 50px;
@@ -977,61 +1053,61 @@
 		transition: all 0.2s ease;
 		font-family: 'Comic Sans MS', cursive, sans-serif;
 	}
-	
+
 	.new-game-btn:hover {
 		transform: translateY(-3px);
 		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 	}
-	
+
 	.new-game-btn:active {
 		transform: translateY(1px);
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 	}
-	
+
 	/* Responsive adjustments */
 	@media (max-width: 768px) {
 		.game-title {
 			font-size: 2rem;
 		}
-		
+
 		.viewport {
 			width: 95vw;
 			height: 65vh;
 		}
-		
+
 		.math-problem-content {
 			width: 90%;
 			padding: 1.5rem;
 		}
-		
+
 		.question {
 			font-size: 1.4rem;
 		}
-		
+
 		.control-btn {
 			width: 3rem;
 			height: 3rem;
 			font-size: 1.2rem;
 		}
 	}
-	
+
 	@media (max-width: 480px) {
 		.game-title {
 			font-size: 1.8rem;
 		}
-		
+
 		.choice-btn {
 			width: 180px;
 		}
-		
+
 		.math-problem-content h2 {
 			font-size: 1.5rem;
 		}
-		
+
 		.question {
 			font-size: 1.2rem;
 		}
-		
+
 		.celebration-content h2 {
 			font-size: 2rem;
 		}

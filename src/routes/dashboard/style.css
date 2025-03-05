@@ -19,36 +19,36 @@
 
 /* Dashboard layout and animations */
 .dashboard-container {
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-  position: relative;
+	width: 100%;
+	height: 100vh;
+	overflow: hidden;
+	position: relative;
 }
 
 /* Dashboard background */
 .dashboard-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--background-green);
-  z-index: -1;
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: var(--background-green);
+	z-index: -1;
 }
 
 /* Button animation effects */
 .start-button a:hover {
-  transform: scale(1.05);
-  transition: transform 0.3s ease;
+	transform: scale(1.05);
+	transition: transform 0.3s ease;
 }
 
 .view-progress-button .btn:hover {
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Special dashboard button styles (if needed, beyond the global button styles) */
 .view-progress-button .btn {
-  width: auto;
-  min-width: 200px;
+	width: auto;
+	min-width: 200px;
 }

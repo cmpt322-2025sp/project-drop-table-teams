@@ -5,28 +5,28 @@ using SvelteKit, Supabase, and Bun.
 
 ## Table of Contents
 
--   [Prerequisites](#prerequisites)
--   [Setup](#setup)
--   [Development](#development)
--   [Git Workflow](#git-workflow)
--   [VS Code Extensions](#vs-code-extensions)
--   [Project Structure](#project-structure)
--   [Environment Variables](#environment-variables)
--   [Contributing](#contributing)
+- [Prerequisites](#prerequisites)
+- [Setup](#setup)
+- [Development](#development)
+- [Git Workflow](#git-workflow)
+- [VS Code Extensions](#vs-code-extensions)
+- [Project Structure](#project-structure)
+- [Environment Variables](#environment-variables)
+- [Contributing](#contributing)
 
 ## Prerequisites
 
--   **Homebrew:** Install from [brew.sh](https://brew.sh) if you haven't
-    already.
--   **Bun:** JavaScript runtime; installable via Homebrew.
--   **Git:** For version control.
--   **VS Code:** (Optional, but recommended for development)
+- **Homebrew:** Install from [brew.sh](https://brew.sh) if you haven't
+  already.
+- **Bun:** JavaScript runtime; installable via Homebrew.
+- **Git:** For version control.
+- **VS Code:** (Optional, but recommended for development)
 
 ## Setup
 
 1.  **Clone the Repository:**
 
-``` bash
+```bash
 git clone https://github.com/yourusername/your-repo-name.git cd your-repo-name
 ```
 
@@ -35,19 +35,19 @@ git clone https://github.com/yourusername/your-repo-name.git cd your-repo-name
 There is a `Brewfile` for convenience. Run the folling command to install
 required tools (like Bun and Git):
 
-``` bash
+```bash
 brew bundle
 ```
 
 3.  **Install Project Dependencies:**
 
-``` bash
+```bash
 bun install
 ```
 
 4.  **Configure Environment Variables:**
 
-``` bash
+```bash
 cp .env.example .env
 ```
 
@@ -64,29 +64,29 @@ have something else in mind.
 
 ## Development
 
--   Run the Development Server:
+- Run the Development Server:
 
-``` bash
+```bash
 bun dev
 ```
 
--   Build the Project:
+- Build the Project:
 
-``` bash
+```bash
 bun build
 ```
 
--   Linting and Formatting:
+- Linting and Formatting:
 
 Our project uses ESLint and Prettier. To run linting:
 
-``` bash
+```bash
 bun run lint
 ```
 
 To format your code:
 
-``` bash
+```bash
 bun run format
 ```
 
@@ -94,25 +94,27 @@ bun run format
 
 Follow these guidelines to make git simple:
 
--   Branching:
-    -   Create a new branch for each feature or bug fix:
+- Branching:
 
-    ``` bash
-    git checkout -b feature-branch
-    ```
--   Committing:
-    -   Commit small, focused changes with clear commit messages.
--   Pull Requests:
-    -   Push your branch and create a pull request on GitHub for code review.
-    -   Merge changes only after the pull request has been approved.
+  - Create a new branch for each feature or bug fix:
+
+  ```bash
+  git checkout -b feature-branch
+  ```
+
+- Committing:
+  - Commit small, focused changes with clear commit messages.
+- Pull Requests:
+  - Push your branch and create a pull request on GitHub for code review.
+  - Merge changes only after the pull request has been approved.
 
 ## VS Code Extensions
 
 Recommended VS Code extensions:
 
--   Svelte for VS Code (`svelte.svelte-vscode`)
--   Prettier - Code formatter (`esbenp.prettier-vscode`)
--   ESLint (`dbaeumer.vscode-eslint`)
+- Svelte for VS Code (`svelte.svelte-vscode`)
+- Prettier - Code formatter (`esbenp.prettier-vscode`)
+- ESLint (`dbaeumer.vscode-eslint`)
 
 You can install these manually or use the provided `.vscode/extensions.json`
 file for recommendations.
@@ -137,7 +139,7 @@ development.
 
 ## Contributing
 
--   Fork the repository.
--   Create a new branch for your feature/bug fix.
--   Make your changes and commit them with clear messages.
--   Submit a pull request with a detailed description of your changes.
+- Fork the repository.
+- Create a new branch for your feature/bug fix.
+- Make your changes and commit them with clear messages.
+- Submit a pull request with a detailed description of your changes.
