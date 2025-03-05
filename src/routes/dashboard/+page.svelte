@@ -8,7 +8,15 @@
   
   <div class="start-button">
     <a href="/game">
-      <Button variant="primary" size="lg">START GAME</Button>
+      <Button 
+        variant="primary" 
+        size="lg" 
+        width="24rem" 
+        height="8rem" 
+        fontSize="2.5rem"
+      >
+        START GAME
+      </Button>
     </a>
   </div>
   
@@ -38,12 +46,6 @@
     font-weight: 400;
     margin-bottom: 2rem;
     text-align: center;
-  }
-  
-  .start-button button {
-    width: 20rem;
-    height: 6rem;
-    font-size: 2rem;
   }
   
   .view-progress-button {

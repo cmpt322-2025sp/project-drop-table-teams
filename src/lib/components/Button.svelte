@@ -9,6 +9,10 @@
   export let icon: boolean = false;
   export let disabled: boolean = false;
   export let onClick: (() => void) | null = null;
+  export let width: string | undefined = undefined;
+  export let height: string | undefined = undefined;
+  export let fontSize: string | undefined = undefined;
+  export let style: string = '';
   
   // Generate classes based on props
   $: classes = [
@@ -18,12 +22,21 @@
     rounded ? 'btn-round' : '',
     icon ? 'btn-icon' : '',
   ].filter(Boolean).join(' ');
+  
+  // Generate inline style string
+  $: inlineStyle = [
+    width ? `width: ${width};` : '',
+    height ? `height: ${height};` : '',
+    fontSize ? `font-size: ${fontSize};` : '',
+    style
+  ].filter(Boolean).join(' ');
 </script>
 
 <button 
   class={classes} 
   type={type} 
-  disabled={disabled} 
+  disabled={disabled}
+  style={inlineStyle} 
   on:click={onClick || undefined}
 >
   <slot />
