@@ -390,11 +390,16 @@
 		<!-- Invalid move indicator -->
 		<div id="invalid-move" class="invalid-move">Can't go that way!</div>
 
-		<!-- Math problem modal -->
-		{#if showMathProblem && currentProblem}
-			<div class="math-problem-modal" role="dialog" aria-modal="true">
-				<div class="math-problem-content {currentTheme}-theme" role="document">
-					<h2>Solve to Continue!</h2>
+		<!-- Math problem modal using the Modal component -->
+		<Modal 
+			show={showMathProblem && currentProblem !== null} 
+			theme={currentTheme}
+			disableBackdropClick={true}
+			titleId="math-problem-title"
+		>
+			<div class="math-problem-content">
+				<h2 id="math-problem-title">Solve to Continue!</h2>
+				{#if currentProblem}
 					<p class="question">{@html currentProblem.question}</p>
 
 					{#if currentProblem.answer === 'ones' || currentProblem.answer === 'tens' || currentProblem.answer === 'hundreds' || currentProblem.answer === 'thousands'}
@@ -478,9 +483,9 @@
 							<span class="emoji">😕</span> Try again! The answer is {currentProblem.answer}.
 						</p>
 					{/if}
-				</div>
+				{/if}
 			</div>
-		{/if}
+		</Modal>
 
 		<!-- Celebration overlay when reaching the goal -->
 		<Celebration 
@@ -698,72 +703,11 @@
 		opacity: 1;
 	}
 
-	/* Math problem modal */
-	.math-problem-modal {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background-color: rgba(0, 0, 0, 0.7);
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		z-index: 10;
-		backdrop-filter: blur(5px);
-	}
-
+	/* Math problem content styles */
 	.math-problem-content {
-		background-color: white;
-		padding: 2rem;
-		border-radius: 20px;
-		width: 90%;
-		max-width: 500px;
 		text-align: center;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-		border: 6px solid #9c27b0;
-		position: relative;
-		overflow: hidden;
-	}
-
-	/* Different theme styles for math problem modals */
-	.math-problem-content.space-theme {
-		border-color: #3f51b5;
-		background-color: #e8eaf6;
-	}
-
-	.math-problem-content.ocean-theme {
-		border-color: #0288d1;
-		background-color: #e1f5fe;
-	}
-
-	.math-problem-content.jungle-theme {
-		border-color: #388e3c;
-		background-color: #e8f5e9;
-	}
-
-	.math-problem-content.candy-theme {
-		border-color: #d81b60;
-		background-color: #fce4ec;
-	}
-
-	.math-problem-content h2 {
-		font-size: 1.8rem;
-		margin-bottom: 1rem;
-		color: #673ab7;
-	}
-
-	.math-problem-content.space-theme h2 {
-		color: #3f51b5;
-	}
-	.math-problem-content.ocean-theme h2 {
-		color: #0288d1;
-	}
-	.math-problem-content.jungle-theme h2 {
-		color: #388e3c;
-	}
-	.math-problem-content.candy-theme h2 {
-		color: #d81b60;
+		max-width: 500px;
+		margin: 0 auto;
 	}
 
 	.question {
@@ -823,46 +767,6 @@
 		margin: 1.5rem 0;
 	}
 
-	.choice-btn {
-		width: 200px;
-		padding: 0.75rem 1rem;
-		font-size: 1.1rem;
-		border-radius: 50px;
-		border: none;
-		font-weight: bold;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-		font-family: 'Comic Sans MS', cursive, sans-serif;
-	}
-
-	.ones-btn {
-		background-color: #ffc107;
-		color: #333;
-	}
-	.tens-btn {
-		background-color: #4caf50;
-		color: white;
-	}
-	.hundreds-btn {
-		background-color: #2196f3;
-		color: white;
-	}
-	.thousands-btn {
-		background-color: #9c27b0;
-		color: white;
-	}
-
-	.choice-btn:hover {
-		transform: translateY(-3px);
-		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-	}
-
-	.choice-btn:active {
-		transform: translateY(1px);
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	}
-
 	input {
 		padding: 0.75rem 1rem;
 		font-size: 1.2rem;
@@ -889,43 +793,6 @@
 
 	input:focus {
 		box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.3);
-	}
-
-	.submit-btn {
-		padding: 0.75rem 1.5rem;
-		background-color: #9c27b0;
-		color: white;
-		border: none;
-		border-radius: 50px;
-		cursor: pointer;
-		font-size: 1.2rem;
-		font-weight: bold;
-		transition: all 0.2s ease;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-		font-family: 'Comic Sans MS', cursive, sans-serif;
-	}
-
-	.space-theme .submit-btn {
-		background-color: #3f51b5;
-	}
-	.ocean-theme .submit-btn {
-		background-color: #0288d1;
-	}
-	.jungle-theme .submit-btn {
-		background-color: #388e3c;
-	}
-	.candy-theme .submit-btn {
-		background-color: #d81b60;
-	}
-
-	.submit-btn:hover {
-		transform: translateY(-3px);
-		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-	}
-
-	.submit-btn:active {
-		transform: translateY(1px);
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 	}
 
 	.result {
@@ -973,8 +840,6 @@
 		}
 	}
 
-	/* No longer needed - using the Celebration component */
-
 	/* Responsive adjustments */
 	@media (max-width: 768px) {
 		.game-title {
@@ -984,11 +849,6 @@
 		.viewport {
 			width: 95vw;
 			height: 65vh;
-		}
-
-		.math-problem-content {
-			width: 90%;
-			padding: 1.5rem;
 		}
 
 		.question {
@@ -1007,20 +867,8 @@
 			font-size: 1.8rem;
 		}
 
-		.choice-btn {
-			width: 180px;
-		}
-
-		.math-problem-content h2 {
-			font-size: 1.5rem;
-		}
-
 		.question {
 			font-size: 1.2rem;
-		}
-
-		.celebration-content h2 {
-			font-size: 2rem;
 		}
 	}
 </style>

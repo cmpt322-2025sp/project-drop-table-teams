@@ -11,7 +11,7 @@
 	export let onButtonClick: (() => void) | null = null;
 </script>
 
-{#if show}
+{#if typeof window !== 'undefined' && show}
 	<div class="celebration">
 		<div class="celebration-content">
 			<h2>{title}</h2>

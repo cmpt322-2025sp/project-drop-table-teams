@@ -49,27 +49,33 @@
 	}
 
 	onMount(() => {
-		if (show) {
-			// Store currently focused element to restore later
-			previouslyFocusedElement = document.activeElement;
-		}
+		// Only run in browser context
+		if (typeof window !== 'undefined') {
+			if (show) {
+				// Store currently focused element to restore later
+				previouslyFocusedElement = document.activeElement;
+			}
 
-		// Add global event listeners for keyboard and click
-		document.addEventListener('keydown', handleEscapeAndTab);
+			// Add global event listeners for keyboard and click
+			document.addEventListener('keydown', handleEscapeAndTab);
+		}
 	});
 
 	onDestroy(() => {
-		// Remove all event listeners
-		document.removeEventListener('keydown', handleEscapeAndTab);
+		// Only run in browser context
+		if (typeof window !== 'undefined') {
+			// Remove all event listeners
+			document.removeEventListener('keydown', handleEscapeAndTab);
 
-		// Restore focus when component is destroyed
-		if (previouslyFocusedElement && previouslyFocusedElement instanceof HTMLElement) {
-			previouslyFocusedElement.focus();
+			// Restore focus when component is destroyed
+			if (previouslyFocusedElement && previouslyFocusedElement instanceof HTMLElement) {
+				previouslyFocusedElement.focus();
+			}
 		}
 	});
 
 	// When dialog element is ready or visibility changes
-	$: if (dialogElement) {
+	$: if (typeof window !== 'undefined' && dialogElement) {
 		if (show) {
 			// Setup event listeners and focus
 			if (!dialogElement.open) {
@@ -100,7 +106,7 @@
 	}
 </script>
 
-{#if show}
+{#if typeof window !== 'undefined' && show}
 	<!-- Using native dialog element with showModal() method -->
 	<dialog bind:this={dialogElement} class="modal-backdrop" aria-labelledby={titleId}>
 		<div class="modal-content {theme}-theme">
