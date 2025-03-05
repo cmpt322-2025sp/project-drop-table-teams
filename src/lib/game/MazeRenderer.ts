@@ -19,10 +19,16 @@ export class MazeRenderer {
 		theme: string = 'space'
 	) {
 		this.canvas = canvas;
-		this.ctx = canvas.getContext('2d');
+		this.ctx = canvas.getContext('2d', { alpha: false, antialias: true });
 		this.cellSize = cellSize;
 		this.wallThickness = wallThickness;
 		this.theme = theme;
+
+		if (this.ctx) {
+			// Enable high-quality image rendering
+			this.ctx.imageSmoothingEnabled = true;
+			this.ctx.imageSmoothingQuality = 'high';
+		}
 	}
 
 	/**
@@ -47,6 +53,12 @@ export class MazeRenderer {
 		this.canvas.height = height;
 		this.canvasWidth = width;
 		this.canvasHeight = height;
+
+		if (this.ctx) {
+			// Reset high-quality image rendering after size change
+			this.ctx.imageSmoothingEnabled = true;
+			this.ctx.imageSmoothingQuality = 'high';
+		}
 	}
 
 	/**
@@ -122,6 +134,9 @@ export class MazeRenderer {
 
 		const ctx = this.ctx;
 		const colors = this.getThemeColors();
+
+		// Clear the canvas first
+		ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
 		// Draw the entire canvas filled with walls
 		ctx.fillStyle = colors.wallColor;
@@ -295,30 +310,68 @@ export class MazeRenderer {
 		const y =
 			this.wallThickness + displayedRow * (this.cellSize + this.wallThickness) + this.cellSize / 2;
 
-		// Size of player
+		// Size of player - make larger for higher resolution
 		const playerSize = this.cellSize * 0.7;
 
 		// Draw player based on theme
 		if (this.theme === 'space') {
-			// Draw spaceship
+			// Draw detailed high-resolution spaceship
+			ctx.save();
+
+			// Add glow behind spaceship
+			const outerGlow = ctx.createRadialGradient(x, y, 0, x, y, playerSize);
+			outerGlow.addColorStop(0, 'rgba(255, 100, 100, 0.4)');
+			outerGlow.addColorStop(0.6, 'rgba(255, 50, 50, 0.3)');
+			outerGlow.addColorStop(1, 'rgba(255, 0, 0, 0)');
+			ctx.fillStyle = outerGlow;
+			ctx.beginPath();
+			ctx.arc(x, y, playerSize, 0, Math.PI * 2);
+			ctx.fill();
+
+			// Main body of spaceship
 			ctx.fillStyle = colors.playerColor;
 			ctx.beginPath();
 			ctx.arc(x, y, playerSize / 2, 0, Math.PI * 2);
 			ctx.fill();
 
-			// Add spaceship details
-			ctx.fillStyle = '#FFF';
+			// Add border for higher contrast
+			ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+			ctx.lineWidth = 2;
+			ctx.beginPath();
+			ctx.arc(x, y, playerSize / 2, 0, Math.PI * 2);
+			ctx.stroke();
+
+			// Add spaceship details with better quality
+			ctx.fillStyle = '#FFFFFF';
 			ctx.beginPath();
 			ctx.arc(x, y - playerSize / 6, playerSize / 6, 0, Math.PI * 2);
 			ctx.fill();
+
+			// Add cockpit highlight
+			ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+			ctx.beginPath();
+			ctx.arc(x - playerSize / 12, y - playerSize / 5, playerSize / 12, 0, Math.PI * 2);
+			ctx.fill();
+
+			// Add engine exhausts
+			ctx.fillStyle = '#FFA500';
+			ctx.beginPath();
+			ctx.arc(x - playerSize / 4, y + playerSize / 3, playerSize / 10, 0, Math.PI * 2);
+			ctx.arc(x + playerSize / 4, y + playerSize / 3, playerSize / 10, 0, Math.PI * 2);
+			ctx.fill();
+
+			ctx.restore();
 		} else if (this.theme === 'ocean') {
-			// Draw fish
+			// Draw fish with smooth edges
+			ctx.save();
+
+			// Fish body
 			ctx.fillStyle = colors.playerColor;
 			ctx.beginPath();
 			ctx.ellipse(x, y, playerSize / 2, playerSize / 3, 0, 0, Math.PI * 2);
 			ctx.fill();
 
-			// Add tail
+			// Add tail with better quality
 			ctx.beginPath();
 			ctx.moveTo(x + playerSize / 2, y);
 			ctx.lineTo(x + playerSize / 2 + playerSize / 4, y - playerSize / 4);
@@ -326,7 +379,7 @@ export class MazeRenderer {
 			ctx.closePath();
 			ctx.fill();
 
-			// Add eye
+			// Add eye with better quality
 			ctx.fillStyle = 'white';
 			ctx.beginPath();
 			ctx.arc(x - playerSize / 6, y - playerSize / 8, playerSize / 8, 0, Math.PI * 2);
@@ -336,48 +389,60 @@ export class MazeRenderer {
 			ctx.beginPath();
 			ctx.arc(x - playerSize / 6, y - playerSize / 8, playerSize / 16, 0, Math.PI * 2);
 			ctx.fill();
+
+			ctx.restore();
 		} else if (this.theme === 'jungle') {
-			// Draw monkey
+			// Draw monkey with better anti-aliasing
+			ctx.save();
+
+			// Monkey body
 			ctx.fillStyle = colors.playerColor;
 			ctx.beginPath();
 			ctx.arc(x, y, playerSize / 2, 0, Math.PI * 2);
 			ctx.fill();
 
-			// Add ears
+			// Add ears with better quality
 			ctx.beginPath();
 			ctx.arc(x - playerSize / 3, y - playerSize / 3, playerSize / 6, 0, Math.PI * 2);
 			ctx.arc(x + playerSize / 3, y - playerSize / 3, playerSize / 6, 0, Math.PI * 2);
 			ctx.fill();
 
-			// Add face
+			// Add face with better quality
 			ctx.fillStyle = '#F5D0A9';
 			ctx.beginPath();
 			ctx.arc(x, y, playerSize / 3, 0, Math.PI * 2);
 			ctx.fill();
 
-			// Add eyes
+			// Add eyes with better quality
 			ctx.fillStyle = 'black';
 			ctx.beginPath();
 			ctx.arc(x - playerSize / 8, y - playerSize / 8, playerSize / 12, 0, Math.PI * 2);
 			ctx.arc(x + playerSize / 8, y - playerSize / 8, playerSize / 12, 0, Math.PI * 2);
 			ctx.fill();
 
-			// Add smile
+			// Add smile with better quality
+			ctx.lineWidth = Math.max(2, playerSize / 20);
+			ctx.strokeStyle = 'black';
 			ctx.beginPath();
 			ctx.arc(x, y + playerSize / 12, playerSize / 8, 0, Math.PI);
 			ctx.stroke();
+
+			ctx.restore();
 		} else if (this.theme === 'candy') {
-			// Draw lollipop character
+			// Draw lollipop character with better anti-aliasing
+			ctx.save();
+
+			// Lollipop head
 			ctx.fillStyle = colors.playerColor;
 			ctx.beginPath();
 			ctx.arc(x, y - playerSize / 6, playerSize / 2, 0, Math.PI * 2);
 			ctx.fill();
 
-			// Add stick
+			// Add stick with better quality
 			ctx.fillStyle = '#8D6E63';
 			ctx.fillRect(x - playerSize / 16, y + playerSize / 6, playerSize / 8, playerSize / 2);
 
-			// Add face
+			// Add face with better quality
 			ctx.fillStyle = 'white';
 			ctx.beginPath();
 			ctx.arc(x - playerSize / 6, y - playerSize / 4, playerSize / 10, 0, Math.PI * 2);
@@ -390,12 +455,22 @@ export class MazeRenderer {
 			ctx.arc(x + playerSize / 6, y - playerSize / 4, playerSize / 20, 0, Math.PI * 2);
 			ctx.fill();
 
-			// Add smile
+			// Add smile with better quality
+			ctx.lineWidth = Math.max(2, playerSize / 20);
+			ctx.strokeStyle = 'black';
 			ctx.beginPath();
 			ctx.arc(x, y, playerSize / 6, 0.2, Math.PI - 0.2);
 			ctx.stroke();
+
+			// Add subtle sparkle effect
+			ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+			ctx.beginPath();
+			ctx.arc(x + playerSize / 4, y - playerSize / 3, playerSize / 12, 0, Math.PI * 2);
+			ctx.fill();
+
+			ctx.restore();
 		} else {
-			// Default player (backup)
+			// Default player (backup) with better anti-aliasing
 			ctx.fillStyle = colors.playerColor;
 			ctx.beginPath();
 			ctx.arc(x, y, playerSize / 2, 0, Math.PI * 2);
@@ -424,15 +499,75 @@ export class MazeRenderer {
 	 * @param ctx Canvas context
 	 */
 	private addStarsTexture(ctx: CanvasRenderingContext2D) {
-		ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-		for (let i = 0; i < 100; i++) {
+		ctx.save();
+
+		// Drastically more stars for dense, high-res effect
+		const starCount = 400;
+
+		// Add depth with different sized stars
+		for (let i = 0; i < starCount; i++) {
 			const x = Math.random() * this.canvasWidth;
 			const y = Math.random() * this.canvasHeight;
-			const size = Math.random() * 2 + 1;
-			ctx.beginPath();
-			ctx.arc(x, y, size, 0, Math.PI * 2);
-			ctx.fill();
+
+			// Vary star size and opacity - larger for high-res
+			const size = Math.random() * 4 + 1;
+			const opacity = Math.random() * 0.6 + 0.4;
+
+			// Draw star
+			ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+
+			// Draw precise stars for high resolution
+			if (Math.random() > 0.7) {
+				// Use star shape for some stars
+				this.drawSmallStar(ctx, x, y, size);
+			} else {
+				// Use circle for most stars
+				ctx.beginPath();
+				ctx.arc(x, y, size, 0, Math.PI * 2);
+				ctx.fill();
+			}
+
+			// Add more "twinkle" effects
+			if (Math.random() > 0.8) {
+				const glow = ctx.createRadialGradient(x, y, 0, x, y, size * 4);
+				glow.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
+				glow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+				ctx.fillStyle = glow;
+				ctx.beginPath();
+				ctx.arc(x, y, size * 4, 0, Math.PI * 2);
+				ctx.fill();
+			}
 		}
+
+		ctx.restore();
+	}
+
+	// Helper method to draw small star shapes
+	private drawSmallStar(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number) {
+		const points = 5;
+		const outerRadius = size;
+		const innerRadius = size / 2;
+
+		let rot = (Math.PI / 2) * 3;
+		const step = Math.PI / points;
+
+		ctx.beginPath();
+		ctx.moveTo(cx, cy - outerRadius);
+
+		for (let i = 0; i < points; i++) {
+			const x1 = cx + Math.cos(rot) * outerRadius;
+			const y1 = cy + Math.sin(rot) * outerRadius;
+			ctx.lineTo(x1, y1);
+			rot += step;
+
+			const x2 = cx + Math.cos(rot) * innerRadius;
+			const y2 = cy + Math.sin(rot) * innerRadius;
+			ctx.lineTo(x2, y2);
+			rot += step;
+		}
+
+		ctx.closePath();
+		ctx.fill();
 	}
 
 	/**
@@ -440,15 +575,45 @@ export class MazeRenderer {
 	 * @param ctx Canvas context
 	 */
 	private addBubblesTexture(ctx: CanvasRenderingContext2D) {
-		ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-		for (let i = 0; i < 50; i++) {
+		ctx.save();
+
+		// Many more bubbles for high-res effect
+		const bubbleCount = 150;
+
+		for (let i = 0; i < bubbleCount; i++) {
 			const x = Math.random() * this.canvasWidth;
 			const y = Math.random() * this.canvasHeight;
-			const size = Math.random() * 10 + 5;
+
+			// Larger, more varied bubbles
+			const size = Math.random() * 15 + 5;
+			const opacity = Math.random() * 0.2 + 0.15;
+
+			// Draw bubble with improved gradient for 3D effect
+			const gradient = ctx.createRadialGradient(x - size / 3, y - size / 3, 0, x, y, size);
+			gradient.addColorStop(0, `rgba(255, 255, 255, ${opacity + 0.15})`);
+			gradient.addColorStop(0.5, `rgba(255, 255, 255, ${opacity + 0.1})`);
+			gradient.addColorStop(1, `rgba(255, 255, 255, ${opacity})`);
+
+			ctx.fillStyle = gradient;
 			ctx.beginPath();
 			ctx.arc(x, y, size, 0, Math.PI * 2);
 			ctx.fill();
+
+			// Add highlight to bubble for more dimension
+			ctx.fillStyle = `rgba(255, 255, 255, ${opacity + 0.2})`;
+			ctx.beginPath();
+			ctx.arc(x - size / 3, y - size / 3, size / 3, 0, Math.PI * 2);
+			ctx.fill();
+
+			// Add rim highlight
+			ctx.strokeStyle = `rgba(255, 255, 255, ${opacity + 0.1})`;
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.arc(x, y, size - 1, 0, Math.PI * 2);
+			ctx.stroke();
 		}
+
+		ctx.restore();
 	}
 
 	/**
@@ -456,15 +621,47 @@ export class MazeRenderer {
 	 * @param ctx Canvas context
 	 */
 	private addLeavesTexture(ctx: CanvasRenderingContext2D) {
-		ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-		for (let i = 0; i < 30; i++) {
+		ctx.save();
+
+		// More leaves for density
+		const leafCount = 50;
+
+		for (let i = 0; i < leafCount; i++) {
 			const x = Math.random() * this.canvasWidth;
 			const y = Math.random() * this.canvasHeight;
+
+			// Vary leaf size and rotation
 			const size = Math.random() * 15 + 5;
+			const angle = Math.random() * Math.PI;
+			const opacity = Math.random() * 0.1 + 0.05;
+
+			// Draw leaf with gradient
+			const leafGradient = ctx.createLinearGradient(x - size, y, x + size, y);
+			leafGradient.addColorStop(0, `rgba(255, 255, 255, ${opacity})`);
+			leafGradient.addColorStop(0.5, `rgba(255, 255, 255, ${opacity + 0.05})`);
+			leafGradient.addColorStop(1, `rgba(255, 255, 255, ${opacity})`);
+
+			ctx.fillStyle = leafGradient;
+
+			ctx.save();
+			ctx.translate(x, y);
+			ctx.rotate(angle);
 			ctx.beginPath();
-			ctx.ellipse(x, y, size, size / 2, Math.random() * Math.PI, 0, Math.PI * 2);
+			ctx.ellipse(0, 0, size, size / 2, 0, 0, Math.PI * 2);
 			ctx.fill();
+
+			// Add leaf vein
+			ctx.strokeStyle = `rgba(255, 255, 255, ${opacity + 0.05})`;
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.moveTo(-size, 0);
+			ctx.lineTo(size, 0);
+			ctx.stroke();
+
+			ctx.restore();
 		}
+
+		ctx.restore();
 	}
 
 	/**
@@ -472,23 +669,93 @@ export class MazeRenderer {
 	 * @param ctx Canvas context
 	 */
 	private addSprinklesTexture(ctx: CanvasRenderingContext2D) {
-		const sprinkleColors = ['#FF5252', '#FFEB3B', '#2196F3', '#4CAF50', '#9C27B0'];
-		for (let i = 0; i < 100; i++) {
+		ctx.save();
+
+		// Bright, vibrant colors
+		const sprinkleColors = ['#FF5252', '#FFEB3B', '#2196F3', '#4CAF50', '#9C27B0', '#FF9800'];
+
+		// More sprinkles for density
+		const sprinkleCount = 150;
+
+		for (let i = 0; i < sprinkleCount; i++) {
 			const x = Math.random() * this.canvasWidth;
 			const y = Math.random() * this.canvasHeight;
-			const color = sprinkleColors[Math.floor(Math.random() * sprinkleColors.length)];
-			ctx.fillStyle = color;
 
-			// Draw small rounded rectangles for sprinkles
+			// Vary sprinkle size and rotation
 			const width = Math.random() * 8 + 4;
 			const height = Math.random() * 3 + 2;
 			const angle = Math.random() * Math.PI;
 
+			// Pick random color
+			const color = sprinkleColors[Math.floor(Math.random() * sprinkleColors.length)];
+
+			// Draw rounded sprinkle
 			ctx.save();
 			ctx.translate(x, y);
 			ctx.rotate(angle);
-			ctx.fillRect(-width / 2, -height / 2, width, height);
+
+			// Create gradient for 3D effect
+			const sprinkleGradient = ctx.createLinearGradient(
+				-width / 2,
+				-height / 2,
+				width / 2,
+				height / 2
+			);
+			sprinkleGradient.addColorStop(0, color);
+			sprinkleGradient.addColorStop(1, shadeColor(color, -20)); // darker shade
+
+			ctx.fillStyle = sprinkleGradient;
+
+			// Draw rounded rectangle
+			roundRect(ctx, -width / 2, -height / 2, width, height, height / 2);
+			ctx.fill();
+
 			ctx.restore();
+		}
+
+		ctx.restore();
+
+		// Helper function to darken a color
+		function shadeColor(color: string, percent: number) {
+			let R = parseInt(color.substring(1, 3), 16);
+			let G = parseInt(color.substring(3, 5), 16);
+			let B = parseInt(color.substring(5, 7), 16);
+
+			R = Math.floor((R * (100 + percent)) / 100);
+			G = Math.floor((G * (100 + percent)) / 100);
+			B = Math.floor((B * (100 + percent)) / 100);
+
+			R = R < 255 ? R : 255;
+			G = G < 255 ? G : 255;
+			B = B < 255 ? B : 255;
+
+			const RR = R.toString(16).length == 1 ? '0' + R.toString(16) : R.toString(16);
+			const GG = G.toString(16).length == 1 ? '0' + G.toString(16) : G.toString(16);
+			const BB = B.toString(16).length == 1 ? '0' + B.toString(16) : B.toString(16);
+
+			return '#' + RR + GG + BB;
+		}
+
+		// Helper function to draw rounded rectangle
+		function roundRect(
+			ctx: CanvasRenderingContext2D,
+			x: number,
+			y: number,
+			width: number,
+			height: number,
+			radius: number
+		) {
+			ctx.beginPath();
+			ctx.moveTo(x + radius, y);
+			ctx.lineTo(x + width - radius, y);
+			ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+			ctx.lineTo(x + width, y + height - radius);
+			ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+			ctx.lineTo(x + radius, y + height);
+			ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+			ctx.lineTo(x, y + radius);
+			ctx.quadraticCurveTo(x, y, x + radius, y);
+			ctx.closePath();
 		}
 	}
 
@@ -502,47 +769,133 @@ export class MazeRenderer {
 		const centerX = x + this.cellSize / 2;
 		const centerY = y + this.cellSize / 2;
 
+		ctx.save();
+
 		if (this.theme === 'space') {
-			// Small planet
-			ctx.fillStyle = 'rgba(100, 100, 255, 0.2)';
+			// Small planet with gradient
+			const radius = this.cellSize / 6;
+			const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+			gradient.addColorStop(0, 'rgba(100, 150, 255, 0.3)');
+			gradient.addColorStop(1, 'rgba(70, 100, 200, 0.15)');
+
+			ctx.fillStyle = gradient;
 			ctx.beginPath();
-			ctx.arc(centerX, centerY, this.cellSize / 6, 0, Math.PI * 2);
+			ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
 			ctx.fill();
+
+			// Add subtle ring
+			if (Math.random() > 0.5) {
+				ctx.strokeStyle = 'rgba(150, 200, 255, 0.2)';
+				ctx.lineWidth = 1;
+				ctx.beginPath();
+				ctx.ellipse(
+					centerX,
+					centerY,
+					radius * 1.3,
+					radius * 0.4,
+					Math.random() * Math.PI,
+					0,
+					Math.PI * 2
+				);
+				ctx.stroke();
+			}
 		} else if (this.theme === 'ocean') {
-			// Small fish or shell
-			ctx.fillStyle = 'rgba(100, 200, 255, 0.3)';
+			// Small fish or shell with gradient
+			ctx.save();
+
+			const size = this.cellSize / 8;
+			const angle = Math.PI / 4;
+
+			ctx.translate(centerX, centerY);
+			ctx.rotate(angle);
+
+			const gradient = ctx.createLinearGradient(-size, 0, size, 0);
+			gradient.addColorStop(0, 'rgba(70, 170, 230, 0.3)');
+			gradient.addColorStop(1, 'rgba(100, 200, 255, 0.2)');
+
+			ctx.fillStyle = gradient;
 			ctx.beginPath();
-			ctx.ellipse(
-				centerX,
-				centerY,
-				this.cellSize / 8,
-				this.cellSize / 12,
-				Math.PI / 4,
-				0,
-				Math.PI * 2
-			);
+			ctx.ellipse(0, 0, size, size / 2, 0, 0, Math.PI * 2);
 			ctx.fill();
+
+			// Add details for shell-like appearance
+			if (Math.random() > 0.5) {
+				ctx.strokeStyle = 'rgba(150, 220, 255, 0.3)';
+				ctx.lineWidth = 1;
+				for (let i = 0; i < 3; i++) {
+					ctx.beginPath();
+					ctx.ellipse(0, 0, size * (1 - i * 0.2), (size / 2) * (1 - i * 0.2), 0, 0, Math.PI * 2);
+					ctx.stroke();
+				}
+			}
+
+			ctx.restore();
 		} else if (this.theme === 'jungle') {
-			// Small leaf
-			ctx.fillStyle = 'rgba(100, 200, 100, 0.3)';
+			// Small leaf with gradient
+			ctx.save();
+
+			const size = this.cellSize / 10;
+			const angle = Math.PI / 3;
+
+			ctx.translate(centerX, centerY);
+			ctx.rotate(angle);
+
+			const gradient = ctx.createLinearGradient(-size * 2, 0, size * 2, 0);
+			gradient.addColorStop(0, 'rgba(80, 180, 80, 0.3)');
+			gradient.addColorStop(1, 'rgba(100, 200, 100, 0.2)');
+
+			ctx.fillStyle = gradient;
 			ctx.beginPath();
-			ctx.ellipse(
-				centerX,
-				centerY,
-				this.cellSize / 10,
-				this.cellSize / 5,
-				Math.PI / 3,
-				0,
-				Math.PI * 2
-			);
+			ctx.ellipse(0, 0, size * 2, size, 0, 0, Math.PI * 2);
 			ctx.fill();
+
+			// Add leaf vein
+			ctx.strokeStyle = 'rgba(120, 200, 120, 0.3)';
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.moveTo(-size * 2, 0);
+			ctx.lineTo(size * 2, 0);
+			ctx.stroke();
+
+			ctx.restore();
 		} else if (this.theme === 'candy') {
-			// Small candy
-			ctx.fillStyle = 'rgba(255, 150, 200, 0.3)';
+			// Small candy with gradient
+			const radius = this.cellSize / 8;
+
+			// Sweet candy gradient
+			const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+			gradient.addColorStop(0, 'rgba(255, 180, 220, 0.4)');
+			gradient.addColorStop(1, 'rgba(255, 150, 200, 0.2)');
+
+			ctx.fillStyle = gradient;
 			ctx.beginPath();
-			ctx.arc(centerX, centerY, this.cellSize / 8, 0, Math.PI * 2);
+			ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
 			ctx.fill();
+
+			// Add candy details - swirl or sprinkles
+			if (Math.random() > 0.5) {
+				// Swirl
+				ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+				ctx.lineWidth = 1;
+				ctx.beginPath();
+				ctx.arc(centerX, centerY, radius * 0.6, 0, Math.PI * 4);
+				ctx.stroke();
+			} else {
+				// Sprinkles
+				const sprinkleColors = ['rgba(255, 255, 255, 0.4)', 'rgba(255, 255, 100, 0.4)'];
+				for (let i = 0; i < 3; i++) {
+					const angle = Math.random() * Math.PI * 2;
+					const distance = Math.random() * radius * 0.7;
+					const x = centerX + Math.cos(angle) * distance;
+					const y = centerY + Math.sin(angle) * distance;
+
+					ctx.fillStyle = sprinkleColors[Math.floor(Math.random() * sprinkleColors.length)];
+					ctx.fillRect(x, y, 2, 1);
+				}
+			}
 		}
+
+		ctx.restore();
 	}
 
 	/**
@@ -552,6 +905,8 @@ export class MazeRenderer {
 	 * @param cy Center Y position
 	 */
 	private drawStar(ctx: CanvasRenderingContext2D, cx: number, cy: number) {
+		ctx.save();
+
 		const spikes = 5;
 		const outerRadius = this.cellSize / 3;
 		const innerRadius = this.cellSize / 6;
@@ -560,6 +915,11 @@ export class MazeRenderer {
 		let x = cx;
 		let y = cy;
 		let step = Math.PI / spikes;
+
+		// Create gradient for star
+		const gradient = ctx.createRadialGradient(cx, cy, innerRadius * 0.5, cx, cy, outerRadius);
+		gradient.addColorStop(0, '#FFEE58'); // bright center
+		gradient.addColorStop(1, '#FFCC00'); // deeper yellow edge
 
 		ctx.beginPath();
 		ctx.moveTo(cx, cy - outerRadius);
@@ -578,10 +938,33 @@ export class MazeRenderer {
 
 		ctx.lineTo(cx, cy - outerRadius);
 		ctx.closePath();
-		ctx.fillStyle = '#FFEE58';
+
+		// Fill with gradient
+		ctx.fillStyle = gradient;
 		ctx.fill();
+
+		// Add outline
 		ctx.strokeStyle = '#FFA000';
 		ctx.lineWidth = 2;
 		ctx.stroke();
+
+		// Add glow effect
+		const glowGradient = ctx.createRadialGradient(
+			cx,
+			cy,
+			outerRadius * 0.9,
+			cx,
+			cy,
+			outerRadius * 1.5
+		);
+		glowGradient.addColorStop(0, 'rgba(255, 215, 0, 0.2)');
+		glowGradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+
+		ctx.fillStyle = glowGradient;
+		ctx.beginPath();
+		ctx.arc(cx, cy, outerRadius * 1.5, 0, Math.PI * 2);
+		ctx.fill();
+
+		ctx.restore();
 	}
 }

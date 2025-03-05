@@ -13,8 +13,8 @@
 	// Maze settings
 	const rows = 5;
 	const cols = 5;
-	const cellSize = 50; // Larger cells for better visibility
-	const wallThickness = 30;
+	const cellSize = 70; // Larger cells for better visibility and higher resolution
+	const wallThickness = 40;
 
 	let goalCell: Cell;
 	let maze: Cell[][] = [];
@@ -37,7 +37,7 @@
 	let displayedCol = targetCol;
 
 	// Zoom setting: this is how much we want to zoom into the maze.
-	const zoom = 3;
+	const zoom = 2;
 	// We'll compute offsets based on the full canvas dimensions.
 	let canvasWidth = 0;
 	let canvasHeight = 0;
@@ -65,12 +65,29 @@
 			maze = mazeData.maze;
 			goalCell = mazeData.goal;
 
-			// Initialize the maze renderer
+			// Initialize the maze renderer with high-res support
+			const pixelRatio = window.devicePixelRatio || 1;
+
 			mazeRenderer = new MazeRenderer(canvas, cellSize, wallThickness, currentTheme);
 			const dimensions = mazeRenderer.calculateCanvasDimensions(rows, cols);
-			mazeRenderer.setCanvasDimensions(dimensions.width, dimensions.height);
+
+			// Set the canvas's display size
+			canvas.style.width = `${dimensions.width}px`;
+			canvas.style.height = `${dimensions.height}px`;
+
+			// Set the canvas's drawing buffer size
+			canvas.width = dimensions.width * pixelRatio;
+			canvas.height = dimensions.height * pixelRatio;
+
+			// Store logical dimensions for calculations
 			canvasWidth = dimensions.width;
 			canvasHeight = dimensions.height;
+
+			// Scale the context for high-resolution display
+			const ctx = canvas.getContext('2d');
+			if (ctx) {
+				ctx.scale(pixelRatio, pixelRatio);
+			}
 
 			// Initial render
 			draw();
@@ -602,8 +619,8 @@
 
 	/* Viewport container */
 	.viewport {
-		width: 85vw;
-		height: 70vh;
+		width: 95vw;
+		height: 90vh;
 		overflow: hidden;
 		border-radius: 16px;
 		margin: auto;
@@ -615,6 +632,10 @@
 	canvas {
 		transform-origin: top left;
 		transition: transform 0.3s ease;
+		image-rendering: crisp-edges; /* For Firefox */
+		image-rendering: -webkit-optimize-contrast; /* For Chrome/Safari */
+		image-rendering: pixelated; /* Modern browsers */
+		-ms-interpolation-mode: nearest-neighbor; /* For IE */
 	}
 
 	/* Control buttons for mobile/younger kids */
