@@ -509,10 +509,6 @@ export class MazeRenderer {
 			ctx.arc(x, y, playerSize / 6, 0.2, Math.PI - 0.2);
 			ctx.stroke();
 
-			// Add subtle sparkle effect
-			ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-			ctx.beginPath();
-			ctx.arc(x + playerSize / 4, y - playerSize / 3, playerSize / 12, 0, Math.PI * 2);
 			ctx.fill();
 
 			ctx.restore();
