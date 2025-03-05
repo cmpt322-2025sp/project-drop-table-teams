@@ -3,7 +3,7 @@
   <div class="logo">Math Maze</div>
   
   <div class="start-button">
-    <a href="/game">
+    <a href="/game" style="text-decoration: none;">
       <button>START GAME</button>
     </a>
   </div>
@@ -53,6 +53,9 @@
     border: none;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
   }
   
   .start-button button:hover {
@@ -63,6 +66,23 @@
   .start-button button:active {
     transform: translateY(1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .start-button button::after {
+    content: '';
+    position: absolute;
+    background: rgba(255, 255, 255, 0.3);
+    width: 100%;
+    height: 100%;
+    left: -100%;
+    top: 0;
+    border-radius: 8px;
+    z-index: -1;
+    transition: all 0.4s ease;
+  }
+  
+  .start-button button:hover::after {
+    left: 0;
   }
   
   .view-progress-button {
@@ -81,10 +101,30 @@
     border: none;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
   }
   
   .view-progress-button button:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .view-progress-button button::after {
+    content: '';
+    position: absolute;
+    background: rgba(255, 255, 255, 0.3);
+    width: 100%;
+    height: 100%;
+    left: -100%;
+    top: 0;
+    border-radius: 8px;
+    z-index: -1;
+    transition: all 0.4s ease;
+  }
+  
+  .view-progress-button button:hover::after {
+    left: 0;
   }
 </style>
