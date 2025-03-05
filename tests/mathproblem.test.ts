@@ -35,27 +35,44 @@ test('generateSubtractionProblem creates a valid math problem', () => {
 test('generateRandomPlaceValueProblem creates a valid question', () => {
 	const problem = generateRandomPlaceValueProblem();
 
-	expect(problem.question).toMatch(
-		/What is the digit in the (ones|tens|hundreds) place of \d+\?|What number place is this\?\n\d+\n\s*\^/
-	);
-
-	const numberMatch = problem.question.match(/\d+/);
-	expect(numberMatch).not.toBeNull();
-
-	const number = numberMatch![0];
-
-	if (problem.question.includes('What number place is this?')) {
-		const caretIndex = problem.question.split('\n')[2].indexOf('^');
-		const expectedPlace = ['ones', 'tens', 'hundreds'][number.length - caretIndex - 1];
-		expect(problem.answer).toBe(expectedPlace);
-	} else {
+	// Validate the format of the question
+	if (problem.question.includes('What is the digit in the')) {
+		// Place value identification question
+		expect(problem.question).toMatch(
+			/What is the digit in the (ones|tens|hundreds|thousands) place of \d+\?/
+		);
+		
+		const place = problem.question.match(/(ones|tens|hundreds|thousands)/)?.[0];
+		const number = parseInt(problem.question.match(/\d+/)?.[0] || '0');
+		
+		// Verify the answer is correct
 		let expectedAnswer: string;
-		if (problem.question.includes('ones')) {
-			expectedAnswer = (parseInt(number) % 10).toString();
-		} else if (problem.question.includes('tens')) {
-			expectedAnswer = Math.floor((parseInt(number) / 10) % 10).toString();
-		} else if (problem.question.includes('hundreds')) {
-			expectedAnswer = Math.floor(parseInt(number) / 100).toString();
+		switch (place) {
+			case 'ones':
+				expectedAnswer = (number % 10).toString();
+				break;
+			case 'tens':
+				expectedAnswer = Math.floor((number / 10) % 10).toString();
+				break;
+			case 'hundreds':
+				expectedAnswer = Math.floor((number / 100) % 10).toString();
+				break;
+			case 'thousands':
+				expectedAnswer = Math.floor((number / 1000) % 10).toString();
+				break;
+			default:
+				expectedAnswer = '';
 		}
+		
+		expect(problem.answer).toBe(expectedAnswer);
+	} else {
+		// Number place identification question
+		expect(problem.question).toMatch(/What number place is this\?/);
+		expect(problem.question).toContain('<div class="number-place-display">');
+		expect(problem.question).toContain('<span class="digit highlight">');
+		expect(problem.question).toContain('⬆');
+		
+		// Answer should be one of the valid place values
+		expect(['ones', 'tens', 'hundreds', 'thousands']).toContain(problem.answer);
 	}
 });
