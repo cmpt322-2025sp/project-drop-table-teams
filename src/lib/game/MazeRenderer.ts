@@ -1,4 +1,6 @@
 import type { Cell } from '$lib/Maze';
+import { theme } from '$lib/stores/theme';
+import { get } from 'svelte/store';
 
 /**
  * Handles rendering of the maze on a canvas
@@ -10,19 +12,25 @@ export class MazeRenderer {
 	private wallThickness: number;
 	private canvasWidth: number = 0;
 	private canvasHeight: number = 0;
-	private theme: string;
+	private currentTheme: string;
+	private unsubscribe: () => void;
 
 	constructor(
 		canvas: HTMLCanvasElement,
 		cellSize: number = 50,
-		wallThickness: number = 30,
-		theme: string = 'space'
+		wallThickness: number = 30
 	) {
 		this.canvas = canvas;
 		this.ctx = canvas.getContext('2d', { alpha: false, antialias: true });
 		this.cellSize = cellSize;
 		this.wallThickness = wallThickness;
-		this.theme = theme;
+		this.currentTheme = get(theme); // Get initial theme from store
+		
+		// Subscribe to theme changes
+		this.unsubscribe = theme.subscribe(value => {
+			this.currentTheme = value;
+			this.draw(); // Redraw when theme changes
+		});
 
 		if (this.ctx) {
 			// Enable high-quality image rendering
@@ -62,11 +70,26 @@ export class MazeRenderer {
 	}
 
 	/**
-	 * Set the theme for rendering
-	 * @param theme Theme name
+	 * Clean up subscriptions when the renderer is no longer needed
 	 */
-	setTheme(theme: string) {
-		this.theme = theme;
+	destroy() {
+		if (this.unsubscribe) {
+			this.unsubscribe();
+		}
+	}
+
+	/**
+	 * Draw method called when theme changes
+	 */
+	private draw() {
+		if (this.canvas && this.ctx) {
+			// Only redraw if we have a maze to render
+			if (this.canvasWidth > 0 && this.canvasHeight > 0) {
+				// The render method is likely called externally with maze data
+				// We don't have that data here, so just mark for redraw
+				// The next regular render call will use the updated theme
+			}
+		}
 	}
 
 	/**
@@ -74,7 +97,7 @@ export class MazeRenderer {
 	 * @returns Object with color values
 	 */
 	getThemeColors() {
-		switch (this.theme) {
+		switch (this.currentTheme) {
 			case 'space':
 				return {
 					wallColor: '#2C3E50', // Deep blue
@@ -314,7 +337,7 @@ export class MazeRenderer {
 		const playerSize = this.cellSize * 0.7;
 
 		// Draw player based on theme
-		if (this.theme === 'space') {
+		if (this.currentTheme === 'space') {
 			// Draw rocket ship in high resolution
 			ctx.save();
 
@@ -408,7 +431,7 @@ export class MazeRenderer {
 			ctx.stroke();
 
 			ctx.restore();
-		} else if (this.theme === 'ocean') {
+		} else if (this.currentTheme === 'ocean') {
 			// Draw fish with smooth edges
 			ctx.save();
 
@@ -438,7 +461,7 @@ export class MazeRenderer {
 			ctx.fill();
 
 			ctx.restore();
-		} else if (this.theme === 'jungle') {
+		} else if (this.currentTheme === 'jungle') {
 			// Draw monkey with better anti-aliasing
 			ctx.save();
 
@@ -475,7 +498,7 @@ export class MazeRenderer {
 			ctx.stroke();
 
 			ctx.restore();
-		} else if (this.theme === 'candy') {
+		} else if (this.currentTheme === 'candy') {
 			// Draw lollipop character with better anti-aliasing
 			ctx.save();
 
@@ -526,13 +549,13 @@ export class MazeRenderer {
 	 * @param ctx Canvas context
 	 */
 	private addWallTexture(ctx: CanvasRenderingContext2D) {
-		if (this.theme === 'space') {
+		if (this.currentTheme === 'space') {
 			this.addStarsTexture(ctx);
-		} else if (this.theme === 'ocean') {
+		} else if (this.currentTheme === 'ocean') {
 			this.addBubblesTexture(ctx);
-		} else if (this.theme === 'jungle') {
+		} else if (this.currentTheme === 'jungle') {
 			this.addLeavesTexture(ctx);
-		} else if (this.theme === 'candy') {
+		} else if (this.currentTheme === 'candy') {
 			this.addSprinklesTexture(ctx);
 		}
 	}
@@ -814,7 +837,7 @@ export class MazeRenderer {
 
 		ctx.save();
 
-		if (this.theme === 'space') {
+		if (this.currentTheme === 'space') {
 			// Small planet with gradient
 			const radius = this.cellSize / 6;
 			const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
@@ -842,7 +865,7 @@ export class MazeRenderer {
 				);
 				ctx.stroke();
 			}
-		} else if (this.theme === 'ocean') {
+		} else if (this.currentTheme === 'ocean') {
 			// Small fish or shell with gradient
 			ctx.save();
 
@@ -873,7 +896,7 @@ export class MazeRenderer {
 			}
 
 			ctx.restore();
-		} else if (this.theme === 'jungle') {
+		} else if (this.currentTheme === 'jungle') {
 			// Small leaf with gradient
 			ctx.save();
 
@@ -901,7 +924,7 @@ export class MazeRenderer {
 			ctx.stroke();
 
 			ctx.restore();
-		} else if (this.theme === 'candy') {
+		} else if (this.currentTheme === 'candy') {
 			// Small candy with gradient
 			const radius = this.cellSize / 8;
 

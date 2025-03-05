@@ -9,6 +9,7 @@
 	} from '$lib/mathproblems';
 	import { Button, Modal, Celebration } from '$lib/components';
 	import { MazeRenderer } from '$lib/game/MazeRenderer';
+	import { theme, nextTheme, themes } from '$lib/stores/theme';
 
 	// Maze settings
 	const rows = 5;
@@ -55,9 +56,13 @@
 	// Add celebration visuals
 	let showCelebration = false;
 
-	// Add background theme
-	const themes = ['space', 'ocean', 'jungle', 'candy'];
-	let currentTheme = themes[Math.floor(Math.random() * themes.length)];
+	// Theme comes from the Svelte store
+	let currentTheme; // For binding the UI
+	
+	// Subscribe to theme changes
+	const unsubscribeTheme = theme.subscribe(value => {
+		currentTheme = value;
+	});
 
 	onMount(() => {
 		if (typeof window !== 'undefined') {
@@ -68,7 +73,7 @@
 			// Initialize the maze renderer with high-res support
 			const pixelRatio = window.devicePixelRatio || 1;
 
-			mazeRenderer = new MazeRenderer(canvas, cellSize, wallThickness, currentTheme);
+			mazeRenderer = new MazeRenderer(canvas, cellSize, wallThickness);
 			const dimensions = mazeRenderer.calculateCanvasDimensions(rows, cols);
 
 			// Set the canvas's display size
@@ -100,6 +105,14 @@
 	onDestroy(() => {
 		if (typeof window !== 'undefined') {
 			window.removeEventListener('keydown', handleKeyDown);
+		}
+		
+		// Clean up subscriptions
+		unsubscribeTheme();
+		
+		// Clean up MazeRenderer resources
+		if (mazeRenderer) {
+			mazeRenderer.destroy();
 		}
 	});
 
@@ -313,12 +326,8 @@
 
 	// Change the maze theme
 	function changeTheme() {
-		const nextIndex = (themes.indexOf(currentTheme) + 1) % themes.length;
-		currentTheme = themes[nextIndex];
-		if (mazeRenderer) {
-			mazeRenderer.setTheme(currentTheme);
-			draw();
-		}
+		nextTheme(); // Use the store's function to change the theme
+		draw();
 	}
 </script>
 
