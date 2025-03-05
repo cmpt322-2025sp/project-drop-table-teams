@@ -24,10 +24,18 @@
     class="modal-backdrop" 
     on:click={handleBackdropClick} 
     on:keydown={(e) => e.key === 'Escape' && onClose && onClose()}
+    role="dialog"
+    aria-modal="true"
+    tabindex="-1"
   >
-    <div class="modal-content {theme}-theme" on:click={handleContentClick}>
+    <div 
+      class="modal-content {theme}-theme" 
+      on:click={handleContentClick}
+      on:keydown={(e) => e.stopPropagation()}
+      role="document"
+    >
       {#if onClose}
-        <button class="close-button" on:click={onClose}>×</button>
+        <button class="close-button" on:click={onClose} aria-label="Close">×</button>
       {/if}
       <slot />
     </div>
