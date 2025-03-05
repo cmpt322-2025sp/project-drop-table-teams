@@ -1,0 +1,9 @@
+/* Dashboard specific variables */
+:root {
+  /* Using the global variables defined in +layout.svelte */
+  --dashboard-logo-size: 5rem;
+  --dashboard-button-width: 24rem;
+  --dashboard-button-height: 8rem;
+  --dashboard-button-font-size: 2.5rem;
+  --dashboard-spacing: 2rem;
+}
