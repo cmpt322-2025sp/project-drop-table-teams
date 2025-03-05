@@ -13,7 +13,6 @@ export interface Cell {
 	isIntersection?: boolean; // Add a property to mark intersections
 	hasMathProblem?: boolean; // Whether this cell has a math problem
 	mathProblemSolved?: boolean; // Whether the math problem has been solved
-	mathProblemType?: string; // Could be 'addition', 'subtraction', etc.
 	isGoal?: boolean; // Add a property to mark the goal cell
 }
 
@@ -156,10 +155,6 @@ export function generateMaze(rows: number, cols: number): { maze: Cell[][]; goal
 			if (passages >= 3) {
 				cell.isIntersection = true;
 				cell.hasMathProblem = true;
-
-				// Assign a random math problem type
-				const problemTypes = ['addition', 'subtraction', 'multiplication'];
-				cell.mathProblemType = problemTypes[Math.floor(Math.random() * problemTypes.length)];
 			}
 		}
 	}

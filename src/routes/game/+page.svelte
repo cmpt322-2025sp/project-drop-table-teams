@@ -10,7 +10,7 @@
 	import { Button, Modal } from '$lib/components';
 	import Celebration from '$lib/components/Celebration.svelte';
 	import { MazeRenderer } from '$lib/game/MazeRenderer';
-	import { theme, nextTheme, themes, getThemeColors } from '$lib/stores/theme';
+	import { theme, nextTheme, getThemeColors } from '$lib/stores/theme';
 
 	// Maze settings
 	const rows = 6;
@@ -59,9 +59,9 @@
 
 	// Theme comes from the Svelte store
 	let currentTheme; // For binding the UI
-	
+
 	// Subscribe to theme changes
-	const unsubscribeTheme = theme.subscribe(value => {
+	const unsubscribeTheme = theme.subscribe((value) => {
 		currentTheme = value;
 	});
 
@@ -107,10 +107,10 @@
 		if (typeof window !== 'undefined') {
 			window.removeEventListener('keydown', handleKeyDown);
 		}
-		
+
 		// Clean up subscriptions
 		unsubscribeTheme();
-		
+
 		// Clean up MazeRenderer resources
 		if (mazeRenderer) {
 			mazeRenderer.destroy();
@@ -391,14 +391,16 @@
 		<div id="invalid-move" class="invalid-move">Can't go that way!</div>
 
 		<!-- Math problem modal using the Modal component -->
-		<Modal 
-			show={showMathProblem && currentProblem !== null} 
+		<Modal
+			show={showMathProblem && currentProblem !== null}
 			theme={currentTheme}
 			disableBackdropClick={true}
 			titleId="math-problem-title"
 		>
 			<div class="math-problem-content">
-				<h2 id="math-problem-title" style="color: {getThemeColors(currentTheme).mathProblemColor}">Solve to Continue!</h2>
+				<h2 id="math-problem-title" style="color: {getThemeColors(currentTheme).mathProblemColor}">
+					Solve to Continue!
+				</h2>
 				{#if currentProblem}
 					<p class="question">{@html currentProblem.question}</p>
 
@@ -488,7 +490,7 @@
 		</Modal>
 
 		<!-- Celebration overlay when reaching the goal -->
-		<Celebration 
+		<Celebration
 			show={showCelebration}
 			title="You Did It!"
 			message="Great job solving the maze!"
