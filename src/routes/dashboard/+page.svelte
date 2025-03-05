@@ -38,7 +38,7 @@
 		font-family: 'NovaFlat-Book', sans-serif;
 		font-size: var(--dashboard-logo-size);
 		line-height: 1.2;
-		font-weight: 400;
+		font-weight: 700;
 		margin-bottom: var(--dashboard-spacing);
 		text-align: center;
 		animation: fadeIn 1.5s ease;
