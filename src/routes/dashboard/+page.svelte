@@ -1,15 +1,19 @@
 
+<script lang="ts">
+  import { Button } from '$lib/components';
+</script>
+
 <div class="dashboard-container">
   <div class="logo">Math Maze</div>
   
   <div class="start-button">
     <a href="/game">
-      <button class="btn btn-primary">START GAME</button>
+      <Button variant="primary" size="lg">START GAME</Button>
     </a>
   </div>
   
   <div class="view-progress-button">
-    <button class="btn btn-secondary">View Progress</button>
+    <Button variant="secondary" size="md" rounded={true}>View Progress</Button>
   </div>
 </div>
 
@@ -37,7 +41,6 @@
   }
   
   .start-button button {
-    padding: 14px 24px;
     width: 20rem;
     height: 6rem;
     font-size: 2rem;
@@ -45,10 +48,5 @@
   
   .view-progress-button {
     margin-top: 2rem;
-  }
-  
-  .view-progress-button button {
-    padding: 10px 20px;
-    font-size: 1rem;
   }
 </style>

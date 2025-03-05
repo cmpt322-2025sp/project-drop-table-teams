@@ -58,6 +58,9 @@
     overflow: hidden;
     z-index: 1;
     border-radius: 8px;
+    font-family: inherit;
+    font-weight: bold;
+    box-shadow: var(--button-shadow);
   }
 
   :global(.btn::after) {
@@ -87,12 +90,12 @@
     box-shadow: var(--button-shadow-active);
   }
 
+  /* Button variants */
   :global(.btn-primary) {
     background: var(--button-orange);
     color: var(--text-color);
     font-family: "NovaFlat-Book", sans-serif;
     font-weight: bold;
-    box-shadow: var(--button-shadow);
   }
 
   :global(.btn-secondary) {
@@ -100,7 +103,37 @@
     color: var(--text-color);
     font-family: "CrimsonText-SemiBold", sans-serif;
     font-weight: 600;
-    box-shadow: var(--button-shadow);
+  }
+  
+  :global(.btn-round) {
+    border-radius: 50px;
+  }
+  
+  :global(.btn-round::after) {
+    border-radius: 50px;
+  }
+  
+  /* Button sizes */
+  :global(.btn-lg) {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.2rem;
+  }
+  
+  :global(.btn-md) {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+  }
+  
+  :global(.btn-sm) {
+    padding: 0.3rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  :global(.btn-icon) {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.2rem;
+    border-radius: 50%;
   }
 
   :global(a) {
