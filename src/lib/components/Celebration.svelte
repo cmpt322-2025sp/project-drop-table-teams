@@ -2,6 +2,8 @@
   /**
    * A celebration component to show when a user completes a level
    */
+  import { Button } from '$lib/components';
+  
   export let show: boolean = false;
   export let title: string = 'You Did It!';
   export let message: string = 'Great job!';
@@ -19,9 +21,15 @@
         <div class="star">⭐</div>
       </div>
       <p>{message}</p>
-      <button class="btn btn-primary btn-round btn-lg" on:click={onButtonClick}>
+      <Button 
+        variant="primary" 
+        size="lg"
+        rounded={true}
+        onClick={onButtonClick}
+        style="background-color: #FFEB3B; color: #333; font-weight: bold;"
+      >
         {buttonText}
-      </button>
+      </Button>
     </div>
   </div>
 {/if}
