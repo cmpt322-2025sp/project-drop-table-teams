@@ -13,8 +13,8 @@
 	import { theme, nextTheme, themes, getThemeColors } from '$lib/stores/theme';
 
 	// Maze settings
-	const rows = 5;
-	const cols = 5;
+	const rows = 6;
+	const cols = 6;
 	const cellSize = 70; // Larger cells for better visibility and higher resolution
 	const wallThickness = 40;
 
