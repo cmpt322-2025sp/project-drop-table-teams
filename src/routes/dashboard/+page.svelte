@@ -51,7 +51,7 @@
 	}
 
 	.view-progress-button {
-		margin-top: var(--dashboard-spacing);
+		margin-top: calc(var(--dashboard-spacing) * 0.5);
 		animation: fadeIn 2s ease;
 	}
 
