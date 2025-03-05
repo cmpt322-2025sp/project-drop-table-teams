@@ -2,9 +2,36 @@
 	import { Button } from '$lib/components';
 	import './vars.css';
 	import './style.css';
+
+	// Mock user data
+	const user = {
+		name: 'Sarah',
+		level: 3,
+		points: 120
+	};
 </script>
 
 <div class="dashboard-container">
+	<div class="user-info">
+		<div class="user-avatar">
+			<svg
+				viewBox="0 0 24 24"
+				width="24"
+				height="24"
+				stroke="currentColor"
+				stroke-width="2"
+				fill="none"
+			>
+				<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+				<circle cx="12" cy="7" r="4" />
+			</svg>
+		</div>
+		<div class="user-details">
+			<div class="user-name">{user.name}</div>
+			<div class="user-stats">Level {user.level} • {user.points} points</div>
+		</div>
+	</div>
+
 	<div class="logo">Math Maze</div>
 
 	<div class="start-button">
@@ -31,6 +58,62 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+		position: relative;
+		width: 100%;
+		height: 100%;
+		padding: 1rem;
+	}
+
+	.user-info {
+		position: absolute;
+		top: 1rem;
+		left: 1rem;
+		display: flex;
+		align-items: center;
+		background-color: rgba(255, 255, 255, 0.1);
+		padding: 0.5rem 1rem;
+		border-radius: 2rem;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		animation: slideIn 1s ease;
+	}
+
+	.user-avatar {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		background-color: var(--primary-color-light);
+		border-radius: 50%;
+		margin-right: 0.75rem;
+		color: var(--text-color-light);
+	}
+
+	.user-details {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.user-name {
+		font-weight: 600;
+		font-size: 1rem;
+		color: var(--text-color);
+	}
+
+	.user-stats {
+		font-size: 0.8rem;
+		color: var(--text-color-muted);
+	}
+
+	@keyframes slideIn {
+		from {
+			transform: translateX(-100%);
+			opacity: 0;
+		}
+		to {
+			transform: translateX(0);
+			opacity: 1;
+		}
 	}
 
 	.logo {
