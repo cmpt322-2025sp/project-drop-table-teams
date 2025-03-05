@@ -315,50 +315,97 @@ export class MazeRenderer {
 
 		// Draw player based on theme
 		if (this.theme === 'space') {
-			// Draw detailed high-resolution spaceship
+			// Draw rocket ship in high resolution
 			ctx.save();
 
-			// Add glow behind spaceship
-			const outerGlow = ctx.createRadialGradient(x, y, 0, x, y, playerSize);
-			outerGlow.addColorStop(0, 'rgba(255, 100, 100, 0.4)');
-			outerGlow.addColorStop(0.6, 'rgba(255, 50, 50, 0.3)');
-			outerGlow.addColorStop(1, 'rgba(255, 0, 0, 0)');
-			ctx.fillStyle = outerGlow;
+			// Add rocket thrust/exhaust glow
+			const thrustGlow = ctx.createRadialGradient(
+				x,
+				y + playerSize * 0.7,
+				0,
+				x,
+				y + playerSize * 0.7,
+				playerSize
+			);
+			thrustGlow.addColorStop(0, 'rgba(255, 165, 0, 0.8)');
+			thrustGlow.addColorStop(0.5, 'rgba(255, 69, 0, 0.5)');
+			thrustGlow.addColorStop(1, 'rgba(255, 0, 0, 0)');
+			ctx.fillStyle = thrustGlow;
 			ctx.beginPath();
-			ctx.arc(x, y, playerSize, 0, Math.PI * 2);
+			ctx.moveTo(x - playerSize * 0.2, y + playerSize * 0.4);
+			ctx.lineTo(x, y + playerSize);
+			ctx.lineTo(x + playerSize * 0.2, y + playerSize * 0.4);
+			ctx.closePath();
 			ctx.fill();
 
-			// Main body of spaceship
+			// Draw rocket body (elongated)
 			ctx.fillStyle = colors.playerColor;
 			ctx.beginPath();
-			ctx.arc(x, y, playerSize / 2, 0, Math.PI * 2);
+			ctx.ellipse(x, y, playerSize * 0.25, playerSize * 0.6, 0, 0, Math.PI * 2);
 			ctx.fill();
 
-			// Add border for higher contrast
-			ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+			// Draw rocket border for clarity
+			ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
 			ctx.lineWidth = 2;
-			ctx.beginPath();
-			ctx.arc(x, y, playerSize / 2, 0, Math.PI * 2);
 			ctx.stroke();
 
-			// Add spaceship details with better quality
-			ctx.fillStyle = '#FFFFFF';
+			// Draw rocket nose cone
+			ctx.fillStyle = colors.playerColor;
 			ctx.beginPath();
-			ctx.arc(x, y - playerSize / 6, playerSize / 6, 0, Math.PI * 2);
+			ctx.moveTo(x - playerSize * 0.25, y - playerSize * 0.45);
+			ctx.lineTo(x, y - playerSize * 0.75);
+			ctx.lineTo(x + playerSize * 0.25, y - playerSize * 0.45);
+			ctx.closePath();
+			ctx.fill();
+			ctx.stroke();
+
+			// Draw fins
+			ctx.fillStyle = colors.playerColor;
+			// Left fin
+			ctx.beginPath();
+			ctx.moveTo(x - playerSize * 0.25, y + playerSize * 0.2);
+			ctx.lineTo(x - playerSize * 0.45, y + playerSize * 0.45);
+			ctx.lineTo(x - playerSize * 0.25, y + playerSize * 0.35);
+			ctx.closePath();
+			ctx.fill();
+			ctx.stroke();
+
+			// Right fin
+			ctx.beginPath();
+			ctx.moveTo(x + playerSize * 0.25, y + playerSize * 0.2);
+			ctx.lineTo(x + playerSize * 0.45, y + playerSize * 0.45);
+			ctx.lineTo(x + playerSize * 0.25, y + playerSize * 0.35);
+			ctx.closePath();
+			ctx.fill();
+			ctx.stroke();
+
+			// Draw cockpit/window
+			ctx.fillStyle = '#87CEFA'; // Light blue
+			ctx.beginPath();
+			ctx.ellipse(x, y - playerSize * 0.3, playerSize * 0.15, playerSize * 0.2, 0, 0, Math.PI * 2);
+			ctx.fill();
+			ctx.stroke();
+
+			// Add window highlight
+			ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+			ctx.beginPath();
+			ctx.ellipse(
+				x - playerSize * 0.05,
+				y - playerSize * 0.35,
+				playerSize * 0.07,
+				playerSize * 0.1,
+				Math.PI / 4,
+				0,
+				Math.PI * 2
+			);
 			ctx.fill();
 
-			// Add cockpit highlight
-			ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+			// Add engine nozzle
+			ctx.fillStyle = '#A0A0A0'; // Silver color
 			ctx.beginPath();
-			ctx.arc(x - playerSize / 12, y - playerSize / 5, playerSize / 12, 0, Math.PI * 2);
+			ctx.ellipse(x, y + playerSize * 0.4, playerSize * 0.2, playerSize * 0.1, 0, 0, Math.PI * 2);
 			ctx.fill();
-
-			// Add engine exhausts
-			ctx.fillStyle = '#FFA500';
-			ctx.beginPath();
-			ctx.arc(x - playerSize / 4, y + playerSize / 3, playerSize / 10, 0, Math.PI * 2);
-			ctx.arc(x + playerSize / 4, y + playerSize / 3, playerSize / 10, 0, Math.PI * 2);
-			ctx.fill();
+			ctx.stroke();
 
 			ctx.restore();
 		} else if (this.theme === 'ocean') {
