@@ -10,7 +10,7 @@
 	import { Button, Modal } from '$lib/components';
 	import Celebration from '$lib/components/Celebration.svelte';
 	import { MazeRenderer } from '$lib/game/MazeRenderer';
-	import { theme, nextTheme, themes } from '$lib/stores/theme';
+	import { theme, nextTheme, themes, getThemeColors } from '$lib/stores/theme';
 
 	// Maze settings
 	const rows = 5;
@@ -398,7 +398,7 @@
 			titleId="math-problem-title"
 		>
 			<div class="math-problem-content">
-				<h2 id="math-problem-title">Solve to Continue!</h2>
+				<h2 id="math-problem-title" style="color: {getThemeColors(currentTheme).mathProblemColor}">Solve to Continue!</h2>
 				{#if currentProblem}
 					<p class="question">{@html currentProblem.question}</p>
 
@@ -708,6 +708,7 @@
 		text-align: center;
 		max-width: 500px;
 		margin: 0 auto;
+		/* Modal component handles background color and border */
 	}
 
 	.question {
@@ -778,16 +779,16 @@
 		font-family: 'Comic Sans MS', cursive, sans-serif;
 	}
 
-	.space-theme input {
+	:global(.space-theme) input {
 		border-color: #3f51b5;
 	}
-	.ocean-theme input {
+	:global(.ocean-theme) input {
 		border-color: #0288d1;
 	}
-	.jungle-theme input {
+	:global(.jungle-theme) input {
 		border-color: #388e3c;
 	}
-	.candy-theme input {
+	:global(.candy-theme) input {
 		border-color: #d81b60;
 	}
 
