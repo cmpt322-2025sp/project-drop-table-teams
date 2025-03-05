@@ -60,6 +60,9 @@
 		border: 6px solid #ffc107;
 		max-width: 400px;
 		width: 90%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 	}
 
 	h2 {

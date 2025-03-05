@@ -7,7 +7,8 @@
 		generateRandomPlaceValueProblem,
 		type MathProblem
 	} from '$lib/mathproblems';
-	import { Button, Modal, Celebration } from '$lib/components';
+	import { Button, Modal } from '$lib/components';
+	import Celebration from '$lib/components/Celebration.svelte';
 	import { MazeRenderer } from '$lib/game/MazeRenderer';
 	import { theme, nextTheme, themes } from '$lib/stores/theme';
 
@@ -482,28 +483,13 @@
 		{/if}
 
 		<!-- Celebration overlay when reaching the goal -->
-		{#if showCelebration}
-			<div class="celebration" role="dialog" aria-modal="true">
-				<div class="celebration-content" role="document">
-					<h2>You Did It!</h2>
-					<div class="stars">
-						<div class="star">⭐</div>
-						<div class="star">⭐</div>
-						<div class="star">⭐</div>
-					</div>
-					<p>Great job solving the maze!</p>
-					<Button
-						variant="primary"
-						size="lg"
-						rounded={true}
-						onClick={() => window.location.reload()}
-						style="background-color: #FFEB3B; color: #333; font-weight: bold;"
-					>
-						Play Again
-					</Button>
-				</div>
-			</div>
-		{/if}
+		<Celebration 
+			show={showCelebration}
+			title="You Did It!"
+			message="Great job solving the maze!"
+			buttonText="Play Again"
+			onButtonClick={() => window.location.reload()}
+		/>
 	</div>
 </div>
 
@@ -987,112 +973,7 @@
 		}
 	}
 
-	/* Celebration overlay */
-	.celebration {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: rgba(0, 0, 0, 0.7);
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		z-index: 20;
-		animation: fadeIn 0.5s;
-		backdrop-filter: blur(5px);
-	}
-
-	.celebration-content {
-		background: linear-gradient(135deg, #ff9800, #f44336);
-		padding: 2rem;
-		border-radius: 20px;
-		text-align: center;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-		color: white;
-		border: 6px solid #ffc107;
-		max-width: 400px;
-		width: 90%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-
-	.celebration-content h2 {
-		font-size: 2.5rem;
-		margin-bottom: 1rem;
-		animation: celebrate 1s infinite alternate;
-	}
-
-	@keyframes celebrate {
-		0% {
-			transform: scale(1);
-		}
-		100% {
-			transform: scale(1.1);
-		}
-	}
-
-	.stars {
-		display: flex;
-		justify-content: center;
-		margin: 1rem 0;
-	}
-
-	.star {
-		font-size: 3rem;
-		margin: 0 0.5rem;
-		animation: spin 2s infinite linear;
-	}
-
-	.star:nth-child(2) {
-		animation-delay: 0.3s;
-	}
-
-	.star:nth-child(3) {
-		animation-delay: 0.6s;
-	}
-
-	@keyframes spin {
-		0% {
-			transform: rotate(0deg) scale(1);
-		}
-		50% {
-			transform: rotate(180deg) scale(1.2);
-		}
-		100% {
-			transform: rotate(360deg) scale(1);
-		}
-	}
-
-	.celebration-content p {
-		font-size: 1.3rem;
-		margin-bottom: 1.5rem;
-	}
-
-	.new-game-btn {
-		background-color: #ffeb3b;
-		color: #333;
-		border: none;
-		border-radius: 50px;
-		padding: 0.75rem 1.5rem;
-		font-size: 1.2rem;
-		font-weight: bold;
-		cursor: pointer;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-		transition: all 0.2s ease;
-		font-family: 'Comic Sans MS', cursive, sans-serif;
-	}
-
-	.new-game-btn:hover {
-		transform: translateY(-3px);
-		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-	}
-
-	.new-game-btn:active {
-		transform: translateY(1px);
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-	}
+	/* No longer needed - using the Celebration component */
 
 	/* Responsive adjustments */
 	@media (max-width: 768px) {
