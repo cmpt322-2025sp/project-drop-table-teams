@@ -2,6 +2,8 @@
   /**
    * Reusable modal component
    */
+  import { Button } from '$lib/components';
+  
   export let show: boolean = false;
   export let theme: string = 'default';
   export let onClose: (() => void) | null = null;
@@ -35,7 +37,16 @@
       role="document"
     >
       {#if onClose}
-        <button class="close-button" on:click={onClose} aria-label="Close">×</button>
+        <Button 
+          variant="default"
+          size="sm" 
+          icon={true}
+          onClick={onClose}
+          style="position: absolute; top: 1rem; right: 1rem; background: rgba(0, 0, 0, 0.1); width: 2rem; height: 2rem; padding: 0;"
+          aria-label="Close"
+        >
+          ×
+        </Button>
       {/if}
       <slot />
     </div>
@@ -70,27 +81,6 @@
     animation: scaleIn 0.3s ease;
   }
   
-  .close-button {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    width: 2rem;
-    height: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease;
-  }
-  
-  .close-button:hover {
-    background-color: rgba(0, 0, 0, 0.2);
-  }
   
   @keyframes fadeIn {
     from { opacity: 0; }
