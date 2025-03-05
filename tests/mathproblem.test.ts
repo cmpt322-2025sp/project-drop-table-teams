@@ -41,10 +41,10 @@ test('generateRandomPlaceValueProblem creates a valid question', () => {
 		expect(problem.question).toMatch(
 			/What is the digit in the (ones|tens|hundreds|thousands) place of \d+\?/
 		);
-		
+
 		const place = problem.question.match(/(ones|tens|hundreds|thousands)/)?.[0];
 		const number = parseInt(problem.question.match(/\d+/)?.[0] || '0');
-		
+
 		// Verify the answer is correct
 		let expectedAnswer: string;
 		switch (place) {
@@ -63,7 +63,7 @@ test('generateRandomPlaceValueProblem creates a valid question', () => {
 			default:
 				expectedAnswer = '';
 		}
-		
+
 		expect(problem.answer).toBe(expectedAnswer);
 	} else {
 		// Number place identification question
@@ -71,7 +71,7 @@ test('generateRandomPlaceValueProblem creates a valid question', () => {
 		expect(problem.question).toContain('<div class="number-place-display">');
 		expect(problem.question).toContain('<span class="digit highlight">');
 		expect(problem.question).toContain('⬆');
-		
+
 		// Answer should be one of the valid place values
 		expect(['ones', 'tens', 'hundreds', 'thousands']).toContain(problem.answer);
 	}

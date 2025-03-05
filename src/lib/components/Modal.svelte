@@ -11,7 +11,7 @@
 	export let onClose: (() => void) | null = null;
 	export let disableBackdropClick: boolean = false;
 	export let titleId: string = 'dialog-title';
-	
+
 	// Get theme colors based on the selected theme
 	$: themeColors = getThemeColors(theme);
 
@@ -113,7 +113,7 @@
 {#if typeof window !== 'undefined' && show}
 	<!-- Using native dialog element with showModal() method -->
 	<dialog bind:this={dialogElement} class="modal-backdrop" aria-labelledby={titleId}>
-		<div 
+		<div
 			class="modal-content {theme}-theme"
 			style="background-color: {theme !== 'default' ? themeColors.pathColor : 'white'}; 
 				   border: 6px solid {themeColors.mathProblemColor};"

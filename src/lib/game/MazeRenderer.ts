@@ -15,19 +15,15 @@ export class MazeRenderer {
 	private currentTheme: string;
 	private unsubscribe: () => void;
 
-	constructor(
-		canvas: HTMLCanvasElement,
-		cellSize: number = 50,
-		wallThickness: number = 30
-	) {
+	constructor(canvas: HTMLCanvasElement, cellSize: number = 50, wallThickness: number = 30) {
 		this.canvas = canvas;
 		this.ctx = canvas.getContext('2d', { alpha: false, antialias: true });
 		this.cellSize = cellSize;
 		this.wallThickness = wallThickness;
 		this.currentTheme = get(theme); // Get initial theme from store
-		
+
 		// Subscribe to theme changes
-		this.unsubscribe = theme.subscribe(value => {
+		this.unsubscribe = theme.subscribe((value) => {
 			this.currentTheme = value;
 			this.draw(); // Redraw when theme changes
 		});
