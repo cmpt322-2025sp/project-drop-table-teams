@@ -1,10 +1,22 @@
 <script>
 	// Global layout for Math Maze application
+	import { invalidate } from '$app/navigation';
+	import { onMount } from 'svelte';
+	let { data, children } = $props();
+	let { session, supabase } = $derived(data);
+	onMount(() => {
+		const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
+			if (newSession?.expires_at !== session?.expires_at) {
+				invalidate('supabase:auth');
+			}
+		});
+		return () => data.subscription.unsubscribe();
+	});
 </script>
 
-<div class="app-container">
-	<slot />
-</div>
+{@render children()}
+
+<div class="app-container"></div>
 
 <style>
 	/* Global styles for Math Maze */
