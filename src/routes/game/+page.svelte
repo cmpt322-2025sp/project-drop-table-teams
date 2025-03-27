@@ -38,8 +38,8 @@
 	let displayedRow = targetRow;
 	let displayedCol = targetCol;
 
-	// Zoom setting: this is how much we want to zoom into the maze.
-	const zoom = 2;
+	// Zoom setting: this is dynamically calculated based on screen resolution
+	let zoom = 1; // Default value, will be adjusted based on screen size
 	// We'll compute offsets based on the full canvas dimensions.
 	let canvasWidth = 0;
 	let canvasHeight = 0;
@@ -47,8 +47,26 @@
 	let offsetX = 0;
 	let offsetY = 0;
 
+	// Helper for calculating appropriate zoom based on device
+	function calculateZoom() {
+		if (typeof window === 'undefined') return 1;
+
+		// Get screen dimensions
+		const screenWidth = window.innerWidth;
+		const screenHeight = window.innerHeight;
+
+		// Calculate zoom based on the smaller dimension to ensure it fits on any screen
+		const baseZoom = Math.min(
+			(screenWidth * 0.8) / (cols * (cellSize + wallThickness) + wallThickness),
+			(screenHeight * 0.7) / (rows * (cellSize + wallThickness) + wallThickness)
+		);
+
+		// Add a small buffer to prevent edge cases
+		return Math.max(baseZoom * 0.9, 0.5);
+	}
+
 	// Animation settings.
-	const animationSpeed = 0.15; // Slightly slower for kids to follow
+	const animationSpeed = 0.15;
 	let animating = false;
 
 	// Add movement buttons for kids (in addition to keyboard controls)
@@ -58,7 +76,7 @@
 	let showCelebration = false;
 
 	// Theme comes from the Svelte store
-	let currentTheme; // For binding the UI
+	let currentTheme: string; // For binding the UI
 
 	// Subscribe to theme changes
 	const unsubscribeTheme = theme.subscribe((value) => {
@@ -77,17 +95,20 @@
 			mazeRenderer = new MazeRenderer(canvas, cellSize, wallThickness);
 			const dimensions = mazeRenderer.calculateCanvasDimensions(rows, cols);
 
+			// Store logical dimensions for calculations
+			canvasWidth = dimensions.width;
+			canvasHeight = dimensions.height;
+
+			// Calculate optimal zoom based on screen size
+			zoom = calculateZoom();
+
 			// Set the canvas's display size
 			canvas.style.width = `${dimensions.width}px`;
 			canvas.style.height = `${dimensions.height}px`;
 
-			// Set the canvas's drawing buffer size
+			// Set the canvas's drawing buffer size (accounting for pixel ratio for high-res displays)
 			canvas.width = dimensions.width * pixelRatio;
 			canvas.height = dimensions.height * pixelRatio;
-
-			// Store logical dimensions for calculations
-			canvasWidth = dimensions.width;
-			canvasHeight = dimensions.height;
 
 			// Scale the context for high-resolution display
 			const ctx = canvas.getContext('2d');
@@ -99,15 +120,26 @@
 			draw();
 			updateTransform();
 
+			// Add event listeners
 			window.addEventListener('keydown', handleKeyDown);
+
+			// Handle resize events to adapt the game zoom and position
+			const handleResize = () => {
+				zoom = calculateZoom();
+				updateTransform();
+			};
+
+			window.addEventListener('resize', handleResize);
+
+			// Return cleanup function that removes both event listeners
+			return () => {
+				window.removeEventListener('keydown', handleKeyDown);
+				window.removeEventListener('resize', handleResize);
+			};
 		}
 	});
 
 	onDestroy(() => {
-		if (typeof window !== 'undefined') {
-			window.removeEventListener('keydown', handleKeyDown);
-		}
-
 		// Clean up subscriptions
 		unsubscribeTheme();
 
@@ -132,17 +164,18 @@
 		const playerCenterX = wallThickness + displayedCol * (cellSize + wallThickness) + cellSize / 2;
 		const playerCenterY = wallThickness + displayedRow * (cellSize + wallThickness) + cellSize / 2;
 
-		// Define the viewport dimensions. Here we use 80% of the window dimensions.
-		const viewportWidth = window.innerWidth * 0.8;
-		const viewportHeight = window.innerHeight * 0.8;
+		// Define the viewport dimensions, adjusted based on device
+		// Use a larger percentage on larger screens for better visibility
+		const viewportWidth = window.innerWidth * (window.innerWidth < 768 ? 0.85 : 0.8);
+		const viewportHeight = window.innerHeight * (window.innerWidth < 768 ? 0.7 : 0.75);
 
-		// To center the player in the viewport compute the offset needed.
-		// Note: Because we apply a scale transform, we need to divide the offset
-		// by the zoom factor.
+		// Center the player in the viewport by calculating the offset needed
+		// Apply the offsets inversely proportional to the zoom to maintain correct positioning
 		offsetX = (viewportWidth / 2 - playerCenterX * zoom) / zoom;
 		offsetY = (viewportHeight / 2 - playerCenterY * zoom) / zoom;
 
 		if (canvas) {
+			// Apply the transformation
 			canvas.style.transform = `scale(${zoom}) translate(${offsetX}px, ${offsetY}px)`;
 		}
 	}
@@ -622,22 +655,27 @@
 	/* Viewport container */
 	.viewport {
 		width: 95vw;
-		height: 90vh;
+		height: 75vh;
+		max-height: calc(100vh - 150px); /* Ensure it doesn't overflow the screen */
 		overflow: hidden;
 		border-radius: 16px;
 		margin: auto;
 		position: relative;
 		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 		background: rgba(255, 255, 255, 0.1);
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
 	canvas {
-		transform-origin: top left;
+		transform-origin: center;
 		transition: transform 0.3s ease;
 		image-rendering: crisp-edges; /* For Firefox */
 		image-rendering: -webkit-optimize-contrast; /* For Chrome/Safari */
 		image-rendering: pixelated; /* Modern browsers */
 		-ms-interpolation-mode: nearest-neighbor; /* For IE */
+		will-change: transform; /* Optimize performance for transforms */
 	}
 
 	/* Control buttons for mobile/younger kids */
@@ -847,31 +885,49 @@
 	@media (max-width: 768px) {
 		.game-title {
 			font-size: 2rem;
+			margin-bottom: 0.5rem;
 		}
 
 		.viewport {
-			width: 95vw;
+			width: 98vw;
 			height: 65vh;
+			margin-top: 0.5rem;
 		}
 
 		.question {
 			font-size: 1.4rem;
 		}
 
-		.control-btn {
-			width: 3rem;
-			height: 3rem;
-			font-size: 1.2rem;
+		.control-buttons {
+			bottom: 0.5rem;
+			right: 0.5rem;
 		}
 	}
 
 	@media (max-width: 480px) {
 		.game-title {
-			font-size: 1.8rem;
+			font-size: 1.7rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.viewport {
+			width: 98vw;
+			height: 60vh;
+			border-radius: 12px;
 		}
 
 		.question {
 			font-size: 1.2rem;
+		}
+
+		.control-buttons {
+			transform: scale(0.9);
+			transform-origin: bottom right;
+		}
+
+		input {
+			width: 120px;
+			font-size: 1rem;
 		}
 	}
 </style>
