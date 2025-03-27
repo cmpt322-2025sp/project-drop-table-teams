@@ -164,15 +164,14 @@
 		const playerCenterX = wallThickness + displayedCol * (cellSize + wallThickness) + cellSize / 2;
 		const playerCenterY = wallThickness + displayedRow * (cellSize + wallThickness) + cellSize / 2;
 
-		// Define the viewport dimensions, adjusted based on device
-		// Use a larger percentage on larger screens for better visibility
+		// Get the center of the viewport
 		const viewportWidth = window.innerWidth * (window.innerWidth < 768 ? 0.85 : 0.8);
 		const viewportHeight = window.innerHeight * (window.innerWidth < 768 ? 0.7 : 0.75);
-
-		// Center the player in the viewport by calculating the offset needed
-		// Apply the offsets inversely proportional to the zoom to maintain correct positioning
-		offsetX = (viewportWidth / 2 - playerCenterX * zoom) / zoom;
-		offsetY = (viewportHeight / 2 - playerCenterY * zoom) / zoom;
+		
+		// Fixed approach: Calculate the translation needed to center the player in the viewport
+		// This directly calculates where the player should appear in window space
+		offsetX = (viewportWidth / 2) / zoom - playerCenterX;
+		offsetY = (viewportHeight / 2) / zoom - playerCenterY;
 
 		if (canvas) {
 			// Apply the transformation
@@ -669,13 +668,14 @@
 	}
 
 	canvas {
-		transform-origin: center;
+		transform-origin: 0 0; /* Origin at top-left for more predictable positioning */
 		transition: transform 0.3s ease;
 		image-rendering: crisp-edges; /* For Firefox */
 		image-rendering: -webkit-optimize-contrast; /* For Chrome/Safari */
 		image-rendering: pixelated; /* Modern browsers */
 		-ms-interpolation-mode: nearest-neighbor; /* For IE */
 		will-change: transform; /* Optimize performance for transforms */
+		position: absolute; /* Take it out of document flow for better positioning */
 	}
 
 	/* Control buttons for mobile/younger kids */
