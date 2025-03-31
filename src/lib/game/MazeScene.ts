@@ -56,7 +56,7 @@ export class MazeScene extends Phaser.Scene {
     // Setup camera and world bounds
     this.setupCamera();
     
-    // Create initial maze graphics
+    // Create initial maze graphics - this will handle the background too
     this.createMazeGraphics();
     
     // Setup input handling
@@ -65,6 +65,149 @@ export class MazeScene extends Phaser.Scene {
     // Emit event to notify Svelte that scene is ready
     const sceneReadyEvent = { scene: this };
     EventBus.emit('maze-scene-ready', sceneReadyEvent);
+  }
+  
+  /**
+   * Create a background that matches the current theme
+   */
+  private createThemeBackground(): void {
+    // We need to create a background that extends beyond the maze bounds
+    // to fill the entire visible area
+    
+    // Clear any existing background graphics first - safely check if children exists
+    if (this.children && typeof this.children.getAll === 'function') {
+      this.children.getAll().forEach(child => {
+        if (child && child.name === 'theme-background') {
+          child.destroy();
+        }
+      });
+    }
+    
+    // Calculate dimensions safely
+    let worldWidth = 2000; 
+    let worldHeight = 2000;
+    
+    if (this.cameras && this.cameras.main) {
+      worldWidth = this.cameras.main.width * 2 || 2000;
+      worldHeight = this.cameras.main.height * 2 || 2000;
+    }
+    
+    // Get the theme colors
+    const colors = this.getThemeColors();
+    
+    // Create a background graphics object
+    const bg = this.add.graphics();
+    bg.name = 'theme-background'; // Set a name for later reference
+    
+    // Fill with the theme background color with reduced opacity to make maze visible
+    bg.fillStyle(colors.backgroundColor, 0.2);
+    bg.fillRect(0, 0, worldWidth, worldHeight);
+    
+    // Set to the back of the display list so it doesn't overlap other elements
+    bg.setDepth(-100);
+    
+    // Add theme-specific decorative elements depending on the theme
+    if (this.currentTheme === 'space') {
+      this.addSpaceBackgroundElements(bg);
+    } else if (this.currentTheme === 'ocean') {
+      this.addOceanBackgroundElements(bg);
+    } else if (this.currentTheme === 'jungle') {
+      this.addJungleBackgroundElements(bg);
+    } else if (this.currentTheme === 'candy') {
+      this.addCandyBackgroundElements(bg);
+    }
+  }
+  
+  /**
+   * Add space-themed background elements
+   * @param bg Background graphics object
+   */
+  private addSpaceBackgroundElements(bg: Phaser.GameObjects.Graphics): void {
+    // Add stars in the background
+    const starCount = 100;
+    
+    for (let i = 0; i < starCount; i++) {
+      const x = Phaser.Math.Between(-this.cameras.main.width, this.cameras.main.width * 2);
+      const y = Phaser.Math.Between(-this.cameras.main.height, this.cameras.main.height * 2);
+      const size = Phaser.Math.Between(1, 3);
+      
+      // Draw a star
+      bg.fillStyle(0xFFFFFF, Phaser.Math.FloatBetween(0.3, 1));
+      bg.fillCircle(x, y, size);
+    }
+  }
+  
+  /**
+   * Add ocean-themed background elements
+   * @param bg Background graphics object
+   */
+  private addOceanBackgroundElements(bg: Phaser.GameObjects.Graphics): void {
+    // Add bubbles in the background
+    const bubbleCount = 30;
+    
+    for (let i = 0; i < bubbleCount; i++) {
+      const x = Phaser.Math.Between(-this.cameras.main.width, this.cameras.main.width * 2);
+      const y = Phaser.Math.Between(-this.cameras.main.height, this.cameras.main.height * 2);
+      const size = Phaser.Math.Between(5, 15);
+      
+      // Draw a bubble
+      bg.fillStyle(0xFFFFFF, Phaser.Math.FloatBetween(0.1, 0.2));
+      bg.fillCircle(x, y, size);
+    }
+  }
+  
+  /**
+   * Add jungle-themed background elements
+   * @param bg Background graphics object
+   */
+  private addJungleBackgroundElements(bg: Phaser.GameObjects.Graphics): void {
+    // Add leaf silhouettes in the background
+    const leafCount = 15;
+    
+    for (let i = 0; i < leafCount; i++) {
+      const x = Phaser.Math.Between(-this.cameras.main.width, this.cameras.main.width * 2);
+      const y = Phaser.Math.Between(-this.cameras.main.height, this.cameras.main.height * 2);
+      const size = Phaser.Math.Between(20, 50);
+      
+      // Draw a simple leaf shape
+      bg.fillStyle(0xFFFFFF, Phaser.Math.FloatBetween(0.05, 0.1));
+      bg.fillEllipse(x, y, size, size / 2);
+    }
+  }
+  
+  /**
+   * Add candy-themed background elements
+   * @param bg Background graphics object
+   */
+  private addCandyBackgroundElements(bg: Phaser.GameObjects.Graphics): void {
+    // Add candy sprinkles in the background
+    const sprinkleCount = 40;
+    const sprinkleColors = [0xFFEB3B, 0x2196F3, 0x4CAF50, 0x9C27B0, 0xFF9800];
+    
+    for (let i = 0; i < sprinkleCount; i++) {
+      const x = Phaser.Math.Between(-this.cameras.main.width, this.cameras.main.width * 2);
+      const y = Phaser.Math.Between(-this.cameras.main.height, this.cameras.main.height * 2);
+      const width = Phaser.Math.Between(5, 10);
+      const height = Phaser.Math.Between(2, 4);
+      const angle = Phaser.Math.FloatBetween(0, Math.PI);
+      
+      // Get a random color for the sprinkle
+      const colorIndex = Phaser.Math.Between(0, sprinkleColors.length - 1);
+      
+      // Save the current transform state
+      bg.save();
+      
+      // Move to the position and rotate
+      bg.translateCanvas(x, y);
+      bg.rotateCanvas(angle);
+      
+      // Draw the sprinkle
+      bg.fillStyle(sprinkleColors[colorIndex], 0.3);
+      bg.fillRoundedRect(-width/2, -height/2, width, height, height/2);
+      
+      // Restore the transform state
+      bg.restore();
+    }
   }
   
   update(time: number, delta: number): void {
@@ -162,12 +305,23 @@ export class MazeScene extends Phaser.Scene {
   setTheme(theme: string): void {
     if (!theme) return; // Ignore empty theme values
     
+    // Just store the theme name - don't attempt to update visuals immediately 
+    // as scene may not be fully initialized
     this.currentTheme = theme;
     console.log('Setting theme to:', theme);
     
-    // Always update the visuals when theme changes
-    // The scene.isActive check can cause issues during initialization
-    this.createMazeGraphics();
+    // Only try to update visuals if the scene is fully initialized
+    // Check for essential scene properties
+    if (this.scene && this.scene.isActive && this.add && this.cameras) {
+      try {
+        // Update the background to match the new theme
+        this.createMazeGraphics();
+      } catch (error) {
+        console.error('Error updating maze graphics during theme change:', error);
+      }
+    } else {
+      console.log('Scene not fully initialized, theme stored for later application');
+    }
     
     // Emit an event that the theme has been updated
     const themeEvent: ThemeUpdatedEvent = { theme };
@@ -185,6 +339,7 @@ export class MazeScene extends Phaser.Scene {
     mathProblemColor: number;
     solvedColor: number;
     playerColor: number;
+    backgroundColor: number;
   } {
     switch (this.currentTheme) {
       case 'space':
@@ -194,7 +349,8 @@ export class MazeScene extends Phaser.Scene {
           goalColor: 0xFFD700,
           mathProblemColor: 0x9B59B6,
           solvedColor: 0x3498DB,
-          playerColor: 0xE74C3C
+          playerColor: 0xE74C3C,
+          backgroundColor: 0x203A43 // Middle color from the gradient
         };
       case 'ocean':
         return {
@@ -203,7 +359,8 @@ export class MazeScene extends Phaser.Scene {
           goalColor: 0xFFEB3B,
           mathProblemColor: 0x26A69A,
           solvedColor: 0x66BB6A,
-          playerColor: 0xFF7043
+          playerColor: 0xFF7043,
+          backgroundColor: 0x0277BD // Middle color from the gradient
         };
       case 'jungle':
         return {
@@ -212,7 +369,8 @@ export class MazeScene extends Phaser.Scene {
           goalColor: 0xFFC107,
           mathProblemColor: 0xFF9800,
           solvedColor: 0x8BC34A,
-          playerColor: 0x7B1FA2
+          playerColor: 0x7B1FA2,
+          backgroundColor: 0x00796B // Middle color from the gradient
         };
       case 'candy':
         return {
@@ -221,7 +379,8 @@ export class MazeScene extends Phaser.Scene {
           goalColor: 0xFFEB3B,
           mathProblemColor: 0xAB47BC,
           solvedColor: 0x26C6DA,
-          playerColor: 0x7CB342
+          playerColor: 0x7CB342,
+          backgroundColor: 0xC2185B // Middle color from the gradient
         };
       default:
         return {
@@ -230,7 +389,8 @@ export class MazeScene extends Phaser.Scene {
           goalColor: 0xFFD700,
           mathProblemColor: 0x9B59B6,
           solvedColor: 0x3498DB,
-          playerColor: 0xE74C3C
+          playerColor: 0xE74C3C,
+          backgroundColor: 0x203A43 // Middle color from the gradient
         };
     }
   }
@@ -244,19 +404,38 @@ export class MazeScene extends Phaser.Scene {
     
     // If no theme is set yet, we'll use a default theme
     if (!this.currentTheme) {
-      import('$lib/stores/theme').then(({ theme }) => {
-        let initialTheme = '';
-        const unsubscribe = theme.subscribe(value => {
-          initialTheme = value;
-          this.setTheme(value);
+      try {
+        // Safely try to get the theme from the store
+        import('$lib/stores/theme').then(({ theme }) => {
+          let initialTheme = '';
+          const unsubscribe = theme.subscribe(value => {
+            initialTheme = value;
+            this.currentTheme = value; // Just store the theme, don't recursively call setTheme
+          });
+          unsubscribe();
+          
+          // If we successfully got a theme, use it
+          if (initialTheme) {
+            this.currentTheme = initialTheme;
+          } else {
+            // Otherwise default to space theme
+            this.currentTheme = 'space';
+          }
+          
+          // Now continue with rendering
+          this.createMazeGraphics();
+        }).catch(err => {
+          console.error('Failed to load theme store:', err);
+          // Use space theme as default
+          this.currentTheme = 'space';
+          this.createMazeGraphics();
         });
-        unsubscribe();
-      }).catch(err => {
-        console.error('Failed to load theme store:', err);
+      } catch (error) {
+        console.error('Error loading theme store:', error);
         // Use space theme as default
         this.currentTheme = 'space';
         this.createMazeGraphics();
-      });
+      }
       return; // Wait for theme to be set
     }
     
@@ -264,9 +443,39 @@ export class MazeScene extends Phaser.Scene {
     this.mazeGraphics.clear();
     this.playerGraphics.clear();
     
+    // Clean up existing text objects (like question marks, checkmarks)
+    if (this.children && typeof this.children.each === 'function') {
+      this.children.each(child => {
+        if (child && child.type === 'Text') {
+          child.destroy();
+        }
+      });
+    }
+    
+    // Set maze graphics depth to be above background but below UI
+    this.mazeGraphics.setDepth(1);
+    this.playerGraphics.setDepth(2);
+    
     const colors = this.getThemeColors();
     const rows = this.maze.length;
     const cols = this.maze[0].length;
+    
+    // First create a background with theme color
+    // Safely check for existing background
+    if (this.children && typeof this.children.getByName === 'function') {
+      const bgGraphics = this.children.getByName('theme-background') as Phaser.GameObjects.Graphics;
+      if (bgGraphics) {
+        bgGraphics.destroy(); // Remove if it exists
+      }
+    }
+    
+    // Create new background
+    const bg = this.add.graphics({ name: 'theme-background' });
+    bg.setDepth(-100);
+    
+    // Fill with the theme background color
+    bg.fillStyle(colors.backgroundColor, 0.2);
+    bg.fillRect(0, 0, this.worldWidth * 2, this.worldHeight * 2);
     
     // Draw the entire canvas filled with walls
     this.mazeGraphics.fillStyle(colors.wallColor, 1);
@@ -324,7 +533,7 @@ export class MazeScene extends Phaser.Scene {
           this.mazeGraphics.fillRect(x, y, this.cellSize, this.cellSize);
           
           // Add a question mark
-          this.add.text(
+          const questionMark = this.add.text(
             x + this.cellSize / 2,
             y + this.cellSize / 2,
             '?',
@@ -334,12 +543,15 @@ export class MazeScene extends Phaser.Scene {
             }
           ).setOrigin(0.5);
           
+          // Set depth to be above maze graphics
+          questionMark.setDepth(1.5);
+          
         } else if (cell.isIntersection && cell.mathProblemSolved) {
           this.mazeGraphics.fillStyle(colors.solvedColor, 1);
           this.mazeGraphics.fillRect(x, y, this.cellSize, this.cellSize);
           
           // Add a checkmark
-          this.add.text(
+          const checkmark = this.add.text(
             x + this.cellSize / 2,
             y + this.cellSize / 2,
             '✓',
@@ -348,6 +560,9 @@ export class MazeScene extends Phaser.Scene {
               color: '#ffffff'
             }
           ).setOrigin(0.5);
+          
+          // Set depth to be above maze graphics
+          checkmark.setDepth(1.5);
           
         } else {
           this.mazeGraphics.fillStyle(colors.pathColor, 1);
@@ -438,15 +653,29 @@ export class MazeScene extends Phaser.Scene {
     // Clear previous player
     this.playerGraphics.clear();
     
+    // Make sure the player is drawn above everything else
+    this.playerGraphics.setDepth(10);
+    
     // Draw player based on theme
     const playerSize = this.cellSize * 0.6;
     
-    // Use a simple circle for all themes initially
+    // Draw with a bright color to ensure visibility
     this.playerGraphics.fillStyle(colors.playerColor, 1);
     this.playerGraphics.fillCircle(x, y, playerSize / 2);
     
-    // Center camera on player
-    this.cameras.main.centerOn(x, y);
+    // Add a white glow effect to make the player stand out
+    // First a larger soft outline in white
+    this.playerGraphics.lineStyle(3, 0xFFFFFF, 0.3);
+    this.playerGraphics.strokeCircle(x, y, playerSize / 2 + 2);
+    
+    // Then a smaller, sharper black outline
+    this.playerGraphics.lineStyle(2, 0x000000, 0.5);
+    this.playerGraphics.strokeCircle(x, y, playerSize / 2);
+    
+    // Center camera on player if cameras exists
+    if (this.cameras && this.cameras.main) {
+      this.cameras.main.centerOn(x, y);
+    }
   }
   
   /**

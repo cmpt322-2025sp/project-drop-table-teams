@@ -25,7 +25,7 @@ export class PhaserGame {
       parent: parentElement,
       width: 800,
       height: 600,
-      backgroundColor: '#2c3e50',
+      transparent: true, // Make canvas background transparent to show theme background
       scene: [this.mazeScene],
       physics: {
         default: 'arcade',
@@ -87,12 +87,16 @@ export class PhaserGame {
    * @param themeName Current theme name
    */
   private updateTheme(themeName: string): void {
+    if (!themeName) return; // Skip empty theme values
+    
+    console.log('PhaserGame: Updating theme to', themeName);
+    
     if (this.mazeScene) {
       this.mazeScene.setTheme(themeName);
+    } else {
+      console.log('PhaserGame: Scene not ready, theme will be applied when scene loads');
+      // When game is initialized, we'll set the theme from the scene's preload
     }
-    
-    // If game is not initialized yet, we'll set the theme when the scene is ready
-    // The Scene will also retrieve the initial theme in its preload method
   }
   
   /**

@@ -41,6 +41,7 @@
 
 	// Add celebration visuals
 	let showCelebration = false;
+	let celebrationMessage = 'Great job solving the maze!';
 
 	// Theme comes from the Svelte store
 	let currentTheme: string; // For binding the UI
@@ -102,36 +103,35 @@
 			// Connect goal reached events
 			EventBus.on('goal-reached', (_data: GoalReachedEvent) => {
 				console.log('Goal reached!');
-				// Only show celebration if all math problems are solved
-				let allProblemsSolved = true;
+				// Count how many math problems were solved
+				let solvedProblems = 0;
+				let totalProblems = 0;
 				
 				for (let r = 0; r < maze.length; r++) {
 					for (let c = 0; c < maze[0].length; c++) {
 						const cell = maze[r][c];
-						if (cell.isIntersection && !cell.mathProblemSolved) {
-							allProblemsSolved = false;
-							break;
+						if (cell.isIntersection) {
+							totalProblems++;
+							if (cell.mathProblemSolved) {
+								solvedProblems++;
+							}
 						}
 					}
 				}
 				
-				if (allProblemsSolved) {
-					showCelebration = true;
-					setTimeout(() => {
-						showCelebration = false;
-					}, 3000);
+				// Always show celebration when goal is reached
+				showCelebration = true;
+				
+				// Update the celebration message based on solved problems
+				if (solvedProblems === totalProblems) {
+					celebrationMessage = `Perfect! You solved all ${totalProblems} math problems!`;
 				} else {
-					// Show a message that not all problems are solved
-					const invalidMove = document.getElementById('invalid-move');
-					if (invalidMove) {
-						invalidMove.textContent = 'Solve all math problems first!';
-						invalidMove.classList.add('show');
-						setTimeout(() => {
-							invalidMove.textContent = 'Can\'t go that way!';
-							invalidMove.classList.remove('show');
-						}, 2000);
-					}
+					celebrationMessage = `Good job! You solved ${solvedProblems} out of ${totalProblems} math problems.`;
 				}
+				
+				setTimeout(() => {
+					showCelebration = false;
+				}, 5000);
 			});
 		}
 	}
@@ -252,7 +252,17 @@
 
 	// Change the maze theme
 	function changeTheme() {
-		nextTheme(); // Use the store's function to change the theme
+		console.log('Changing theme from:', currentTheme);
+		
+		// Store current theme
+		const oldTheme = currentTheme;
+		
+		// Update the theme in the store
+		nextTheme(); 
+		
+		// Don't directly call scene methods - scene may not be fully initialized
+		// Just let the subscription in PhaserGame handle the update
+		console.log('Theme updated in store, PhaserGame will handle the update');
 	}
 </script>
 
@@ -272,7 +282,7 @@
 	</Button>
 
 	<!-- Phaser game container -->
-	<div class="viewport">
+	<div class="viewport {currentTheme}-viewport">
 		<!-- PhaserGame Svelte component -->
 		<PhaserGameComponent 
 			bind:phaserRef={phaserRef} 
@@ -425,7 +435,7 @@
 		<Celebration
 			show={showCelebration}
 			title="You Did It!"
-			message="Great job solving the maze!"
+			message={celebrationMessage}
 			buttonText="Play Again"
 			onButtonClick={() => window.location.reload()}
 		/>
@@ -519,6 +529,23 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+	}
+
+	/* Theme-specific viewport enhancements */
+	.space-viewport {
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 40px rgba(41, 121, 255, 0.4);
+	}
+  
+	.ocean-viewport {
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 188, 212, 0.4);
+	}
+  
+	.jungle-viewport {
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 195, 74, 0.4);
+	}
+  
+	.candy-viewport {
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 40px rgba(233, 30, 99, 0.4);
 	}
 
 	/* Control buttons for mobile/younger kids */

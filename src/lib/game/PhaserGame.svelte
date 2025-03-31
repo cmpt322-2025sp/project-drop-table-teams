@@ -94,5 +94,11 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
+    border-radius: inherit; /* Inherit border radius from parent */
+  }
+  
+  /* This ensures Phaser canvas inherits border radius */
+  :global(.phaser-container canvas) {
+    border-radius: inherit;
   }
 </style>
