@@ -9,7 +9,8 @@
 	} from '$lib/mathproblems';
 	import { Button, Modal } from '$lib/components';
 	import Celebration from '$lib/components/Celebration.svelte';
-	import { PhaserGame } from '$lib/game';
+	import { EventBus, type MazeScene } from '$lib/game';
+	import PhaserGameComponent from '$lib/game/PhaserGame.svelte';
 	import { theme, nextTheme, getThemeColors } from '$lib/stores/theme';
 
 	// Maze settings
@@ -18,8 +19,8 @@
 
 	let goalCell: Cell;
 	let maze: Cell[][] = [];
-	let gameContainer: HTMLDivElement;
-	let phaserGame: PhaserGame;
+	// Phaser game references
+	let phaserRef = { game: null, scene: null };
 
 	// Math problem state
 	let showMathProblem = false;
@@ -47,35 +48,37 @@
 		currentTheme = value;
 	});
 
+	// Handle Phaser scene when it's ready
+	function handleSceneReady(scene: MazeScene) {
+		console.log('Maze scene is ready', scene);
+		
+		// Now we can interact with the scene directly
+		if (scene) {
+			// Set the maze data in the scene
+			if (maze.length > 0 && goalCell) {
+				scene.setMaze(maze, goalCell);
+			}
+			
+			// Connect player movement events
+			EventBus.on('player-moved', (data) => {
+				console.log('Player moved:', data.direction);
+				// We can respond to player movement here
+			});
+		}
+	}
+	
 	onMount(() => {
 		if (typeof window !== 'undefined') {
 			// Generate the maze
 			const mazeData = generateMaze(rows, cols);
 			maze = mazeData.maze;
 			goalCell = mazeData.goal;
-
-			// Initialize the Phaser game
-			phaserGame = new PhaserGame(gameContainer);
-			phaserGame.init();
-			phaserGame.setMaze(maze, goalCell);
-
-			// Handle resize events to adapt the game to screen size
-			const handleResize = () => {
-				if (phaserGame) {
-					phaserGame.resize(gameContainer.clientWidth, gameContainer.clientHeight);
-				}
-			};
-
-			// Initial resize
-			handleResize();
-			window.addEventListener('resize', handleResize);
-
+			
 			// Add keyboard event listener for the game controls
 			window.addEventListener('keydown', handleKeyDown);
-
+			
 			// Return cleanup function
 			return () => {
-				window.removeEventListener('resize', handleResize);
 				window.removeEventListener('keydown', handleKeyDown);
 			};
 		}
@@ -84,11 +87,9 @@
 	onDestroy(() => {
 		// Clean up subscriptions
 		unsubscribeTheme();
-
-		// Clean up PhaserGame resources
-		if (phaserGame) {
-			phaserGame.destroy();
-		}
+		
+		// Clean up EventBus listeners
+		EventBus.removeAllListeners('player-moved');
 	});
 
 	// Generate a math problem for the intersection
@@ -145,13 +146,21 @@
 
 	// Handle movement with direction buttons or keyboard
 	function movePlayer(direction: 'up' | 'down' | 'left' | 'right') {
-		// This is a placeholder for now - movement will be handled by Phaser
-		console.log(`Moving player ${direction}`);
+		// Forward the move to the Phaser scene
+		if (phaserRef.scene) {
+			phaserRef.scene.movePlayer(direction);
+		} else {
+			console.log(`Scene not ready, can't move player ${direction}`);
+		}
 	}
 
 	// Handle arrow keys or WASD key presses to move the player
 	function handleKeyDown(e: KeyboardEvent) {
-		// This will be connected to Phaser input in a future step
+		// Avoid processing keys if we're in a text input
+		if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+			return;
+		}
+
 		if (e.key === 'ArrowUp' || e.key === 'w') {
 			movePlayer('up');
 		} else if (e.key === 'ArrowDown' || e.key === 's') {
@@ -185,8 +194,12 @@
 	</Button>
 
 	<!-- Phaser game container -->
-	<div class="viewport" bind:this={gameContainer}>
-		<!-- The Phaser game will be mounted in this container -->
+	<div class="viewport">
+		<!-- PhaserGame Svelte component -->
+		<PhaserGameComponent 
+			bind:phaserRef={phaserRef} 
+			onSceneReady={handleSceneReady}
+		/>
 
 		<!-- On-screen controls for touchscreens or younger kids -->
 		{#if showControls}

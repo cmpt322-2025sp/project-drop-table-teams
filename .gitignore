@@ -31,3 +31,6 @@ CLAUDE.md
 
 # svelte data
 .svelte-kit/
+
+# Phaser Svelte template
+template-svelte/

@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import type { Cell } from '$lib/Maze';
 import { theme } from '$lib/stores/theme';
 import { MazeScene } from './MazeScene';
+import { EventBus } from './EventBus';
 
 /**
  * Main Phaser game class for Math Maze
