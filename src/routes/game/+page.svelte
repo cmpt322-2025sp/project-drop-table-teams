@@ -9,19 +9,17 @@
 	} from '$lib/mathproblems';
 	import { Button, Modal } from '$lib/components';
 	import Celebration from '$lib/components/Celebration.svelte';
-	import { MazeRenderer } from '$lib/game/MazeRenderer';
+	import { PhaserGame } from '$lib/game';
 	import { theme, nextTheme, getThemeColors } from '$lib/stores/theme';
 
 	// Maze settings
 	const rows = 6;
 	const cols = 6;
-	const cellSize = 70; // Larger cells for better visibility and higher resolution
-	const wallThickness = 40;
 
 	let goalCell: Cell;
 	let maze: Cell[][] = [];
-	let canvas: HTMLCanvasElement;
-	let mazeRenderer: MazeRenderer;
+	let gameContainer: HTMLDivElement;
+	let phaserGame: PhaserGame;
 
 	// Math problem state
 	let showMathProblem = false;
@@ -31,43 +29,9 @@
 	let problemResult: 'correct' | 'incorrect' | null = null;
 	let answerInput: HTMLInputElement;
 
-	// Player starting position (center of maze for now).
+	// Player starting position (center of maze for now)
 	let targetRow = Math.floor(rows / 2);
 	let targetCol = Math.floor(cols / 2);
-	// The "displayed" position is used for animation (in grid units, as a float).
-	let displayedRow = targetRow;
-	let displayedCol = targetCol;
-
-	// Zoom setting: this is dynamically calculated based on screen resolution
-	let zoom = 1; // Default value, will be adjusted based on screen size
-	// We'll compute offsets based on the full canvas dimensions.
-	let canvasWidth = 0;
-	let canvasHeight = 0;
-	// These will be used in the transform style.
-	let offsetX = 0;
-	let offsetY = 0;
-
-	// Helper for calculating appropriate zoom based on device
-	function calculateZoom() {
-		if (typeof window === 'undefined') return 1;
-
-		// Get screen dimensions
-		const screenWidth = window.innerWidth;
-		const screenHeight = window.innerHeight;
-
-		// Calculate zoom based on the smaller dimension to ensure it fits on any screen
-		const baseZoom = Math.min(
-			(screenWidth * 0.8) / (cols * (cellSize + wallThickness) + wallThickness),
-			(screenHeight * 0.7) / (rows * (cellSize + wallThickness) + wallThickness)
-		);
-
-		// Add a small buffer to prevent edge cases
-		return Math.max(baseZoom * 0.9, 0.5);
-	}
-
-	// Animation settings.
-	const animationSpeed = 0.15;
-	let animating = false;
 
 	// Add movement buttons for kids (in addition to keyboard controls)
 	let showControls = true;
@@ -85,56 +49,34 @@
 
 	onMount(() => {
 		if (typeof window !== 'undefined') {
+			// Generate the maze
 			const mazeData = generateMaze(rows, cols);
 			maze = mazeData.maze;
 			goalCell = mazeData.goal;
 
-			// Initialize the maze renderer with high-res support
-			const pixelRatio = window.devicePixelRatio || 1;
+			// Initialize the Phaser game
+			phaserGame = new PhaserGame(gameContainer);
+			phaserGame.init();
+			phaserGame.setMaze(maze, goalCell);
 
-			mazeRenderer = new MazeRenderer(canvas, cellSize, wallThickness);
-			const dimensions = mazeRenderer.calculateCanvasDimensions(rows, cols);
-
-			// Store logical dimensions for calculations
-			canvasWidth = dimensions.width;
-			canvasHeight = dimensions.height;
-
-			// Calculate optimal zoom based on screen size
-			zoom = calculateZoom();
-
-			// Set the canvas's display size
-			canvas.style.width = `${dimensions.width}px`;
-			canvas.style.height = `${dimensions.height}px`;
-
-			// Set the canvas's drawing buffer size (accounting for pixel ratio for high-res displays)
-			canvas.width = dimensions.width * pixelRatio;
-			canvas.height = dimensions.height * pixelRatio;
-
-			// Scale the context for high-resolution display
-			const ctx = canvas.getContext('2d');
-			if (ctx) {
-				ctx.scale(pixelRatio, pixelRatio);
-			}
-
-			// Initial render
-			draw();
-			updateTransform();
-
-			// Add event listeners
-			window.addEventListener('keydown', handleKeyDown);
-
-			// Handle resize events to adapt the game zoom and position
+			// Handle resize events to adapt the game to screen size
 			const handleResize = () => {
-				zoom = calculateZoom();
-				updateTransform();
+				if (phaserGame) {
+					phaserGame.resize(gameContainer.clientWidth, gameContainer.clientHeight);
+				}
 			};
 
+			// Initial resize
+			handleResize();
 			window.addEventListener('resize', handleResize);
 
-			// Return cleanup function that removes both event listeners
+			// Add keyboard event listener for the game controls
+			window.addEventListener('keydown', handleKeyDown);
+
+			// Return cleanup function
 			return () => {
-				window.removeEventListener('keydown', handleKeyDown);
 				window.removeEventListener('resize', handleResize);
+				window.removeEventListener('keydown', handleKeyDown);
 			};
 		}
 	});
@@ -143,82 +85,11 @@
 		// Clean up subscriptions
 		unsubscribeTheme();
 
-		// Clean up MazeRenderer resources
-		if (mazeRenderer) {
-			mazeRenderer.destroy();
+		// Clean up PhaserGame resources
+		if (phaserGame) {
+			phaserGame.destroy();
 		}
 	});
-
-	// Draw the maze and player using the MazeRenderer
-	function draw() {
-		if (!canvas || !mazeRenderer) return;
-		mazeRenderer.render(maze, displayedRow, displayedCol);
-	}
-
-	function updateTransform() {
-		// Check if window exists (i.e. code is running in the browser)
-		if (typeof window === 'undefined') return;
-
-		// Compute the center of the player's cell in the full maze (in canvas pixels).
-		// We add half the cell's width/height to center within the cell.
-		const playerCenterX = wallThickness + displayedCol * (cellSize + wallThickness) + cellSize / 2;
-		const playerCenterY = wallThickness + displayedRow * (cellSize + wallThickness) + cellSize / 2;
-
-		// Get the center of the viewport
-		const viewportWidth = window.innerWidth * (window.innerWidth < 768 ? 0.85 : 0.8);
-		const viewportHeight = window.innerHeight * (window.innerWidth < 768 ? 0.7 : 0.75);
-		
-		// Fixed approach: Calculate the translation needed to center the player in the viewport
-		// This directly calculates where the player should appear in window space
-		offsetX = (viewportWidth / 2) / zoom - playerCenterX;
-		offsetY = (viewportHeight / 2) / zoom - playerCenterY;
-
-		if (canvas) {
-			// Apply the transformation
-			canvas.style.transform = `scale(${zoom}) translate(${offsetX}px, ${offsetY}px)`;
-		}
-	}
-
-	// Animate the transition from the current displayed position to the target.
-	function animate(onComplete?: () => void) {
-		// Linear interpolation helper.
-		const lerp = (start: number, end: number, t: number) => start + (end - start) * t;
-
-		// Update displayed positions.
-		displayedRow = lerp(displayedRow, targetRow, animationSpeed);
-		displayedCol = lerp(displayedCol, targetCol, animationSpeed);
-
-		// Redraw and update transform.
-		draw();
-		updateTransform();
-
-		// If the displayed position is nearly at the target, finish animating.
-		if (Math.abs(displayedRow - targetRow) < 0.01 && Math.abs(displayedCol - targetCol) < 0.01) {
-			displayedRow = targetRow;
-			displayedCol = targetCol;
-			animating = false;
-
-			// Call the completion callback if provided
-			if (onComplete) onComplete();
-		} else {
-			requestAnimationFrame(() => animate(onComplete));
-		}
-	}
-
-	// Check if the move is valid based on walls
-	function isMoveValid(newRow: number, newCol: number): boolean {
-		if (newRow < 0 || newRow >= rows || newCol < 0 || newCol >= cols) {
-			return false; // Out of bounds
-		}
-
-		const currentCell = maze[targetRow][targetCol];
-		if (newRow < targetRow && currentCell.walls.top) return false; // Moving up
-		if (newRow > targetRow && currentCell.walls.bottom) return false; // Moving down
-		if (newCol < targetCol && currentCell.walls.left) return false; // Moving left
-		if (newCol > targetCol && currentCell.walls.right) return false; // Moving right
-
-		return true; // Move is valid
-	}
 
 	// Generate a math problem for the intersection
 	function generateMathProblem(): MathProblem {
@@ -239,9 +110,6 @@
 			if (attemptedCell) {
 				attemptedCell.mathProblemSolved = true;
 
-				// Immediately redraw the maze to update the block appearance
-				draw();
-
 				// Handle goal check and close math problem
 				const isGoalCell = attemptedCell.isGoal;
 
@@ -260,8 +128,6 @@
 					userAnswer = '';
 					attemptedCell = null;
 					problemResult = null;
-					// Redraw one more time to ensure everything is updated
-					draw();
 				}, 1000);
 			}
 		} else {
@@ -279,73 +145,13 @@
 
 	// Handle movement with direction buttons or keyboard
 	function movePlayer(direction: 'up' | 'down' | 'left' | 'right') {
-		// If math problem is showing or currently animating, don't allow movement
-		if (showMathProblem || animating) return;
-
-		let newRow = targetRow;
-		let newCol = targetCol;
-
-		if (direction === 'up') {
-			newRow = targetRow - 1;
-		} else if (direction === 'down') {
-			newRow = targetRow + 1;
-		} else if (direction === 'left') {
-			newCol = targetCol - 1;
-		} else if (direction === 'right') {
-			newCol = targetCol + 1;
-		}
-
-		// Check boundaries and wall collision
-		if (isMoveValid(newRow, newCol)) {
-			const targetCell = maze[newRow][newCol];
-
-			// Normal movement first, then check for special cases after animation
-			targetRow = newRow;
-			targetCol = newCol;
-
-			// Start animating
-			animating = true;
-
-			// Handle math problems or goal after animation completes
-			requestAnimationFrame(() =>
-				animate(() => {
-					// After animation completes, check if cell has math problem
-					if (targetCell.hasMathProblem && !targetCell.mathProblemSolved) {
-						// Show math problem after movement completes
-						showMathProblem = true;
-						currentProblem = generateMathProblem();
-						attemptedCell = targetCell;
-						userAnswer = '';
-						problemResult = null;
-
-						// Focus the input element after the modal opens
-						setTimeout(() => {
-							if (answerInput) answerInput.focus();
-						}, 100);
-					}
-					// Check if player reached the goal after animation completes
-					else if (targetCell.isGoal) {
-						showCelebration = true;
-						setTimeout(() => {
-							showCelebration = false;
-						}, 3000);
-					}
-				})
-			);
-		} else {
-			// Give visual feedback when trying to move through walls
-			const invalidMove = document.getElementById('invalid-move');
-			if (invalidMove) {
-				invalidMove.classList.add('show');
-				setTimeout(() => {
-					invalidMove.classList.remove('show');
-				}, 500);
-			}
-		}
+		// This is a placeholder for now - movement will be handled by Phaser
+		console.log(`Moving player ${direction}`);
 	}
 
 	// Handle arrow keys or WASD key presses to move the player
 	function handleKeyDown(e: KeyboardEvent) {
+		// This will be connected to Phaser input in a future step
 		if (e.key === 'ArrowUp' || e.key === 'w') {
 			movePlayer('up');
 		} else if (e.key === 'ArrowDown' || e.key === 's') {
@@ -360,7 +166,6 @@
 	// Change the maze theme
 	function changeTheme() {
 		nextTheme(); // Use the store's function to change the theme
-		draw();
 	}
 </script>
 
@@ -379,10 +184,9 @@
 		Change Theme
 	</Button>
 
-	<!-- Wrap the canvas in a viewport container -->
-	<div class="viewport">
-		<canvas bind:this={canvas} style="transform: scale({zoom}) translate({offsetX}px, {offsetY}px);"
-		></canvas>
+	<!-- Phaser game container -->
+	<div class="viewport" bind:this={gameContainer}>
+		<!-- The Phaser game will be mounted in this container -->
 
 		<!-- On-screen controls for touchscreens or younger kids -->
 		{#if showControls}
@@ -605,52 +409,6 @@
 		}
 	}
 
-	/* Theme button */
-	.theme-button {
-		background-color: #ffeb3b;
-		color: #333;
-		border: none;
-		border-radius: 50px;
-		padding: 0.75rem 1.5rem;
-		font-size: 1.1rem;
-		font-weight: bold;
-		margin-bottom: 1rem;
-		cursor: pointer;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-		transition: all 0.2s ease;
-		font-family: 'Comic Sans MS', cursive, sans-serif;
-		position: relative;
-		overflow: hidden;
-		z-index: 1;
-	}
-
-	.theme-button:hover {
-		transform: translateY(-3px);
-		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
-	}
-
-	.theme-button:active {
-		transform: translateY(1px);
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-	}
-
-	.theme-button::after {
-		content: '';
-		position: absolute;
-		background: rgba(255, 255, 255, 0.3);
-		width: 100%;
-		height: 100%;
-		left: -100%;
-		top: 0;
-		border-radius: 50px;
-		z-index: -1;
-		transition: all 0.4s ease;
-	}
-
-	.theme-button:hover::after {
-		left: 0;
-	}
-
 	/* Viewport container */
 	.viewport {
 		width: 95vw;
@@ -665,17 +423,6 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-	}
-
-	canvas {
-		transform-origin: 0 0; /* Origin at top-left for more predictable positioning */
-		transition: transform 0.3s ease;
-		image-rendering: crisp-edges; /* For Firefox */
-		image-rendering: -webkit-optimize-contrast; /* For Chrome/Safari */
-		image-rendering: pixelated; /* Modern browsers */
-		-ms-interpolation-mode: nearest-neighbor; /* For IE */
-		will-change: transform; /* Optimize performance for transforms */
-		position: absolute; /* Take it out of document flow for better positioning */
 	}
 
 	/* Control buttons for mobile/younger kids */
@@ -693,33 +440,6 @@
 	.control-row {
 		display: flex;
 		gap: 1rem;
-	}
-
-	.control-btn {
-		width: 3.5rem;
-		height: 3.5rem;
-		border-radius: 50%;
-		border: none;
-		background-color: rgba(255, 255, 255, 0.7);
-		color: #333;
-		font-size: 1.5rem;
-		font-weight: bold;
-		cursor: pointer;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-		transition: all 0.2s ease;
-	}
-
-	.control-btn:hover {
-		background-color: rgba(255, 255, 255, 0.9);
-		transform: scale(1.1);
-	}
-
-	.control-btn:active {
-		background-color: rgba(200, 200, 200, 0.9);
-		transform: scale(0.95);
 	}
 
 	/* Invalid move indicator */
@@ -748,7 +468,6 @@
 		text-align: center;
 		max-width: 500px;
 		margin: 0 auto;
-		/* Modal component handles background color and border */
 	}
 
 	.question {
