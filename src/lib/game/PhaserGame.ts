@@ -8,7 +8,8 @@ import { EventBus } from './EventBus';
  * Main Phaser game class for Math Maze
  */
 export class PhaserGame {
-  private game: Phaser.Game | null = null;
+  // Make this public so it can be accessed by PhaserGame.svelte
+  public game: Phaser.Game | null = null;
   private config: Phaser.Types.Core.GameConfig;
   private parentElement: HTMLElement;
   private mazeScene: MazeScene;

@@ -10,7 +10,9 @@
 	import { Button, Modal } from '$lib/components';
 	import Celebration from '$lib/components/Celebration.svelte';
 	import { EventBus, type MazeScene } from '$lib/game';
+	import type { PlayerMovedEvent, InvalidMoveEvent, ShowMathProblemEvent, GoalReachedEvent } from '$lib/game/EventBus';
 	import PhaserGameComponent from '$lib/game/PhaserGame.svelte';
+	import type { TPhaserRef } from '$lib/game/PhaserGame.svelte';
 	import { theme, nextTheme, getThemeColors } from '$lib/stores/theme';
 
 	// Maze settings
@@ -20,7 +22,7 @@
 	let goalCell: Cell;
 	let maze: Cell[][] = [];
 	// Phaser game references
-	let phaserRef = { game: null, scene: null };
+	let phaserRef: TPhaserRef = { game: null, scene: null };
 
 	// Math problem state
 	let showMathProblem = false;
@@ -63,9 +65,73 @@
 			scene.setTheme(currentTheme);
 			
 			// Connect player movement events
-			EventBus.on('player-moved', (data) => {
-				console.log('Player moved:', data.direction);
-				// We can respond to player movement here
+			EventBus.on('player-moved', (data: PlayerMovedEvent) => {
+				console.log('Player moved:', data.direction, data.position);
+				// Update player position in our state if needed
+			});
+			
+			// Connect invalid move events
+			EventBus.on('invalid-move', (data: InvalidMoveEvent) => {
+				console.log('Invalid move:', data.direction);
+				// Show invalid move indicator
+				const invalidMove = document.getElementById('invalid-move');
+				if (invalidMove) {
+					invalidMove.classList.add('show');
+					setTimeout(() => {
+						invalidMove.classList.remove('show');
+					}, 1500);
+				}
+			});
+			
+			// Connect math problem events
+			EventBus.on('show-math-problem', (data: ShowMathProblemEvent) => {
+				console.log('Math problem at cell:', data.cell);
+				// Show the math problem modal
+				attemptedCell = data.cell;
+				currentProblem = generateMathProblem();
+				showMathProblem = true;
+				
+				// Focus the answer input if available
+				setTimeout(() => {
+					if (answerInput) {
+						answerInput.focus();
+					}
+				}, 100);
+			});
+			
+			// Connect goal reached events
+			EventBus.on('goal-reached', (_data: GoalReachedEvent) => {
+				console.log('Goal reached!');
+				// Only show celebration if all math problems are solved
+				let allProblemsSolved = true;
+				
+				for (let r = 0; r < maze.length; r++) {
+					for (let c = 0; c < maze[0].length; c++) {
+						const cell = maze[r][c];
+						if (cell.isIntersection && !cell.mathProblemSolved) {
+							allProblemsSolved = false;
+							break;
+						}
+					}
+				}
+				
+				if (allProblemsSolved) {
+					showCelebration = true;
+					setTimeout(() => {
+						showCelebration = false;
+					}, 3000);
+				} else {
+					// Show a message that not all problems are solved
+					const invalidMove = document.getElementById('invalid-move');
+					if (invalidMove) {
+						invalidMove.textContent = 'Solve all math problems first!';
+						invalidMove.classList.add('show');
+						setTimeout(() => {
+							invalidMove.textContent = 'Can\'t go that way!';
+							invalidMove.classList.remove('show');
+						}, 2000);
+					}
+				}
 			});
 		}
 	}
@@ -99,6 +165,9 @@
 		
 		// Clean up EventBus listeners
 		EventBus.removeAllListeners('player-moved');
+		EventBus.removeAllListeners('invalid-move');
+		EventBus.removeAllListeners('show-math-problem');
+		EventBus.removeAllListeners('goal-reached');
 	});
 
 	// Generate a math problem for the intersection

@@ -11,7 +11,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import { PhaserGame } from "./PhaserGame";
-  import { EventBus } from './EventBus';
+  import { EventBus, type MazeSceneReadyEvent } from './EventBus';
   import type { Cell } from '$lib/Maze';
 
   // Expose the game and scene references to parent components
@@ -40,11 +40,11 @@
     }
     
     // Listen for scene ready event
-    EventBus.on('maze-scene-ready', (scene: MazeScene) => {
-      phaserRef.scene = scene;
+    EventBus.on('maze-scene-ready', (data: MazeSceneReadyEvent) => {
+      phaserRef.scene = data.scene;
       
       if (onSceneReady) {
-        onSceneReady(scene);
+        onSceneReady(data.scene);
       }
     });
     

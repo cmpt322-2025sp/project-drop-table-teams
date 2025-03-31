@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import type { Cell } from '$lib/Maze';
-import { EventBus } from './EventBus';
+import { EventBus, type PlayerMovedEvent, type InvalidMoveEvent, 
+  type ShowMathProblemEvent, type GoalReachedEvent, type ThemeUpdatedEvent } from './EventBus';
 
 /**
  * Phaser scene that handles the maze gameplay
@@ -62,11 +63,46 @@ export class MazeScene extends Phaser.Scene {
     this.setupInput();
     
     // Emit event to notify Svelte that scene is ready
-    EventBus.emit('maze-scene-ready', this);
+    const sceneReadyEvent = { scene: this };
+    EventBus.emit('maze-scene-ready', sceneReadyEvent);
   }
   
   update(time: number, delta: number): void {
-    // Game loop logic - will update player position in future steps
+    // Handle animations and smooth movement
+    this.updatePlayerMovement(delta);
+  }
+  
+  /**
+   * Update player movement with animation
+   * @param delta Time since last frame in ms
+   */
+  private updatePlayerMovement(delta: number): void {
+    if (!this.playerGraphics) return;
+    
+    // Check if player is moving (displayedRow/Col different from targetRow/Col)
+    const isMoving = this.displayedRow !== this.targetRow || this.displayedCol !== this.targetCol;
+    
+    if (isMoving) {
+      // Calculate the movement speed (cells per second)
+      const moveSpeed = 5; // Can be adjusted for faster/slower movement
+      const frameMove = moveSpeed * delta / 1000;
+      
+      // Calculate direction to move
+      const diffRow = this.targetRow - this.displayedRow;
+      const diffCol = this.targetCol - this.displayedCol;
+      
+      // Update displayed position with smooth movement
+      if (Math.abs(diffRow) > 0) {
+        this.displayedRow += Math.sign(diffRow) * Math.min(frameMove, Math.abs(diffRow));
+      }
+      
+      if (Math.abs(diffCol) > 0) {
+        this.displayedCol += Math.sign(diffCol) * Math.min(frameMove, Math.abs(diffCol));
+      }
+      
+      // Redraw player at new position
+      this.drawPlayer();
+    }
   }
   
   /**
@@ -134,7 +170,8 @@ export class MazeScene extends Phaser.Scene {
     this.createMazeGraphics();
     
     // Emit an event that the theme has been updated
-    EventBus.emit('theme-updated', { theme });
+    const themeEvent: ThemeUpdatedEvent = { theme };
+    EventBus.emit('theme-updated', themeEvent);
   }
   
   /**
@@ -434,10 +471,76 @@ export class MazeScene extends Phaser.Scene {
    * @param direction The direction to move
    */
   movePlayer(direction: 'up' | 'down' | 'left' | 'right'): void {
-    // Placeholder movement logic - will be implemented in future steps
-    console.log(`Moving player ${direction}`);
+    // Don't allow movement if player is already animating
+    if (this.displayedRow !== this.targetRow || this.displayedCol !== this.targetCol) {
+      return;
+    }
     
-    // Emit event for Svelte components to react to
-    EventBus.emit('player-moved', { direction });
+    // Current player cell
+    const currentCell = this.maze[this.targetRow][this.targetCol];
+    
+    // Check if movement is valid (no wall in the direction)
+    let canMove = false;
+    let nextRow = this.targetRow;
+    let nextCol = this.targetCol;
+    
+    switch (direction) {
+      case 'up':
+        canMove = !currentCell.walls.top;
+        if (canMove) nextRow -= 1;
+        break;
+      case 'down':
+        canMove = !currentCell.walls.bottom;
+        if (canMove) nextRow += 1;
+        break;
+      case 'left':
+        canMove = !currentCell.walls.left;
+        if (canMove) nextCol -= 1;
+        break;
+      case 'right':
+        canMove = !currentCell.walls.right;
+        if (canMove) nextCol += 1;
+        break;
+    }
+    
+    // Check if we can move (no wall in the way)
+    if (canMove) {
+      // Check if next cell is valid (within maze bounds)
+      if (nextRow >= 0 && nextRow < this.maze.length && 
+          nextCol >= 0 && nextCol < this.maze[0].length) {
+        
+        // Get the next cell
+        const nextCell = this.maze[nextRow][nextCol];
+        
+        // Update target position (actual movement is done in the update method)
+        this.targetRow = nextRow;
+        this.targetCol = nextCol;
+        
+        // Check if the cell is an intersection with an unsolved math problem
+        if (nextCell.isIntersection && !nextCell.mathProblemSolved) {
+          // Emit an event to show the math problem in the Svelte UI
+          const mathProblemEvent: ShowMathProblemEvent = { cell: nextCell };
+          EventBus.emit('show-math-problem', mathProblemEvent);
+        }
+        
+        // Check if player reached the goal
+        if (nextCell.isGoal) {
+          // Emit goal reached event
+          const goalEvent: GoalReachedEvent = { };
+          EventBus.emit('goal-reached', goalEvent);
+        }
+        
+        // Emit player moved event with new position
+        const moveEvent: PlayerMovedEvent = {
+          direction,
+          position: { row: nextRow, col: nextCol }
+        };
+        EventBus.emit('player-moved', moveEvent);
+      }
+    } else {
+      // Cannot move in this direction
+      const invalidEvent: InvalidMoveEvent = { direction };
+      EventBus.emit('invalid-move', invalidEvent);
+    }
   }
 }
