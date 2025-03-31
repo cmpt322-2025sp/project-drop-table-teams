@@ -77,6 +77,11 @@
     if (gameInstance) {
       gameInstance.setMaze(maze, goal);
     }
+    
+    // If the scene is already available, set the maze directly
+    if (phaserRef.scene) {
+      phaserRef.scene.setMaze(maze, goal);
+    }
   }
 </script>
 

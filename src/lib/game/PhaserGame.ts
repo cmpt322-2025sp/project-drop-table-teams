@@ -86,11 +86,12 @@ export class PhaserGame {
    * @param themeName Current theme name
    */
   private updateTheme(themeName: string): void {
-    if (!this.game) return;
-    
     if (this.mazeScene) {
       this.mazeScene.setTheme(themeName);
     }
+    
+    // If game is not initialized yet, we'll set the theme when the scene is ready
+    // The Scene will also retrieve the initial theme in its preload method
   }
   
   /**

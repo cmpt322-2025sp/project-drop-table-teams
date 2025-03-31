@@ -59,6 +59,9 @@
 				scene.setMaze(maze, goalCell);
 			}
 			
+			// Make sure theme is set
+			scene.setTheme(currentTheme);
+			
 			// Connect player movement events
 			EventBus.on('player-moved', (data) => {
 				console.log('Player moved:', data.direction);
@@ -76,6 +79,12 @@
 			
 			// Add keyboard event listener for the game controls
 			window.addEventListener('keydown', handleKeyDown);
+			
+			// If we already have a scene reference, immediately set maze and theme
+			if (phaserRef.scene) {
+				phaserRef.scene.setMaze(maze, goalCell);
+				phaserRef.scene.setTheme(currentTheme);
+			}
 			
 			// Return cleanup function
 			return () => {
@@ -200,6 +209,11 @@
 			bind:phaserRef={phaserRef} 
 			onSceneReady={handleSceneReady}
 		/>
+		
+		<!-- This block helps ensure theme and maze are properly set -->
+		{#if maze.length > 0 && currentTheme}
+			<!-- Force reactivity when maze and theme are ready -->
+		{/if}
 
 		<!-- On-screen controls for touchscreens or younger kids -->
 		{#if showControls}

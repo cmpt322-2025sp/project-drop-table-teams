@@ -23,7 +23,7 @@ export class MazeScene extends Phaser.Scene {
   private displayedCol: number = 0;
   
   // Theme properties
-  private currentTheme: string = 'space';
+  private currentTheme: string = '';
   
   // Camera and world size
   private worldWidth: number = 0;
@@ -35,6 +35,16 @@ export class MazeScene extends Phaser.Scene {
   
   preload(): void {
     // No assets needed for now, we'll use basic shapes
+    
+    // Get the initial theme from the theme store
+    import('$lib/stores/theme').then(({ theme }) => {
+      let initialTheme = '';
+      const unsubscribe = theme.subscribe(value => {
+        initialTheme = value;
+        this.setTheme(value);
+      });
+      unsubscribe();
+    }).catch(err => console.error('Failed to load theme store:', err));
   }
   
   create(): void {
@@ -114,12 +124,17 @@ export class MazeScene extends Phaser.Scene {
    * @param theme The theme name
    */
   setTheme(theme: string): void {
-    this.currentTheme = theme;
+    if (!theme) return; // Ignore empty theme values
     
-    // Update visuals if scene is active
-    if (this.scene.isActive()) {
-      this.createMazeGraphics();
-    }
+    this.currentTheme = theme;
+    console.log('Setting theme to:', theme);
+    
+    // Always update the visuals when theme changes
+    // The scene.isActive check can cause issues during initialization
+    this.createMazeGraphics();
+    
+    // Emit an event that the theme has been updated
+    EventBus.emit('theme-updated', { theme });
   }
   
   /**
@@ -189,6 +204,24 @@ export class MazeScene extends Phaser.Scene {
   private createMazeGraphics(): void {
     // Early exit if no maze data or graphics
     if (this.maze.length === 0 || !this.mazeGraphics || !this.playerGraphics) return;
+    
+    // If no theme is set yet, we'll use a default theme
+    if (!this.currentTheme) {
+      import('$lib/stores/theme').then(({ theme }) => {
+        let initialTheme = '';
+        const unsubscribe = theme.subscribe(value => {
+          initialTheme = value;
+          this.setTheme(value);
+        });
+        unsubscribe();
+      }).catch(err => {
+        console.error('Failed to load theme store:', err);
+        // Use space theme as default
+        this.currentTheme = 'space';
+        this.createMazeGraphics();
+      });
+      return; // Wait for theme to be set
+    }
     
     // Clear previous graphics
     this.mazeGraphics.clear();
