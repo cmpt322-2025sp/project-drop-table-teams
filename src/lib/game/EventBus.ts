@@ -6,28 +6,28 @@ import type { MazeScene } from './MazeScene';
  * Type definitions for events
  */
 export interface PlayerMovedEvent {
-  direction: 'up' | 'down' | 'left' | 'right';
-  position?: { row: number; col: number };
+	direction: 'up' | 'down' | 'left' | 'right';
+	position?: { row: number; col: number };
 }
 
 export interface InvalidMoveEvent {
-  direction: 'up' | 'down' | 'left' | 'right';
+	direction: 'up' | 'down' | 'left' | 'right';
 }
 
 export interface ShowMathProblemEvent {
-  cell: Cell;
+	cell: Cell;
 }
 
 export interface GoalReachedEvent {
-  // No additional data needed for now
+	// No additional data needed for now
 }
 
 export interface MazeSceneReadyEvent {
-  scene: MazeScene;
+	scene: MazeScene;
 }
 
 export interface ThemeUpdatedEvent {
-  theme: string;
+	theme: string;
 }
 
 /**

@@ -10,7 +10,12 @@
 	import { Button, Modal } from '$lib/components';
 	import Celebration from '$lib/components/Celebration.svelte';
 	import { EventBus, type MazeScene } from '$lib/game';
-	import type { PlayerMovedEvent, InvalidMoveEvent, ShowMathProblemEvent, GoalReachedEvent } from '$lib/game/EventBus';
+	import type {
+		PlayerMovedEvent,
+		InvalidMoveEvent,
+		ShowMathProblemEvent,
+		GoalReachedEvent
+	} from '$lib/game/EventBus';
 	import PhaserGameComponent from '$lib/game/PhaserGame.svelte';
 	import type { TPhaserRef } from '$lib/game/PhaserGame.svelte';
 	import { theme, nextTheme, getThemeColors } from '$lib/stores/theme';
@@ -54,23 +59,23 @@
 	// Handle Phaser scene when it's ready
 	function handleSceneReady(scene: MazeScene) {
 		console.log('Maze scene is ready', scene);
-		
+
 		// Now we can interact with the scene directly
 		if (scene) {
 			// Set the maze data in the scene
 			if (maze.length > 0 && goalCell) {
 				scene.setMaze(maze, goalCell);
 			}
-			
+
 			// Make sure theme is set
 			scene.setTheme(currentTheme);
-			
+
 			// Connect player movement events
 			EventBus.on('player-moved', (data: PlayerMovedEvent) => {
 				console.log('Player moved:', data.direction, data.position);
 				// Update player position in our state if needed
 			});
-			
+
 			// Connect invalid move events
 			EventBus.on('invalid-move', (data: InvalidMoveEvent) => {
 				console.log('Invalid move:', data.direction);
@@ -83,7 +88,7 @@
 					}, 1500);
 				}
 			});
-			
+
 			// Connect math problem events
 			EventBus.on('show-math-problem', (data: ShowMathProblemEvent) => {
 				console.log('Math problem at cell:', data.cell);
@@ -91,7 +96,7 @@
 				attemptedCell = data.cell;
 				currentProblem = generateMathProblem();
 				showMathProblem = true;
-				
+
 				// Focus the answer input if available
 				setTimeout(() => {
 					if (answerInput) {
@@ -99,14 +104,14 @@
 					}
 				}, 100);
 			});
-			
+
 			// Connect goal reached events
 			EventBus.on('goal-reached', (_data: GoalReachedEvent) => {
 				console.log('Goal reached!');
 				// Count how many math problems were solved
 				let solvedProblems = 0;
 				let totalProblems = 0;
-				
+
 				for (let r = 0; r < maze.length; r++) {
 					for (let c = 0; c < maze[0].length; c++) {
 						const cell = maze[r][c];
@@ -118,40 +123,40 @@
 						}
 					}
 				}
-				
+
 				// Always show celebration when goal is reached
 				showCelebration = true;
-				
+
 				// Update the celebration message based on solved problems
 				if (solvedProblems === totalProblems) {
 					celebrationMessage = `Perfect! You solved all ${totalProblems} math problems!`;
 				} else {
 					celebrationMessage = `Good job! You solved ${solvedProblems} out of ${totalProblems} math problems.`;
 				}
-				
+
 				setTimeout(() => {
 					showCelebration = false;
 				}, 5000);
 			});
 		}
 	}
-	
+
 	onMount(() => {
 		if (typeof window !== 'undefined') {
 			// Generate the maze
 			const mazeData = generateMaze(rows, cols);
 			maze = mazeData.maze;
 			goalCell = mazeData.goal;
-			
+
 			// Add keyboard event listener for the game controls
 			window.addEventListener('keydown', handleKeyDown);
-			
+
 			// If we already have a scene reference, immediately set maze and theme
 			if (phaserRef.scene) {
 				phaserRef.scene.setMaze(maze, goalCell);
 				phaserRef.scene.setTheme(currentTheme);
 			}
-			
+
 			// Return cleanup function
 			return () => {
 				window.removeEventListener('keydown', handleKeyDown);
@@ -162,7 +167,7 @@
 	onDestroy(() => {
 		// Clean up subscriptions
 		unsubscribeTheme();
-		
+
 		// Clean up EventBus listeners
 		EventBus.removeAllListeners('player-moved');
 		EventBus.removeAllListeners('invalid-move');
@@ -188,7 +193,7 @@
 			// Mark the problem as solved
 			if (attemptedCell) {
 				attemptedCell.mathProblemSolved = true;
-				
+
 				// Refresh the maze to show the solved state immediately
 				if (phaserRef.scene) {
 					phaserRef.scene.refreshMaze();
@@ -258,13 +263,13 @@
 	// Change the maze theme
 	function changeTheme() {
 		console.log('Changing theme from:', currentTheme);
-		
+
 		// Store current theme
 		const oldTheme = currentTheme;
-		
+
 		// Update the theme in the store
-		nextTheme(); 
-		
+		nextTheme();
+
 		// Don't directly call scene methods - scene may not be fully initialized
 		// Just let the subscription in PhaserGame handle the update
 		console.log('Theme updated in store, PhaserGame will handle the update');
@@ -289,11 +294,8 @@
 	<!-- Phaser game container -->
 	<div class="viewport {currentTheme}-viewport">
 		<!-- PhaserGame Svelte component -->
-		<PhaserGameComponent 
-			bind:phaserRef={phaserRef} 
-			onSceneReady={handleSceneReady}
-		/>
-		
+		<PhaserGameComponent bind:phaserRef onSceneReady={handleSceneReady} />
+
 		<!-- This block helps ensure theme and maze are properly set -->
 		{#if maze.length > 0 && currentTheme}
 			<!-- Force reactivity when maze and theme are ready -->
@@ -538,19 +540,27 @@
 
 	/* Theme-specific viewport enhancements */
 	.space-viewport {
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 40px rgba(41, 121, 255, 0.4);
+		box-shadow:
+			0 8px 24px rgba(0, 0, 0, 0.5),
+			0 0 40px rgba(41, 121, 255, 0.4);
 	}
-  
+
 	.ocean-viewport {
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 188, 212, 0.4);
+		box-shadow:
+			0 8px 24px rgba(0, 0, 0, 0.5),
+			0 0 40px rgba(0, 188, 212, 0.4);
 	}
-  
+
 	.jungle-viewport {
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 40px rgba(139, 195, 74, 0.4);
+		box-shadow:
+			0 8px 24px rgba(0, 0, 0, 0.5),
+			0 0 40px rgba(139, 195, 74, 0.4);
 	}
-  
+
 	.candy-viewport {
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 40px rgba(233, 30, 99, 0.4);
+		box-shadow:
+			0 8px 24px rgba(0, 0, 0, 0.5),
+			0 0 40px rgba(233, 30, 99, 0.4);
 	}
 
 	/* Control buttons for mobile/younger kids */
