@@ -3,15 +3,21 @@
 	import { Tab } from '$lib/components';
 	import { TabGroup } from '$lib/components';
 	import { TabContent } from '$lib/components';
-</script>
+
+	import { Table } from '$lib/components';
+	import { studentsArray } from './data-store.js';
+	let blueStyle = "blueTable";
+  </script>
 
 <div>
 	<TabGroup active="student">
 		<span slot="tabs">
-			<Tab key="student">One</Tab>
-			<Tab key="analytic">Two</Tab>
+			<Tab key="student">Student List</Tab>
+			<Tab key="analytic">Analytics</Tab>
 		</span>
-		<TabContent key="student">contents on tab 1</TabContent>
+		<TabContent key="student">
+			<Table tableData={$studentsArray} style={blueStyle}/>
+		</TabContent>
 		<TabContent key="analytic">contents on tab 2</TabContent>
 	</TabGroup>
 </div>
