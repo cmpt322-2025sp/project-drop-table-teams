@@ -348,7 +348,7 @@ export class MazeScene extends Phaser.Scene {
           pathColor: 0xF9FAFB,
           goalColor: 0xFFD700,
           mathProblemColor: 0x9B59B6,
-          solvedColor: 0x3498DB,
+          solvedColor: 0x4CAF50, // Changed to green
           playerColor: 0xE74C3C,
           backgroundColor: 0x203A43 // Middle color from the gradient
         };
@@ -358,7 +358,7 @@ export class MazeScene extends Phaser.Scene {
           pathColor: 0xE3F2FD,
           goalColor: 0xFFEB3B,
           mathProblemColor: 0x26A69A,
-          solvedColor: 0x66BB6A,
+          solvedColor: 0x4CAF50, // Changed to green
           playerColor: 0xFF7043,
           backgroundColor: 0x0277BD // Middle color from the gradient
         };
@@ -368,7 +368,7 @@ export class MazeScene extends Phaser.Scene {
           pathColor: 0xDCEDC8,
           goalColor: 0xFFC107,
           mathProblemColor: 0xFF9800,
-          solvedColor: 0x8BC34A,
+          solvedColor: 0x4CAF50, // Changed to green
           playerColor: 0x7B1FA2,
           backgroundColor: 0x00796B // Middle color from the gradient
         };
@@ -378,7 +378,7 @@ export class MazeScene extends Phaser.Scene {
           pathColor: 0xFCE4EC,
           goalColor: 0xFFEB3B,
           mathProblemColor: 0xAB47BC,
-          solvedColor: 0x26C6DA,
+          solvedColor: 0x4CAF50, // Changed to green
           playerColor: 0x7CB342,
           backgroundColor: 0xC2185B // Middle color from the gradient
         };
@@ -388,13 +388,20 @@ export class MazeScene extends Phaser.Scene {
           pathColor: 0xF9FAFB,
           goalColor: 0xFFD700,
           mathProblemColor: 0x9B59B6,
-          solvedColor: 0x3498DB,
+          solvedColor: 0x4CAF50, // Changed to green
           playerColor: 0xE74C3C,
           backgroundColor: 0x203A43 // Middle color from the gradient
         };
     }
   }
   
+  /**
+   * Refresh the maze graphics - public method that can be called from outside
+   */
+  public refreshMaze(): void {
+    this.createMazeGraphics();
+  }
+
   /**
    * Create the graphical representation of the maze
    */
@@ -443,13 +450,16 @@ export class MazeScene extends Phaser.Scene {
     this.mazeGraphics.clear();
     this.playerGraphics.clear();
     
-    // Clean up existing text objects (like question marks, checkmarks)
-    if (this.children && typeof this.children.each === 'function') {
-      this.children.each(child => {
-        if (child && child.type === 'Text') {
+    // Clean up existing cell marker objects by name pattern
+    if (this.children && typeof this.children.getAll === 'function') {
+      const allChildren = this.children.getAll();
+      for (const child of allChildren) {
+        // Check if the object has a name and it matches our cell marker pattern
+        if (child && child.name && typeof child.name === 'string' && 
+            child.name.startsWith('cell-marker-')) {
           child.destroy();
         }
-      });
+      }
     }
     
     // Set maze graphics depth to be above background but below UI
@@ -532,7 +542,7 @@ export class MazeScene extends Phaser.Scene {
           this.mazeGraphics.fillStyle(colors.mathProblemColor, 1);
           this.mazeGraphics.fillRect(x, y, this.cellSize, this.cellSize);
           
-          // Add a question mark
+          // Add a question mark with unique name for easier cleanup
           const questionMark = this.add.text(
             x + this.cellSize / 2,
             y + this.cellSize / 2,
@@ -543,6 +553,9 @@ export class MazeScene extends Phaser.Scene {
             }
           ).setOrigin(0.5);
           
+          // Set a name for tracking purposes
+          questionMark.name = `cell-marker-${r}-${c}`;
+          
           // Set depth to be above maze graphics
           questionMark.setDepth(1.5);
           
@@ -550,7 +563,7 @@ export class MazeScene extends Phaser.Scene {
           this.mazeGraphics.fillStyle(colors.solvedColor, 1);
           this.mazeGraphics.fillRect(x, y, this.cellSize, this.cellSize);
           
-          // Add a checkmark
+          // Add a checkmark with unique name for easier cleanup
           const checkmark = this.add.text(
             x + this.cellSize / 2,
             y + this.cellSize / 2,
@@ -560,6 +573,9 @@ export class MazeScene extends Phaser.Scene {
               color: '#ffffff'
             }
           ).setOrigin(0.5);
+          
+          // Set a name for tracking purposes
+          checkmark.name = `cell-marker-${r}-${c}`;
           
           // Set depth to be above maze graphics
           checkmark.setDepth(1.5);

@@ -188,6 +188,11 @@
 			// Mark the problem as solved
 			if (attemptedCell) {
 				attemptedCell.mathProblemSolved = true;
+				
+				// Refresh the maze to show the solved state immediately
+				if (phaserRef.scene) {
+					phaserRef.scene.refreshMaze();
+				}
 
 				// Handle goal check and close math problem
 				const isGoalCell = attemptedCell.isGoal;
