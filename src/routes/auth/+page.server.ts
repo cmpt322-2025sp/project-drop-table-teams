@@ -1,32 +1,31 @@
-import { redirect } from '@sveltejs/kit'
-
-import type { Actions } from './$types'
+import { redirect } from '@sveltejs/kit';
+import type { Actions } from './$types';
 
 export const actions: Actions = {
   signup: async ({ request, locals: { supabase } }) => {
-    const formData = await request.formData()
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
+    const formData = await request.formData();
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
 
-    const { error } = await supabase.auth.signUp({ email, password })
+    const { error } = await supabase.auth.signUp({ email, password });
     if (error) {
-      console.error(error)
-      redirect(303, '/auth/error')
+      console.error(error);
+      throw redirect(303, '/auth/error'); // Redirect on failure
     } else {
-      redirect(303, '/')
+      throw redirect(303, '/dashboard'); // Redirect new users to the maze
     }
   },
   login: async ({ request, locals: { supabase } }) => {
-    const formData = await request.formData()
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
+    const formData = await request.formData();
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      console.error(error)
-      redirect(303, '/auth/error')
+      console.error(error);
+      throw redirect(303, '/auth/error'); // Redirect on failure
     } else {
-      redirect(303, '/private')
+      throw redirect(303, '/dashboard'); // Redirect authenticated users to the Math Maze
     }
   },
-}
+};
