@@ -67,12 +67,37 @@ const authGuard: Handle = async ({ event, resolve }) => {
 	event.locals.session = session;
 	event.locals.user = user;
 
-	if (!event.locals.session && event.url.pathname.startsWith('/private')) {
-		redirect(303, '/auth');
+	// Check for user role if session exists
+	let userRole = 'student';
+	if (session) {
+		userRole = user?.user_metadata?.role || 'student';
+		event.locals.userRole = userRole;
 	}
 
-	if (event.locals.session && event.url.pathname === '/auth') {
-		redirect(303, '/private');
+	// Protected routes logic
+	if (!event.locals.session) {
+		// Redirect unauthenticated users from protected routes to login
+		if (event.url.pathname.startsWith('/dashboard') || 
+			event.url.pathname.startsWith('/game') ||
+			event.url.pathname.startsWith('/teacher') ||
+			event.url.pathname.startsWith('/private')) {
+			redirect(303, '/auth');
+		}
+	} else {
+		// Redirect authenticated users from auth page based on role
+		if (event.url.pathname === '/auth') {
+			if (userRole === 'teacher') {
+				redirect(303, '/teacher');
+			} else {
+				redirect(303, '/dashboard');
+			}
+		}
+
+		// Role-based access control
+		if (userRole !== 'teacher' && event.url.pathname.startsWith('/teacher')) {
+			// Students can't access teacher pages
+			redirect(303, '/dashboard');
+		}
 	}
 
 	return resolve(event);

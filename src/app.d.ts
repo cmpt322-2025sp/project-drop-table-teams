@@ -11,9 +11,13 @@ declare global {
 			safeGetSession: () => Promise<{ session: Session | null; user: User | null }>;
 			session: Session | null;
 			user: User | null;
+			userRole?: string; // Add userRole to store the role information
 		}
 		interface PageData {
 			session: Session | null;
+			supabase?: SupabaseClient<Database>;
+			user?: User | null;
+			userRole?: string; // Add userRole to the PageData
 		}
 		// interface PageState {}
 		// interface Platform {}

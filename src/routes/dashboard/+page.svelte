@@ -3,9 +3,12 @@
 	import './vars.css';
 	import './style.css';
 
-	// Mock user data
-	const user = {
-		name: 'Sarah',
+	let { data } = $props();
+	let { user, userRole } = $derived(data);
+
+	// Use real user data or fallback to mock data
+	const studentData = {
+		name: user?.email?.split('@')[0] || 'Student',
 		level: 3,
 		points: 120
 	};
@@ -27,8 +30,8 @@
 			</svg>
 		</div>
 		<div class="user-details">
-			<div class="user-name">{user.name}</div>
-			<div class="user-stats">Level {user.level} • {user.points} points</div>
+			<div class="user-name">{studentData.name}</div>
+			<div class="user-stats">Level {studentData.level} • {studentData.points} points</div>
 		</div>
 	</div>
 
