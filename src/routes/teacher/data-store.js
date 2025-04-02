@@ -8,7 +8,7 @@ export let studentsArray = writable([
 	},
 	{
 		"Name" : "Jose",
-		"Problems" : <a href="/dashboard">Edit</a>,
+		"Problems" : "Edit",
 		"Game" : "Play"
 	},
 ]);

@@ -13,12 +13,12 @@
 	.tab {
 		display: inline-block;
 		padding: 1em;
-		border: solid black 2px;
+		border: solid #103e5d 2px;
 		border-bottom: none;
 	}
 
     .tab.active {
-        background-color: black;
+        background-color: #103e5d;
         color: white;
     }
 </style>

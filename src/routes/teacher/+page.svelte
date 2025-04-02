@@ -9,18 +9,62 @@
 	let blueStyle = "blueTable";
   </script>
 
-<div>
+<div class="teacher">
+
+	<div class="logo">Math Maze</div>
+
 	<TabGroup active="student">
 		<span slot="tabs">
 			<Tab key="student">Student List</Tab>
 			<Tab key="analytic">Analytics</Tab>
 		</span>
 		<TabContent key="student">
-			<Table tableData={$studentsArray} style={blueStyle}/>
+			<Table tableData={ $studentsArray } style={ blueStyle }/>
 		</TabContent>
 		<TabContent key="analytic">contents on tab 2</TabContent>
 	</TabGroup>
 </div>
 
 <style>
+	.teacher {
+		display: flex;
+		flex-direction: column;
+		align-items: left;
+		justify-content: left;
+		position: relative;
+		width: 100%;
+		height: 100%;
+		padding: 3rem;
+	}
+
+	.logo {
+		color: black;
+		font-family: 'NovaFlat-Book', sans-serif;
+		font-size: 50px;
+		line-height: 1.2;
+		font-weight: 700;
+		margin-bottom: var(--teacher-spacing);
+		text-align: center;
+		animation: fadeIn 1.5s ease;
+	}
+
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	@keyframes scaleIn {
+		from {
+			transform: scale(0.8);
+			opacity: 0;
+		}
+		to {
+			transform: scale(1);
+			opacity: 1;
+		}
+	}
 </style>

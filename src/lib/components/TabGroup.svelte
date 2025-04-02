@@ -16,7 +16,7 @@
 
 <style>
 	.tabs {
-		border-bottom: solid black 2px;
+		border-bottom: solid #103e5d 2px;
 	}
 
 	.tab-content {
