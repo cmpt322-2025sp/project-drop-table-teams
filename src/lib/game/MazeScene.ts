@@ -176,6 +176,9 @@ export class MazeScene extends Phaser.Scene {
 		// Enable camera to move beyond game dimensions
 		this.cameras.main.setBounds(0, 0, this.worldWidth, this.worldHeight);
 
+		// Set zoom level to make player more visible (2.5x zoom for much closer view)
+		this.cameras.main.setZoom(2.5);
+
 		// Center camera on the player's starting position
 		const centerX =
 			this.wallThickness +
