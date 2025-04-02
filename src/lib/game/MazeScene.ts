@@ -46,9 +46,8 @@ export class MazeScene extends Phaser.Scene {
 		// Get the initial theme from the theme store
 		import('$lib/stores/theme')
 			.then(({ theme }) => {
-				let initialTheme = '';
+				// Get theme value
 				const unsubscribe = theme.subscribe((value) => {
-					initialTheme = value;
 					this.setTheme(value);
 				});
 				unsubscribe();
@@ -176,7 +175,7 @@ export class MazeScene extends Phaser.Scene {
 		// Enable camera to move beyond game dimensions
 		this.cameras.main.setBounds(0, 0, this.worldWidth, this.worldHeight);
 
-		// Set zoom level to make player more visible (2.5x zoom for much closer view)
+		// Set zoom level to make player more visible - we'll maintain this in drawPlayer
 		this.cameras.main.setZoom(2.5);
 
 		// Center camera on the player's starting position
@@ -607,8 +606,9 @@ export class MazeScene extends Phaser.Scene {
 		this.playerGraphics.lineStyle(2, 0x000000, 0.5);
 		this.playerGraphics.strokeCircle(x, y, playerSize / 2);
 
-		// Center camera on player if cameras exists
+		// Center camera on player and ensure zoom is applied
 		if (this.cameras && this.cameras.main) {
+			this.cameras.main.setZoom(2.5); // Set higher zoom level
 			this.cameras.main.centerOn(x, y);
 		}
 	}
