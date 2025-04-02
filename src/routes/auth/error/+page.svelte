@@ -1,1 +1,1 @@
-<p>Login error</p>
+<p>Login error. You must confirm your email before logging in. Check your inbox.</p>
