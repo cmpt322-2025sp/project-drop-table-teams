@@ -67,12 +67,12 @@ const authGuard: Handle = async ({ event, resolve }) => {
 	event.locals.session = session;
 	event.locals.user = user;
 
-	if (!event.locals.session && event.url.pathname.startsWith('/dashboard')) {
+	if (!event.locals.session && (event.url.pathname.startsWith('/private') || event.url.pathname.startsWith('/dashboard') || event.url.pathname.startsWith('/game'))) {
 		redirect(303, '/auth');
 	}
 
 	if (event.locals.session && event.url.pathname === '/auth') {
-		redirect(303, '/dashboard');
+		redirect(303, '/private/student/dashboard');
 	}
 
 	return resolve(event);

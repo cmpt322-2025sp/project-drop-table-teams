@@ -35,7 +35,7 @@
 	<div class="logo">Math Maze</div>
 
 	<div class="start-button">
-		<a href="/game">
+		<a href="/private/student/game">
 			<Button
 				variant="primary"
 				size="lg"
