@@ -72,7 +72,21 @@ const authGuard: Handle = async ({ event, resolve }) => {
 	}
 
 	if (event.locals.session && event.url.pathname === '/auth') {
-		redirect(303, '/private/student/dashboard');
+		// Get the user role to determine where to redirect
+		const { data: profileData } = await event.locals.supabase
+			.from('profiles')
+			.select('role')
+			.eq('id', event.locals.user.id)
+			.single();
+
+		// Redirect based on role or fallback to user metadata
+		if (profileData) {
+			redirect(303, profileData.role === 'teacher' ? '/private/teacher' : '/private/student/dashboard');
+		} else {
+			// Fallback to metadata
+			const role = event.locals.user.user_metadata?.role || 'student';
+			redirect(303, role === 'teacher' ? '/private/teacher' : '/private/student/dashboard');
+		}
 	}
 
 	return resolve(event);

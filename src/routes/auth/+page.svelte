@@ -4,6 +4,7 @@
 	let isLogin = true;
 	let email = '';
 	let password = '';
+	let role = 'student'; // Default role
 </script>
 
 <div class="auth-container">
@@ -36,6 +37,32 @@
 					bind:value={password}
 				/>
 			</div>
+			
+			{#if !isLogin}
+				<div class="form-group">
+					<label>Account Type</label>
+					<div class="role-options">
+						<label class="role-option">
+							<input 
+								type="radio" 
+								name="role" 
+								value="student" 
+								bind:group={role}
+							/>
+							<span class="role-label">Student</span>
+						</label>
+						<label class="role-option">
+							<input 
+								type="radio" 
+								name="role" 
+								value="teacher" 
+								bind:group={role}
+							/>
+							<span class="role-label">Teacher</span>
+						</label>
+					</div>
+				</div>
+			{/if}
 			
 			<div class="auth-actions">
 				<Button 
@@ -114,7 +141,8 @@
 		font-size: 0.9rem;
 	}
 
-	input {
+	input[type="email"],
+	input[type="password"] {
 		width: 100%;
 		padding: 0.9rem 1rem;
 		border: 2px solid #e0e0e0;
@@ -125,9 +153,46 @@
 		font-family: inherit;
 	}
 
-	input:focus {
+	input[type="email"]:focus,
+	input[type="password"]:focus {
 		border-color: var(--button-orange);
 		box-shadow: 0 0 0 2px rgba(255, 157, 0, 0.2);
+	}
+
+	.role-options {
+		display: flex;
+		gap: 1rem;
+		margin-top: 0.5rem;
+	}
+
+	.role-option {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		background-color: #f5f5f5;
+		padding: 0.75rem 1rem;
+		border-radius: 8px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.role-option:hover {
+		background-color: #eeeeee;
+	}
+
+	input[type="radio"] {
+		cursor: pointer;
+	}
+
+	.role-option input[type="radio"]:checked + .role-label {
+		font-weight: 600;
+		color: var(--button-orange);
+	}
+
+	.role-label {
+		font-size: 0.9rem;
+		font-weight: 500;
 	}
 
 	.auth-actions {
@@ -182,6 +247,10 @@
 
 		.auth-title {
 			font-size: 1.5rem;
+		}
+
+		.role-options {
+			flex-direction: column;
 		}
 	}
 </style>
