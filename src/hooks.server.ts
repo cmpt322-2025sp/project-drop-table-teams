@@ -67,37 +67,25 @@ const authGuard: Handle = async ({ event, resolve }) => {
 	event.locals.session = session;
 	event.locals.user = user;
 
-	// Check for user role if session exists
-	let userRole = 'student';
-	if (session) {
-		userRole = user?.user_metadata?.role || 'student';
-		event.locals.userRole = userRole;
+	if (!event.locals.session && (event.url.pathname.startsWith('/private') || event.url.pathname.startsWith('/dashboard') || event.url.pathname.startsWith('/game'))) {
+		redirect(303, '/auth');
 	}
 
-	// Protected routes logic
-	if (!event.locals.session) {
-		// Redirect unauthenticated users from protected routes to login
-		if (
-			event.url.pathname.startsWith('/dashboard') ||
-			event.url.pathname.startsWith('/game') ||
-			event.url.pathname.startsWith('/teacher')
-		) {
-			redirect(303, '/auth');
-		}
-	} else {
-		// Redirect authenticated users from auth page based on role
-		if (event.url.pathname === '/auth') {
-			if (userRole === 'teacher') {
-				redirect(303, '/teacher');
-			} else {
-				redirect(303, '/dashboard');
-			}
-		}
+	if (event.locals.session && event.url.pathname === '/auth') {
+		// Get the user role to determine where to redirect
+		const { data: profileData } = await event.locals.supabase
+			.from('profiles')
+			.select('role')
+			.eq('id', event.locals.user.id)
+			.single();
 
-		// Role-based access control
-		if (userRole !== 'teacher' && event.url.pathname.startsWith('/teacher')) {
-			// Students can't access teacher pages
-			redirect(303, '/dashboard');
+		// Redirect based on role or fallback to user metadata
+		if (profileData) {
+			redirect(303, profileData.role === 'teacher' ? '/private/teacher' : '/private/student/dashboard');
+		} else {
+			// Fallback to metadata
+			const role = event.locals.user.user_metadata?.role || 'student';
+			redirect(303, role === 'teacher' ? '/private/teacher' : '/private/student/dashboard');
 		}
 	}
 
