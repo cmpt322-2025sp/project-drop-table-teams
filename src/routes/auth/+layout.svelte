@@ -2,10 +2,13 @@
 	let { children } = $props();
 </script>
 
-<header>
-	<nav>
-		<a href="/">Home</a>
-	</nav>
-</header>
+<div class="auth-layout">
+	{@render children()}
+</div>
 
-{@render children()}
+<style>
+	.auth-layout {
+		min-height: 100vh;
+		width: 100%;
+	}
+</style>
