@@ -1,10 +1,19 @@
 <script lang="ts">
   import { Button } from '$lib/components';
+  import { page } from '$app/stores';
+  
   let userType = 'student'; // Default to student
+  $: signupSuccessMessage = $page.form?.success && $page.form?.message;
 </script>
 
 <div class="login-container">
   <h1 class="login-title">Math Maze Login</h1>
+  
+  {#if signupSuccessMessage}
+    <div class="message success">
+      {$page.form.message}
+    </div>
+  {/if}
   
   <div class="user-type-selector">
     <button 
@@ -55,6 +64,19 @@
     margin-bottom: 1.5rem;
     font-family: 'NovaFlat-Book', sans-serif;
     color: var(--text-color, #ffffff);
+  }
+
+  .message {
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .success {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    border: 1px solid #4CAF50;
   }
 
   .user-type-selector {

@@ -15,7 +15,8 @@ export const actions: Actions = {
       options: {
         data: {
           role: userType // Store the role in user metadata
-        }
+        },
+        emailRedirectTo: `${new URL(request.url).origin}/auth/confirm`
       } 
     });
 
@@ -23,25 +24,15 @@ export const actions: Actions = {
       console.error(error);
       throw redirect(303, '/auth/error'); // Redirect on failure
     } else {
-      // Create a profile entry in the database (you'll need to create this table)
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({ 
-          id: data.user?.id,
-          role: userType,
-          email: email 
-        });
-
-      if (profileError) {
-        console.error('Profile creation error:', profileError);
-      }
-
-      // Redirect based on user type
-      if (userType === 'teacher') {
-        throw redirect(303, '/teacher'); // Teacher dashboard
-      } else {
-        throw redirect(303, '/dashboard'); // Student dashboard
-      }
+      // Note: We don't need to manually create a profile here as the database trigger 
+      // handle_new_user() will do it automatically
+      
+      // Redirect to confirmation page instead of dashboard
+      // User must verify email before accessing the dashboard
+      return {
+        success: true,
+        message: 'Please check your email for a confirmation link.'
+      };
     }
   },
   login: async ({ request, locals: { supabase } }) => {

@@ -77,10 +77,11 @@ const authGuard: Handle = async ({ event, resolve }) => {
 	// Protected routes logic
 	if (!event.locals.session) {
 		// Redirect unauthenticated users from protected routes to login
-		if (event.url.pathname.startsWith('/dashboard') || 
+		if (
+			event.url.pathname.startsWith('/dashboard') ||
 			event.url.pathname.startsWith('/game') ||
-			event.url.pathname.startsWith('/teacher') ||
-			event.url.pathname.startsWith('/private')) {
+			event.url.pathname.startsWith('/teacher')
+		) {
 			redirect(303, '/auth');
 		}
 	} else {
