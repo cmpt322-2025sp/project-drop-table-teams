@@ -1,4 +1,4 @@
-<script lang="ts">
+<script  lang="ts">
 	import { Button } from '$lib/components';
 	import { Tab } from '$lib/components';
 	import { TabGroup } from '$lib/components';
@@ -17,11 +17,14 @@
 		<span slot="tabs">
 			<Tab key="student">Student List</Tab>
 			<Tab key="analytic">Analytics</Tab>
+			<Tab key="bookmarks">Bookmarks</Tab>
 		</span>
 		<TabContent key="student">
+			Mock table data right now. Will have a list of the students on the teachers roster with links to their individual problem sets and the students view of the game.
 			<Table tableData={ $studentsArray } style={ blueStyle }/>
 		</TabContent>
-		<TabContent key="analytic">contents on tab 2</TabContent>
+		<TabContent key="analytic">This will show the class analyitc so that the teacher will be able to view how their students are doing with the problem sets.</TabContent>
+		<TabContent key="bookmarks">Bookmarked tabs by the teacher for ease of access.</TabContent>
 	</TabGroup>
 </div>
 
