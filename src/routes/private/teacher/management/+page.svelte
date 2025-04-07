@@ -1,5 +1,8 @@
 <script>
 	import { Button } from '$lib/components';
+
+	let { data } = $props();
+	let { colors } = $derived(data);
 </script>
 
 <header class="teacher-header">
@@ -27,6 +30,12 @@
 
 <main class="teacher-content">
     <p class="welcome-message">Add, edit, or remove students from your class.</p>
+
+	<ul>
+		{#each colors as color}
+			<li>{color.name}</li>
+		{/each}
+	</ul>
 </main>
 
 <style>

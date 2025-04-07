@@ -27,6 +27,7 @@
 
 <main class="teacher-content">
     <p class="welcome-message">View detailed performance reports for your students.</p>
+	<p>This will display a report of the statistics for the class.</p>
 </main>
 
 <style>
