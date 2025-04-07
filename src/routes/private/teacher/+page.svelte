@@ -42,7 +42,11 @@
 				</div>
 				<h2>Student Management</h2>
 				<p>Add, edit, or remove students from your class.</p>
-				<Button variant="primary" size="md" rounded={true}>Manage Students</Button>
+				<div>
+					<a href="/private/teacher/management">
+					<Button variant="primary" size="md" rounded={true}>Manage Students</Button>
+					</a>
+				</div>
 			</div>
 
 			<div class="card">
