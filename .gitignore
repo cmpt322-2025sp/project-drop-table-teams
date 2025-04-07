@@ -15,7 +15,6 @@ Thumbs.db
 # Env
 .env
 .env.*
-<<<<<<< HEAD
 !.env.example
 !.env.test
 
@@ -34,3 +33,5 @@ CLAUDE.md
 
 # Phaser Svelte template
 template-svelte/
+
+supabase/.temp/
