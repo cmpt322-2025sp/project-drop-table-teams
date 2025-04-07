@@ -30,3 +30,9 @@ CLAUDE.md
 
 # svelte data
 .svelte-kit/
+
+# Supabase
+supabase/.temp/
+
+# Phaser Svelte template
+template-svelte/

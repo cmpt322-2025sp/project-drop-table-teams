@@ -3,9 +3,12 @@
 	import './vars.css';
 	import './style.css';
 
-	// Mock user data
-	const user = {
-		name: 'Sarah',
+	let { data } = $props();
+	let { user, userRole } = $derived(data);
+
+	// Use real user data or fallback to mock data
+	const studentData = {
+		name: user?.email?.split('@')[0] || 'Student',
 		level: 3,
 		points: 120
 	};
@@ -27,15 +30,15 @@
 			</svg>
 		</div>
 		<div class="user-details">
-			<div class="user-name">{user.name}</div>
-			<div class="user-stats">Level {user.level} • {user.points} points</div>
+			<div class="user-name">{studentData.name}</div>
+			<div class="user-stats">Level {studentData.level} • {studentData.points} points</div>
 		</div>
 	</div>
 
 	<div class="logo">Math Maze</div>
 
 	<div class="start-button">
-		<a href="/game">
+		<a href="/private/student/game">
 			<Button
 				variant="primary"
 				size="lg"
@@ -48,6 +51,12 @@
 
 	<div class="view-progress-button">
 		<Button variant="secondary" size="md" rounded={true}>View Progress</Button>
+	</div>
+	
+	<div class="logout-button">
+		<form action="/auth/signout" method="POST">
+			<Button type="submit" variant="secondary" size="sm" rounded={true}>Logout</Button>
+		</form>
 	</div>
 </div>
 
@@ -136,6 +145,13 @@
 	.view-progress-button {
 		margin-top: calc(var(--dashboard-spacing) * 0.5);
 		animation: fadeIn 2s ease;
+	}
+	
+	.logout-button {
+		position: absolute;
+		bottom: 1rem;
+		right: 1rem;
+		animation: fadeIn 2.5s ease;
 	}
 
 	/* Simple animations */

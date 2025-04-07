@@ -9,19 +9,25 @@
 	} from '$lib/mathproblems';
 	import { Button, Modal } from '$lib/components';
 	import Celebration from '$lib/components/Celebration.svelte';
-	import { MazeRenderer } from '$lib/game/MazeRenderer';
+	import { EventBus, type MazeScene } from '$lib/game';
+	import type {
+		PlayerMovedEvent,
+		InvalidMoveEvent,
+		ShowMathProblemEvent,
+		GoalReachedEvent
+	} from '$lib/game/EventBus';
+	import PhaserGameComponent from '$lib/game/PhaserGame.svelte';
+	import type { TPhaserRef } from '$lib/game/PhaserGame.svelte';
 	import { theme, nextTheme, getThemeColors } from '$lib/stores/theme';
 
 	// Maze settings
-	const rows = 5;
-	const cols = 5;
-	const cellSize = 70; // Larger cells for better visibility and higher resolution
-	const wallThickness = 40;
+	const rows = 6;
+	const cols = 6;
 
 	let goalCell: Cell;
 	let maze: Cell[][] = [];
-	let canvas: HTMLCanvasElement;
-	let mazeRenderer: MazeRenderer;
+	// Phaser game references
+	let phaserRef: TPhaserRef = { game: null, scene: null };
 
 	// Math problem state
 	let showMathProblem = false;
@@ -31,162 +37,143 @@
 	let problemResult: 'correct' | 'incorrect' | null = null;
 	let answerInput: HTMLInputElement;
 
-	// Player starting position (center of maze for now).
+	// Player starting position (center of maze for now)
 	let targetRow = Math.floor(rows / 2);
 	let targetCol = Math.floor(cols / 2);
-	// The "displayed" position is used for animation (in grid units, as a float).
-	let displayedRow = targetRow;
-	let displayedCol = targetCol;
-
-	// Zoom setting: this is how much we want to zoom into the maze.
-	const zoom = 2;
-	// We'll compute offsets based on the full canvas dimensions.
-	let canvasWidth = 0;
-	let canvasHeight = 0;
-	// These will be used in the transform style.
-	let offsetX = 0;
-	let offsetY = 0;
-
-	// Animation settings.
-	const animationSpeed = 0.15; // Slightly slower for kids to follow
-	let animating = false;
 
 	// Add movement buttons for kids (in addition to keyboard controls)
 	let showControls = true;
 
 	// Add celebration visuals
 	let showCelebration = false;
+	let celebrationMessage = 'Great job solving the maze!';
 
 	// Theme comes from the Svelte store
-	let currentTheme; // For binding the UI
+	let currentTheme: string; // For binding the UI
 
 	// Subscribe to theme changes
 	const unsubscribeTheme = theme.subscribe((value) => {
 		currentTheme = value;
 	});
 
+	// Handle Phaser scene when it's ready
+	function handleSceneReady(scene: MazeScene) {
+		console.log('Maze scene is ready', scene);
+
+		// Now we can interact with the scene directly
+		if (scene) {
+			// Set the maze data in the scene
+			if (maze.length > 0 && goalCell) {
+				scene.setMaze(maze, goalCell);
+			}
+
+			// Make sure theme is set
+			scene.setTheme(currentTheme);
+
+			// Connect player movement events
+			EventBus.on('player-moved', (data: PlayerMovedEvent) => {
+				console.log('Player moved:', data.direction, data.position);
+				// Update player position in our state if needed
+			});
+
+			// Connect invalid move events
+			EventBus.on('invalid-move', (data: InvalidMoveEvent) => {
+				console.log('Invalid move:', data.direction);
+				// Show invalid move indicator
+				const invalidMove = document.getElementById('invalid-move');
+				if (invalidMove) {
+					invalidMove.classList.add('show');
+					setTimeout(() => {
+						invalidMove.classList.remove('show');
+					}, 1500);
+				}
+			});
+
+			// Connect math problem events
+			EventBus.on('show-math-problem', (data: ShowMathProblemEvent) => {
+				console.log('Math problem at cell:', data.cell);
+				// Show the math problem modal
+				attemptedCell = data.cell;
+				currentProblem = generateMathProblem();
+				showMathProblem = true;
+
+				// Focus the answer input if available
+				setTimeout(() => {
+					if (answerInput) {
+						answerInput.focus();
+					}
+				}, 100);
+			});
+
+			// Connect goal reached events
+			EventBus.on('goal-reached', (_data: GoalReachedEvent) => {
+				console.log('Goal reached!');
+				// Count how many math problems were solved
+				let solvedProblems = 0;
+				let totalProblems = 0;
+
+				for (let r = 0; r < maze.length; r++) {
+					for (let c = 0; c < maze[0].length; c++) {
+						const cell = maze[r][c];
+						if (cell.isIntersection) {
+							totalProblems++;
+							if (cell.mathProblemSolved) {
+								solvedProblems++;
+							}
+						}
+					}
+				}
+
+				// Always show celebration when goal is reached
+				showCelebration = true;
+
+				// Update the celebration message based on solved problems
+				if (solvedProblems === totalProblems) {
+					celebrationMessage = `Perfect! You solved all ${totalProblems} math problems!`;
+				} else {
+					celebrationMessage = `Good job! You solved ${solvedProblems} out of ${totalProblems} math problems.`;
+				}
+
+				setTimeout(() => {
+					showCelebration = false;
+				}, 5000);
+			});
+		}
+	}
+
 	onMount(() => {
 		if (typeof window !== 'undefined') {
+			// Generate the maze
 			const mazeData = generateMaze(rows, cols);
 			maze = mazeData.maze;
 			goalCell = mazeData.goal;
 
-			// Initialize the maze renderer with high-res support
-			const pixelRatio = window.devicePixelRatio || 1;
+			// Add keyboard event listener for the game controls
+			window.addEventListener('keydown', handleKeyDown);
 
-			mazeRenderer = new MazeRenderer(canvas, cellSize, wallThickness);
-			const dimensions = mazeRenderer.calculateCanvasDimensions(rows, cols);
-
-			// Set the canvas's display size
-			canvas.style.width = `${dimensions.width}px`;
-			canvas.style.height = `${dimensions.height}px`;
-
-			// Set the canvas's drawing buffer size
-			canvas.width = dimensions.width * pixelRatio;
-			canvas.height = dimensions.height * pixelRatio;
-
-			// Store logical dimensions for calculations
-			canvasWidth = dimensions.width;
-			canvasHeight = dimensions.height;
-
-			// Scale the context for high-resolution display
-			const ctx = canvas.getContext('2d');
-			if (ctx) {
-				ctx.scale(pixelRatio, pixelRatio);
+			// If we already have a scene reference, immediately set maze and theme
+			if (phaserRef.scene) {
+				phaserRef.scene.setMaze(maze, goalCell);
+				phaserRef.scene.setTheme(currentTheme);
 			}
 
-			// Initial render
-			draw();
-			updateTransform();
-
-			window.addEventListener('keydown', handleKeyDown);
+			// Return cleanup function
+			return () => {
+				window.removeEventListener('keydown', handleKeyDown);
+			};
 		}
 	});
 
 	onDestroy(() => {
-		if (typeof window !== 'undefined') {
-			window.removeEventListener('keydown', handleKeyDown);
-		}
-
 		// Clean up subscriptions
 		unsubscribeTheme();
 
-		// Clean up MazeRenderer resources
-		if (mazeRenderer) {
-			mazeRenderer.destroy();
-		}
+		// Clean up EventBus listeners
+		EventBus.removeAllListeners('player-moved');
+		EventBus.removeAllListeners('invalid-move');
+		EventBus.removeAllListeners('show-math-problem');
+		EventBus.removeAllListeners('goal-reached');
 	});
-
-	// Draw the maze and player using the MazeRenderer
-	function draw() {
-		if (!canvas || !mazeRenderer) return;
-		mazeRenderer.render(maze, displayedRow, displayedCol);
-	}
-
-	function updateTransform() {
-		// Check if window exists (i.e. code is running in the browser)
-		if (typeof window === 'undefined') return;
-
-		// Compute the center of the player's cell in the full maze (in canvas pixels).
-		// We add half the cell's width/height to center within the cell.
-		const playerCenterX = wallThickness + displayedCol * (cellSize + wallThickness) + cellSize / 2;
-		const playerCenterY = wallThickness + displayedRow * (cellSize + wallThickness) + cellSize / 2;
-
-		// Define the viewport dimensions. Here we use 80% of the window dimensions.
-		const viewportWidth = window.innerWidth * 0.8;
-		const viewportHeight = window.innerHeight * 0.8;
-
-		// To center the player in the viewport compute the offset needed.
-		// Note: Because we apply a scale transform, we need to divide the offset
-		// by the zoom factor.
-		offsetX = (viewportWidth / 2 - playerCenterX * zoom) / zoom;
-		offsetY = (viewportHeight / 2 - playerCenterY * zoom) / zoom;
-
-		if (canvas) {
-			canvas.style.transform = `scale(${zoom}) translate(${offsetX}px, ${offsetY}px)`;
-		}
-	}
-
-	// Animate the transition from the current displayed position to the target.
-	function animate(onComplete?: () => void) {
-		// Linear interpolation helper.
-		const lerp = (start: number, end: number, t: number) => start + (end - start) * t;
-
-		// Update displayed positions.
-		displayedRow = lerp(displayedRow, targetRow, animationSpeed);
-		displayedCol = lerp(displayedCol, targetCol, animationSpeed);
-
-		// Redraw and update transform.
-		draw();
-		updateTransform();
-
-		// If the displayed position is nearly at the target, finish animating.
-		if (Math.abs(displayedRow - targetRow) < 0.01 && Math.abs(displayedCol - targetCol) < 0.01) {
-			displayedRow = targetRow;
-			displayedCol = targetCol;
-			animating = false;
-
-			// Call the completion callback if provided
-			if (onComplete) onComplete();
-		} else {
-			requestAnimationFrame(() => animate(onComplete));
-		}
-	}
-
-	// Check if the move is valid based on walls
-	function isMoveValid(newRow: number, newCol: number): boolean {
-		if (newRow < 0 || newRow >= rows || newCol < 0 || newCol >= cols) {
-			return false; // Out of bounds
-		}
-
-		const currentCell = maze[targetRow][targetCol];
-		if (newRow < targetRow && currentCell.walls.top) return false; // Moving up
-		if (newRow > targetRow && currentCell.walls.bottom) return false; // Moving down
-		if (newCol < targetCol && currentCell.walls.left) return false; // Moving left
-		if (newCol > targetCol && currentCell.walls.right) return false; // Moving right
-
-		return true; // Move is valid
-	}
 
 	// Generate a math problem for the intersection
 	function generateMathProblem(): MathProblem {
@@ -207,8 +194,10 @@
 			if (attemptedCell) {
 				attemptedCell.mathProblemSolved = true;
 
-				// Immediately redraw the maze to update the block appearance
-				draw();
+				// Refresh the maze to show the solved state immediately
+				if (phaserRef.scene) {
+					phaserRef.scene.refreshMaze();
+				}
 
 				// Handle goal check and close math problem
 				const isGoalCell = attemptedCell.isGoal;
@@ -228,8 +217,6 @@
 					userAnswer = '';
 					attemptedCell = null;
 					problemResult = null;
-					// Redraw one more time to ensure everything is updated
-					draw();
 				}, 1000);
 			}
 		} else {
@@ -247,73 +234,21 @@
 
 	// Handle movement with direction buttons or keyboard
 	function movePlayer(direction: 'up' | 'down' | 'left' | 'right') {
-		// If math problem is showing or currently animating, don't allow movement
-		if (showMathProblem || animating) return;
-
-		let newRow = targetRow;
-		let newCol = targetCol;
-
-		if (direction === 'up') {
-			newRow = targetRow - 1;
-		} else if (direction === 'down') {
-			newRow = targetRow + 1;
-		} else if (direction === 'left') {
-			newCol = targetCol - 1;
-		} else if (direction === 'right') {
-			newCol = targetCol + 1;
-		}
-
-		// Check boundaries and wall collision
-		if (isMoveValid(newRow, newCol)) {
-			const targetCell = maze[newRow][newCol];
-
-			// Normal movement first, then check for special cases after animation
-			targetRow = newRow;
-			targetCol = newCol;
-
-			// Start animating
-			animating = true;
-
-			// Handle math problems or goal after animation completes
-			requestAnimationFrame(() =>
-				animate(() => {
-					// After animation completes, check if cell has math problem
-					if (targetCell.hasMathProblem && !targetCell.mathProblemSolved) {
-						// Show math problem after movement completes
-						showMathProblem = true;
-						currentProblem = generateMathProblem();
-						attemptedCell = targetCell;
-						userAnswer = '';
-						problemResult = null;
-
-						// Focus the input element after the modal opens
-						setTimeout(() => {
-							if (answerInput) answerInput.focus();
-						}, 100);
-					}
-					// Check if player reached the goal after animation completes
-					else if (targetCell.isGoal) {
-						showCelebration = true;
-						setTimeout(() => {
-							showCelebration = false;
-						}, 3000);
-					}
-				})
-			);
+		// Forward the move to the Phaser scene
+		if (phaserRef.scene) {
+			phaserRef.scene.movePlayer(direction);
 		} else {
-			// Give visual feedback when trying to move through walls
-			const invalidMove = document.getElementById('invalid-move');
-			if (invalidMove) {
-				invalidMove.classList.add('show');
-				setTimeout(() => {
-					invalidMove.classList.remove('show');
-				}, 500);
-			}
+			console.log(`Scene not ready, can't move player ${direction}`);
 		}
 	}
 
 	// Handle arrow keys or WASD key presses to move the player
 	function handleKeyDown(e: KeyboardEvent) {
+		// Avoid processing keys if we're in a text input
+		if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+			return;
+		}
+
 		if (e.key === 'ArrowUp' || e.key === 'w') {
 			movePlayer('up');
 		} else if (e.key === 'ArrowDown' || e.key === 's') {
@@ -327,8 +262,17 @@
 
 	// Change the maze theme
 	function changeTheme() {
-		nextTheme(); // Use the store's function to change the theme
-		draw();
+		console.log('Changing theme from:', currentTheme);
+
+		// Store current theme
+		const oldTheme = currentTheme;
+
+		// Update the theme in the store
+		nextTheme();
+
+		// Don't directly call scene methods - scene may not be fully initialized
+		// Just let the subscription in PhaserGame handle the update
+		console.log('Theme updated in store, PhaserGame will handle the update');
 	}
 </script>
 
@@ -347,10 +291,15 @@
 		Change Theme
 	</Button>
 
-	<!-- Wrap the canvas in a viewport container -->
-	<div class="viewport">
-		<canvas bind:this={canvas} style="transform: scale({zoom}) translate({offsetX}px, {offsetY}px);"
-		></canvas>
+	<!-- Phaser game container -->
+	<div class="viewport {currentTheme}-viewport">
+		<!-- PhaserGame Svelte component -->
+		<PhaserGameComponent bind:phaserRef onSceneReady={handleSceneReady} />
+
+		<!-- This block helps ensure theme and maze are properly set -->
+		{#if maze.length > 0 && currentTheme}
+			<!-- Force reactivity when maze and theme are ready -->
+		{/if}
 
 		<!-- On-screen controls for touchscreens or younger kids -->
 		{#if showControls}
@@ -493,7 +442,7 @@
 		<Celebration
 			show={showCelebration}
 			title="You Did It!"
-			message="Great job solving the maze!"
+			message={celebrationMessage}
 			buttonText="Play Again"
 			onButtonClick={() => window.location.reload()}
 		/>
@@ -573,71 +522,45 @@
 		}
 	}
 
-	/* Theme button */
-	.theme-button {
-		background-color: #ffeb3b;
-		color: #333;
-		border: none;
-		border-radius: 50px;
-		padding: 0.75rem 1.5rem;
-		font-size: 1.1rem;
-		font-weight: bold;
-		margin-bottom: 1rem;
-		cursor: pointer;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-		transition: all 0.2s ease;
-		font-family: 'Comic Sans MS', cursive, sans-serif;
-		position: relative;
-		overflow: hidden;
-		z-index: 1;
-	}
-
-	.theme-button:hover {
-		transform: translateY(-3px);
-		box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
-	}
-
-	.theme-button:active {
-		transform: translateY(1px);
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-	}
-
-	.theme-button::after {
-		content: '';
-		position: absolute;
-		background: rgba(255, 255, 255, 0.3);
-		width: 100%;
-		height: 100%;
-		left: -100%;
-		top: 0;
-		border-radius: 50px;
-		z-index: -1;
-		transition: all 0.4s ease;
-	}
-
-	.theme-button:hover::after {
-		left: 0;
-	}
-
 	/* Viewport container */
 	.viewport {
 		width: 95vw;
-		height: 90vh;
+		height: 75vh;
+		max-height: calc(100vh - 150px); /* Ensure it doesn't overflow the screen */
 		overflow: hidden;
 		border-radius: 16px;
 		margin: auto;
 		position: relative;
 		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 		background: rgba(255, 255, 255, 0.1);
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 
-	canvas {
-		transform-origin: top left;
-		transition: transform 0.3s ease;
-		image-rendering: crisp-edges; /* For Firefox */
-		image-rendering: -webkit-optimize-contrast; /* For Chrome/Safari */
-		image-rendering: pixelated; /* Modern browsers */
-		-ms-interpolation-mode: nearest-neighbor; /* For IE */
+	/* Theme-specific viewport enhancements */
+	.space-viewport {
+		box-shadow:
+			0 8px 24px rgba(0, 0, 0, 0.5),
+			0 0 40px rgba(41, 121, 255, 0.4);
+	}
+
+	.ocean-viewport {
+		box-shadow:
+			0 8px 24px rgba(0, 0, 0, 0.5),
+			0 0 40px rgba(0, 188, 212, 0.4);
+	}
+
+	.jungle-viewport {
+		box-shadow:
+			0 8px 24px rgba(0, 0, 0, 0.5),
+			0 0 40px rgba(139, 195, 74, 0.4);
+	}
+
+	.candy-viewport {
+		box-shadow:
+			0 8px 24px rgba(0, 0, 0, 0.5),
+			0 0 40px rgba(233, 30, 99, 0.4);
 	}
 
 	/* Control buttons for mobile/younger kids */
@@ -655,33 +578,6 @@
 	.control-row {
 		display: flex;
 		gap: 1rem;
-	}
-
-	.control-btn {
-		width: 3.5rem;
-		height: 3.5rem;
-		border-radius: 50%;
-		border: none;
-		background-color: rgba(255, 255, 255, 0.7);
-		color: #333;
-		font-size: 1.5rem;
-		font-weight: bold;
-		cursor: pointer;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-		transition: all 0.2s ease;
-	}
-
-	.control-btn:hover {
-		background-color: rgba(255, 255, 255, 0.9);
-		transform: scale(1.1);
-	}
-
-	.control-btn:active {
-		background-color: rgba(200, 200, 200, 0.9);
-		transform: scale(0.95);
 	}
 
 	/* Invalid move indicator */
@@ -710,7 +606,6 @@
 		text-align: center;
 		max-width: 500px;
 		margin: 0 auto;
-		/* Modal component handles background color and border */
 	}
 
 	.question {
@@ -847,31 +742,50 @@
 	@media (max-width: 768px) {
 		.game-title {
 			font-size: 2rem;
+			margin-bottom: 0.5rem;
 		}
 
 		.viewport {
-			width: 95vw;
+			width: 98vw;
 			height: 65vh;
+			margin-top: 0.5rem;
 		}
 
 		.question {
 			font-size: 1.4rem;
 		}
 
-		.control-btn {
-			width: 3rem;
-			height: 3rem;
-			font-size: 1.2rem;
+		.control-buttons {
+			bottom: 0.5rem;
+			right: 0.5rem;
 		}
 	}
 
 	@media (max-width: 480px) {
 		.game-title {
-			font-size: 1.8rem;
+			font-size: 1.7rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.viewport {
+			width: 98vw;
+			height: 60vh;
+			border-radius: 12px;
 		}
 
 		.question {
 			font-size: 1.2rem;
 		}
+
+		.control-buttons {
+			transform: scale(0.9);
+			transform-origin: bottom right;
+		}
+
+		input {
+			width: 120px;
+			font-size: 1rem;
+		}
 	}
 </style>
+
