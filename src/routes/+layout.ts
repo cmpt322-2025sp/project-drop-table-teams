@@ -40,7 +40,7 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
 	} = await supabase.auth.getUser();
 
 	// Get user role from metadata if user exists
-	const userRole = user?.user_metadata?.role || data.userRole || 'student';
+	const userRole = user?.user_metadata?.role || 'student';
 
 	return { session, supabase, user, userRole };
 };
