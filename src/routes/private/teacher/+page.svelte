@@ -59,7 +59,11 @@
 				</div>
 				<h2>Progress Tracking</h2>
 				<p>View detailed performance reports for your students.</p>
-				<Button variant="primary" size="md" rounded={true}>View Reports</Button>
+				<div>
+					<a href="/private/teacher/progress">
+					<Button variant="primary" size="md" rounded={true}>View Reports</Button>
+					</a>
+				</div>
 			</div>
 
 			<div class="card">
@@ -71,7 +75,11 @@
 				</div>
 				<h2>Game Settings</h2>
 				<p>Customize game difficulty and math problems.</p>
-				<Button variant="primary" size="md" rounded={true}>Configure</Button>
+				<div>
+					<a href="/private/teacher/game">
+					<Button variant="primary" size="md" rounded={true}>Configure</Button>
+					</a>
+				</div>
 			</div>
 		</div>
 	</main>
