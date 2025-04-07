@@ -976,7 +976,7 @@ export class MazeRenderer {
 		let rot = (Math.PI / 2) * 3;
 		let x = cx;
 		let y = cy;
-		let step = Math.PI / spikes;
+		const step = Math.PI / spikes;
 
 		// Create gradient for star
 		const gradient = ctx.createRadialGradient(cx, cy, innerRadius * 0.5, cx, cy, outerRadius);

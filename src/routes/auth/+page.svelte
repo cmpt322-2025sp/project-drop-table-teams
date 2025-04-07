@@ -1,134 +1,256 @@
-<script lang="ts">
-  import { Button } from '$lib/components';
-  import { page } from '$app/stores';
-  
-  let userType = 'student'; // Default to student
-  $: signupSuccessMessage = $page.form?.success && $page.form?.message;
+<script>
+	import { Button } from '$lib/components';
+
+	let isLogin = true;
+	let email = '';
+	let password = '';
+	let role = 'student'; // Default role
 </script>
 
-<div class="login-container">
-  <h1 class="login-title">Math Maze Login</h1>
-  
-  {#if signupSuccessMessage}
-    <div class="message success">
-      {$page.form.message}
-    </div>
-  {/if}
-  
-  <div class="user-type-selector">
-    <button 
-      class={userType === 'student' ? 'selected' : ''} 
-      on:click={() => userType = 'student'}>
-      Student
-    </button>
-    <button 
-      class={userType === 'teacher' ? 'selected' : ''} 
-      on:click={() => userType = 'teacher'}>
-      Teacher
-    </button>
-  </div>
-
-  <form method="POST" action="?/login" class="login-form">
-    <input type="hidden" name="userType" value={userType} />
-    
-    <div class="form-group">
-      <label for="email">Email</label>
-      <input id="email" name="email" type="email" required />
-    </div>
-    
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input id="password" name="password" type="password" required />
-    </div>
-    
-    <div class="form-actions">
-      <Button type="submit" variant="primary" size="md">Login</Button>
-      <Button type="submit" formaction="?/signup" variant="secondary" size="md">Sign Up</Button>
-    </div>
-  </form>
+<div class="auth-container">
+	<div class="auth-card">
+		<div class="logo">Math Maze</div>
+		
+		<h1 class="auth-title">{isLogin ? 'Welcome Back!' : 'Create Account'}</h1>
+		
+		<form method="POST" action={isLogin ? '?/login' : '?/signup'}>
+			<div class="form-group">
+				<label for="email">Email</label>
+				<input 
+					id="email"
+					name="email" 
+					type="email" 
+					placeholder="Enter your email"
+					required
+					bind:value={email}
+				/>
+			</div>
+			
+			<div class="form-group">
+				<label for="password">Password</label>
+				<input 
+					id="password"
+					name="password" 
+					type="password" 
+					placeholder="Enter your password"
+					required
+					bind:value={password}
+				/>
+			</div>
+			
+			{#if !isLogin}
+				<div class="form-group">
+					<label>Account Type</label>
+					<div class="role-options">
+						<label class="role-option">
+							<input 
+								type="radio" 
+								name="role" 
+								value="student" 
+								bind:group={role}
+							/>
+							<span class="role-label">Student</span>
+						</label>
+						<label class="role-option">
+							<input 
+								type="radio" 
+								name="role" 
+								value="teacher" 
+								bind:group={role}
+							/>
+							<span class="role-label">Teacher</span>
+						</label>
+					</div>
+				</div>
+			{/if}
+			
+			<div class="auth-actions">
+				<Button 
+					type="submit"
+					variant="primary" 
+					size="lg" 
+					rounded={true}
+					style="width: 100%; margin-bottom: 1rem;"
+				>
+					{isLogin ? 'Login' : 'Sign Up'}
+				</Button>
+				
+				<button 
+					type="button" 
+					class="switch-mode" 
+					on:click={() => isLogin = !isLogin}
+				>
+					{isLogin ? 'Need an account? Sign up' : 'Already have an account? Login'}
+				</button>
+			</div>
+		</form>
+	</div>
 </div>
 
 <style>
-  .login-container {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 2rem;
-    border-radius: 8px;
-    background-color: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
+	.auth-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		min-height: 100vh;
+		width: 100%;
+		background-color: var(--background-green);
+		padding: 1rem;
+		background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+	}
 
-  .login-title {
-    text-align: center;
-    margin-bottom: 1.5rem;
-    font-family: 'NovaFlat-Book', sans-serif;
-    color: var(--text-color, #ffffff);
-  }
+	.auth-card {
+		background-color: white;
+		border-radius: 16px;
+		padding: 2.5rem 2rem;
+		width: 100%;
+		max-width: 450px;
+		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+		animation: slideUp 0.5s ease-out;
+	}
 
-  .message {
-    padding: 1rem;
-    border-radius: 4px;
-    margin-bottom: 1rem;
-    text-align: center;
-  }
+	.logo {
+		color: var(--text-color);
+		font-family: 'NovaFlat-Book', sans-serif;
+		font-size: 3rem;
+		line-height: 1.2;
+		font-weight: 700;
+		margin-bottom: 1.5rem;
+		text-align: center;
+		animation: fadeIn 1s ease;
+		color: var(--button-orange);
+	}
 
-  .success {
-    background-color: rgba(76, 175, 80, 0.2);
-    color: #4CAF50;
-    border: 1px solid #4CAF50;
-  }
+	.auth-title {
+		font-size: 1.8rem;
+		margin-bottom: 2rem;
+		text-align: center;
+		font-weight: 600;
+		color: #333;
+	}
 
-  .user-type-selector {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-    gap: 1rem;
-  }
+	.form-group {
+		margin-bottom: 1.5rem;
+	}
 
-  .user-type-selector button {
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: var(--text-color, #ffffff);
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
+	label {
+		display: block;
+		margin-bottom: 0.5rem;
+		font-weight: 600;
+		color: #555;
+		font-size: 0.9rem;
+	}
 
-  .user-type-selector button.selected {
-    background-color: var(--primary-color, #5e35b1);
-    color: white;
-  }
+	input[type="email"],
+	input[type="password"] {
+		width: 100%;
+		padding: 0.9rem 1rem;
+		border: 2px solid #e0e0e0;
+		border-radius: 8px;
+		font-size: 1rem;
+		transition: border-color 0.3s;
+		outline: none;
+		font-family: inherit;
+	}
 
-  .login-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
+	input[type="email"]:focus,
+	input[type="password"]:focus {
+		border-color: var(--button-orange);
+		box-shadow: 0 0 0 2px rgba(255, 157, 0, 0.2);
+	}
 
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+	.role-options {
+		display: flex;
+		gap: 1rem;
+		margin-top: 0.5rem;
+	}
 
-  .form-group label {
-    font-size: 0.9rem;
-    color: var(--text-color-muted, #a7a7a7);
-  }
+	.role-option {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		background-color: #f5f5f5;
+		padding: 0.75rem 1rem;
+		border-radius: 8px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
 
-  .form-group input {
-    padding: 0.75rem;
-    border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background-color: rgba(255, 255, 255, 0.05);
-    color: var(--text-color, #ffffff);
-  }
+	.role-option:hover {
+		background-color: #eeeeee;
+	}
 
-  .form-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 1rem;
-  }
+	input[type="radio"] {
+		cursor: pointer;
+	}
+
+	.role-option input[type="radio"]:checked + .role-label {
+		font-weight: 600;
+		color: var(--button-orange);
+	}
+
+	.role-label {
+		font-size: 0.9rem;
+		font-weight: 500;
+	}
+
+	.auth-actions {
+		margin-top: 2rem;
+	}
+
+	.switch-mode {
+		background: none;
+		border: none;
+		color: var(--button-orange);
+		font-size: 0.9rem;
+		cursor: pointer;
+		display: block;
+		margin: 0 auto;
+		padding: 0.5rem;
+		transition: color 0.3s;
+		text-decoration: underline;
+	}
+
+	.switch-mode:hover {
+		color: #d68200;
+	}
+
+	@keyframes slideUp {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	@media (max-width: 500px) {
+		.auth-card {
+			padding: 1.5rem 1rem;
+		}
+
+		.logo {
+			font-size: 2.5rem;
+		}
+
+		.auth-title {
+			font-size: 1.5rem;
+		}
+
+		.role-options {
+			flex-direction: column;
+		}
+	}
 </style>

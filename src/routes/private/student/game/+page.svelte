@@ -494,8 +494,8 @@
 			show={showCelebration}
 			title="You Did It!"
 			message="Great job solving the maze!"
-			buttonText="Play Again"
-			onButtonClick={() => window.location.reload()}
+			buttonText="Back to Dashboard"
+			onButtonClick={() => window.location.href = '/private/student/dashboard'}
 		/>
 	</div>
 </div>
