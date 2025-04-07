@@ -23,11 +23,14 @@
 			to their individual problem sets and the students view of the game.
 			<Table tableData={$studentsArray} style={blueStyle} />
 		</TabContent>
-		<TabContent key="analytic"
-			>This will show the class analyitc so that the teacher will be able to view how their students
-			are doing with the problem sets.</TabContent
+		<TabContent key="analytic">
+			This will show the class analyitc so that the teacher will be able to view how their students
+			are doing with the problem sets.
+			</TabContent
 		>
-		<TabContent key="bookmarks">Bookmarked tabs by the teacher for ease of access.</TabContent>
+		<TabContent key="bookmarks">
+			
+		</TabContent>
 	</TabGroup>
 </div>
 
