@@ -33,3 +33,6 @@ CLAUDE.md
 
 # Supabase
 supabase/.temp/
+
+# Phaser Svelte template
+template-svelte/
