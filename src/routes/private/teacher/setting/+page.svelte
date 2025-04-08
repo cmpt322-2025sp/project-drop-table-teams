@@ -1,5 +1,12 @@
 <script>
 	import { Button } from '$lib/components';
+
+	// Navigation with server-side redirect
+    function navigateToStudentView() {
+        // Use our dedicated server-side redirect endpoint
+        // This forces a proper redirect through the server
+        window.location.href = '/private/teacher/student-redict/game';
+    }
 </script>
 
 <header class="teacher-header">
@@ -30,7 +37,7 @@
 	<p class="welcome-message">Customize game difficulty and math problems.</p>
 
 	<div class="action-buttons">
-		<Button variant="secondary" size="md" rounded={true}>
+		<Button variant="secondary" size="md" rounded={true} onClick={navigateToStudentView}>
 			<div class="button-content">
 				<svg
 					width="20"
@@ -123,6 +130,18 @@
 		margin-bottom: 2rem;
 		line-height: 1.5;
 	}
+
+	.action-buttons {
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1rem;
+    }
+	
+	.button-content {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
 
 	@media (max-width: 768px) {
 		.teacher-header {
