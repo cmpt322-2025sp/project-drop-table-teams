@@ -56,6 +56,18 @@
 			</div>
 		</Button>
 	</div>
+
+	.action-buttons {
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1rem;
+    }
+	
+	.button-content {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
 	-->
 </main>
 
@@ -132,18 +144,6 @@
 		margin-bottom: 2rem;
 		line-height: 1.5;
 	}
-
-	.action-buttons {
-        margin-bottom: 2rem;
-        display: flex;
-        gap: 1rem;
-    }
-	
-	.button-content {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
 
 	@media (max-width: 768px) {
 		.teacher-header {
