@@ -7,8 +7,7 @@
 		generateRandomPlaceValueProblem,
 		type MathProblem
 	} from '$lib/mathproblems';
-	import { Button, Modal } from '$lib/components';
-	import Celebration from '$lib/components/Celebration.svelte';
+	import { Button, Modal, Celebration } from '$lib/components';
 	import { EventBus, type MazeScene } from '$lib/game';
 	import type {
 		PlayerMovedEvent,

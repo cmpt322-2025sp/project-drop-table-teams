@@ -1,5 +1,4 @@
 <script context="module" lang="ts">
-	import type { Game, Scene } from 'phaser';
 	import type { MazeScene } from './MazeScene';
 
 	export type TPhaserRef = {
