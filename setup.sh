@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-if [ ! -f .env ]; then
-    cp .env.example .env
+if [ ! -f .env.local ]; then
+    cp .env.example .env.local
     echo ".env file created from .env.example"
 fi
 

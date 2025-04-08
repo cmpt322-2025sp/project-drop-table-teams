@@ -1,145 +1,184 @@
 # Math Maze
 
-This is our group project for software engineering---a math game for kids built
-using SvelteKit, Supabase, and Bun.
+An educational math game for students built using SvelteKit, Phaser, Supabase,
+and Bun.
 
 ## Table of Contents
 
-- [Prerequisites](#prerequisites)
-- [Setup](#setup)
-- [Development](#development)
-- [Git Workflow](#git-workflow)
-- [VS Code Extensions](#vs-code-extensions)
-- [Project Structure](#project-structure)
-- [Environment Variables](#environment-variables)
-- [Contributing](#contributing)
+-   [Project Overview](#project-overview)
+-   [Features](#features)
+-   [Prerequisites](#prerequisites)
+-   [Setup](#setup)
+-   [Development](#development)
+-   [Git Workflow](#git-workflow)
+-   [VS Code Extensions](#vs-code-extensions)
+-   [Project Structure](#project-structure)
+-   [Environment Variables](#environment-variables)
+-   [Contributing](#contributing)
+
+## Project Overview
+
+Math Maze is an interactive educational game that combines mathematics with maze
+exploration. Students navigate through themed mazes while solving math problems
+to progress and reach the goal. Teachers can monitor student progress and switch
+to student view to experience the game from a student's perspective.
+
+## Features
+
+-   **User Authentication**: Secure login/registration system for students and
+    teachers
+-   **Role-based Access**: Different interfaces for students and teachers
+-   **Interactive Maze Game**: Navigate through mazes using keyboard controls
+-   **Math Challenges**: Solve age-appropriate math problems to progress
+-   **Multiple Themes**: Space, Ocean, Jungle, and Candy themes with unique
+    visual elements
+-   **Responsive Design**: Adapts to different screen sizes
+-   **Teacher Dashboard**: View student progress and switch to student view
+-   **Student Dashboard**: Access games and view achievements
 
 ## Prerequisites
 
-- **Homebrew:** Install from [brew.sh](https://brew.sh) if you haven't
-  already.
-- **Bun:** JavaScript runtime; installable via Homebrew.
-- **Git:** For version control.
-- **VS Code:** (Optional, but recommended for development)
+-   **Homebrew:** Install from [brew.sh](https://brew.sh) if you haven't
+    already.
+-   **Bun:** JavaScript runtime; installable via Homebrew.
+-   **Git:** For version control.
+-   **VS Code:** (Optional, but recommended for development)
 
 ## Setup
 
 1.  **Clone the Repository:**
 
-```bash
-git clone https://github.com/yourusername/your-repo-name.git cd your-repo-name
+``` bash
+git clone https://github.com/cmpt322-2025sp/project-drop-table-teams.git
+cd project-drop-table-teams
 ```
 
 2.  **Install Dependencies via Homebrew:**
 
-There is a `Brewfile` for convenience. Run the folling command to install
+There is a `Brewfile` for convenience. Run the following command to install
 required tools (like Bun and Git):
 
-```bash
+``` bash
 brew bundle
 ```
 
 3.  **Install Project Dependencies:**
 
-```bash
+``` bash
 bun install
 ```
 
 4.  **Configure Environment Variables:**
 
-```bash
+``` bash
 cp .env.example .env
 ```
 
-5.  **Optional: Use the `start.sh` script to automate brew, bun, and Supabase**
+5.  **Optional: Use the `setup.sh` script to automate installation**
 
-The `start.sh` script checks for a `.env`, and copies from `.env.exmaple` if
-none is found. Then it installs from the `Brewfile`, installs project
-dependencies with bun, and starts a local Supabase instance for simplicity.
-
-6.  **Optional: Configure VS Code Extensions**
-
-Use VS Code and the following [extensions](#vs-code-extensions) if you don't
-have something else in mind.
+The `setup.sh` script installs from the `Brewfile`, installs project
+dependencies with bun, and sets up necessary configurations.
 
 ## Development
 
-- Run the Development Server:
+-   Run the Development Server:
 
-```bash
-bun dev
+``` bash
+bun run dev
 ```
 
-- Build the Project:
+-   Build the Project:
 
-```bash
-bun build
+``` bash
+bun run build
 ```
 
-- Linting and Formatting:
+-   Preview Production Build:
 
-Our project uses ESLint and Prettier. To run linting:
+``` bash
+bun run preview
+```
 
-```bash
+-   Type Checking:
+
+``` bash
+bun run check
+```
+
+-   Linting and Formatting:
+
+``` bash
 bun run lint
 ```
 
-To format your code:
-
-```bash
+``` bash
 bun run format
+```
+
+-   Running Tests:
+
+``` bash
+bun test
 ```
 
 ## Git Workflow
 
-Follow these guidelines to make git simple:
+Follow these guidelines for contributing:
 
-- Branching:
+-   Branching:
 
-  - Create a new branch for each feature or bug fix:
+    -   Create a new branch for each feature or bug fix:
 
-  ```bash
-  git checkout -b feature-branch
-  ```
+    ``` bash
+    git checkout -b feature-branch
+    ```
 
-- Committing:
-  - Commit small, focused changes with clear commit messages.
-- Pull Requests:
-  - Push your branch and create a pull request on GitHub for code review.
-  - Merge changes only after the pull request has been approved.
+-   Committing:
+
+    -   Commit small, focused changes with clear commit messages.
+    -   Push your branch.
+    -   Allow Josh to merge the branch into main.
 
 ## VS Code Extensions
 
 Recommended VS Code extensions:
 
-- Svelte for VS Code (`svelte.svelte-vscode`)
-- Prettier - Code formatter (`esbenp.prettier-vscode`)
-- ESLint (`dbaeumer.vscode-eslint`)
+-   Svelte for VS Code (`svelte.svelte-vscode`)
+-   Prettier - Code formatter (`esbenp.prettier-vscode`)
+-   ESLint (`dbaeumer.vscode-eslint`)
 
 You can install these manually or use the provided `.vscode/extensions.json`
 file for recommendations.
 
 ## Project Structure
 
-    |-- src/                # Source code for the project
-    |-- public/             # Static assets
-    |-- .env.example        # Example environment variables
-    |-- package.json        # Project metadata and scripts
-    |-- README.md           # This file
-    |-- flake.nix           # Nix flake for dev tools
-    |-- flake.lock          # Flake lock file for version pinning
-    |-- Brewfile            # Project dependencies and dev tools
-    └-- .vscode/            # VS Code settings and reccomended extensions
+The project follows SvelteKit's file-based routing structure:
+
+    math-maze/
+    ├── src/                # Source code
+    │   ├── lib/            # Shared components and utilities
+    │   │   ├── components/ # Reusable UI components
+    │   │   ├── game/       # Phaser game logic
+    │   │   ├── stores/     # Svelte stores
+    │   │   └── Maze.ts     # Maze generation logic
+    │   ├── routes/         # SvelteKit routes
+    │   │   ├── auth/       # Authentication routes
+    │   │   └── private/    # Protected routes
+    │   │       ├── student/ # Student-specific routes
+    │   │       └── teacher/ # Teacher-specific routes
+    ├── static/             # Static assets
+    ├── supabase/           # Supabase configuration and migrations
+    ├── tests/              # Test files
+    └── [config files]      # Various configuration files
 
 ## Environment Variables
 
 The `.env.example` file contains the keys required for connecting to Supabase.
-Make sure to copy it to `.env` and update the values before starting
+Make sure to copy it to `.env.local` and update the values before starting
 development.
 
 ## Contributing
 
-- Fork the repository.
-- Create a new branch for your feature/bug fix.
-- Make your changes and commit them with clear messages.
-- Submit a pull request with a detailed description of your changes.
+-   Create a new branch for your feature/bug fix.
+-   Make your changes and commit them with clear messages.
+
