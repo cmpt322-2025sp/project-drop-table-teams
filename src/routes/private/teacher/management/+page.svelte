@@ -135,4 +135,22 @@
 		}
 	}
 
+
+	table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 8px;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+
+      th {
+        background-color: var(--background-green);
+		text-align: center;
+		color: white;
+      }
 </style>
