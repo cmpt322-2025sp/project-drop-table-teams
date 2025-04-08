@@ -14,9 +14,9 @@
 	});
 </script>
 
-{@render children()}
-
-<div class="app-container"></div>
+<div class="app-container">
+  {@render children()}
+</div>
 
 <style>
 	/* Global styles for Math Maze */
