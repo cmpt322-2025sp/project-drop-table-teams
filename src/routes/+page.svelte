@@ -1,11 +1,5 @@
 <script>
-	let { data } = $props();
-	let { colors } = $derived(data);
+	// Root page - just redirects to auth page via server-side redirect
 </script>
 
-<h1>Welcome to Supabase!</h1>
-<ul>
-	{#each colors as color}
-		<li>{color.name}</li>
-	{/each}
-</ul>
+<h1>Redirecting to login...</h1>

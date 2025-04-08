@@ -219,7 +219,7 @@ export class MazeScene extends Phaser.Scene {
 
 		// Only try to update visuals if the scene is fully initialized
 		// Check for essential scene properties
-		if (this.scene && this.scene.isActive && this.add && this.cameras) {
+		if (this.scene && typeof this.scene.isActive === 'function' && this.scene.isActive()) {
 			try {
 				// Update the background to match the new theme
 				this.createMazeGraphics();
@@ -393,7 +393,9 @@ export class MazeScene extends Phaser.Scene {
 		}
 
 		// Create new background
-		const bg = this.add.graphics({ name: 'theme-background' });
+		const bg = this.add.graphics();
+		// Store name property on the object for debugging
+		(bg as any).name = 'theme-background';
 		bg.setDepth(-100);
 
 		// Fill with the theme background color

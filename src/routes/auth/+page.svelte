@@ -40,8 +40,8 @@
 
 			{#if !isLogin}
 				<div class="form-group">
-					<label>Account Type</label>
-					<div class="role-options">
+					<span id="account-type-label">Account Type</span>
+					<div class="role-options" aria-labelledby="account-type-label">
 						<label class="role-option">
 							<input type="radio" name="role" value="student" bind:group={role} />
 							<span class="role-label">Student</span>

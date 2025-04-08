@@ -13,6 +13,7 @@
 	export let height: string | undefined = undefined;
 	export let fontSize: string | undefined = undefined;
 	export let style: string = '';
+	// Accessibility props passed as attributes directly
 
 	// Generate classes based on props
 	$: classes = [
@@ -36,6 +37,13 @@
 		.join(' ');
 </script>
 
-<button class={classes} {type} {disabled} style={inlineStyle} on:click={onClick || undefined}>
+<button 
+	class={classes} 
+	{type} 
+	{disabled} 
+	style={inlineStyle} 
+	on:click={onClick || undefined}
+	{...$$restProps}
+>
 	<slot />
 </button>
