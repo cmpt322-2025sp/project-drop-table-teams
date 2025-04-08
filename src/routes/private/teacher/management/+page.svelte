@@ -31,6 +31,9 @@
 <main class="teacher-content">
     <p class="welcome-message">Add, edit, or remove students from your class.</p>
 
+	<!-- Just testing to see if I can display data from supabase on the page -->
+	 <!-- Currently the profiles table doesn't work the same way. There are no error when writing the code 
+	  but the information does not show up on the page-->
 	<ul>
 		{#each colors as color}
 			<li>{color.name}</li>
