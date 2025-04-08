@@ -1,5 +1,5 @@
 <script lang="ts">
-    export let active: number | string;
+	export let active: number | string;
 	import { writable } from 'svelte/store';
 	import { setContext } from 'svelte';
 	const store = writable(active);

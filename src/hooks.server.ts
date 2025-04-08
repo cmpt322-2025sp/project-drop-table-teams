@@ -67,7 +67,12 @@ const authGuard: Handle = async ({ event, resolve }) => {
 	event.locals.session = session;
 	event.locals.user = user;
 
-	if (!event.locals.session && (event.url.pathname.startsWith('/private') || event.url.pathname.startsWith('/dashboard') || event.url.pathname.startsWith('/game'))) {
+	if (
+		!event.locals.session &&
+		(event.url.pathname.startsWith('/private') ||
+			event.url.pathname.startsWith('/dashboard') ||
+			event.url.pathname.startsWith('/game'))
+	) {
 		redirect(303, '/auth');
 	}
 
@@ -81,7 +86,10 @@ const authGuard: Handle = async ({ event, resolve }) => {
 
 		// Redirect based on role or fallback to user metadata
 		if (profileData) {
-			redirect(303, profileData.role === 'teacher' ? '/private/teacher' : '/private/student/dashboard');
+			redirect(
+				303,
+				profileData.role === 'teacher' ? '/private/teacher' : '/private/student/dashboard'
+			);
 		} else {
 			// Fallback to metadata
 			const role = event.locals.user.user_metadata?.role || 'student';

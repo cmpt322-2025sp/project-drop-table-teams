@@ -6,64 +6,65 @@
 </script>
 
 <header class="teacher-header">
-    <div class="logo">Math Maze</div>
-    <div class="user-info">
-        <div class="user-avatar">
-            <svg
-                viewBox="0 0 24 24"
-                width="24"
-                height="24"
-                stroke="currentColor"
-                stroke-width="2"
-                fill="none"
-            >
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-            </svg>
-        </div>
-        <div class="user-details">
-            <div class="user-name">Teacher Account</div>
-            <div class="user-role">Administrator</div>
-        </div>
-    </div>
+	<div class="logo">Math Maze</div>
+	<div class="user-info">
+		<div class="user-avatar">
+			<svg
+				viewBox="0 0 24 24"
+				width="24"
+				height="24"
+				stroke="currentColor"
+				stroke-width="2"
+				fill="none"
+			>
+				<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+				<circle cx="12" cy="7" r="4" />
+			</svg>
+		</div>
+		<div class="user-details">
+			<div class="user-name">Teacher Account</div>
+			<div class="user-role">Administrator</div>
+		</div>
+	</div>
 </header>
 
 <main class="teacher-content">
-    <p class="welcome-message">Add, edit, or remove students from your class.</p>
+	<p class="welcome-message">Add, edit, or remove students from your class.</p>
 
 	<table>
 		<thead>
-		<tr>
-			<th scope="col">First Name</th>
-			<th scope="col">Last Name</th>
-			<th scope="col">Email</th>
-			<th scope="col">Level</th>
-			<th scope="col">Points</th>
-		</tr>
-	</thead>
+			<tr>
+				<th scope="col">First Name</th>
+				<th scope="col">Last Name</th>
+				<th scope="col">Email</th>
+				<th scope="col">Level</th>
+				<th scope="col">Points</th>
+			</tr>
+		</thead>
 		{#each Students as Student}
 			<tr>
 				<td>{Student.first_name}</td>
 				<td>{Student.last_name}</td>
-				<td>{Student.profile_email}</td> 
-				<td>{Student.level}</td> 
+				<td>{Student.profile_email}</td>
+				<td>{Student.level}</td>
 				<td>{Student.points}</td>
 			</tr>
 		{/each}
 	</table>
 
-	<br>
+	<br />
 	<div>
-		<Button variant="primary" size="md" rounded={true}>Add Student</Button>
-	</div>
-	<br>
-	<div>
-		<Button variant="primary" size="md" rounded={true}>Remove Student</Button>
+		<div style="float: left;">
+			<Button variant="primary" size="md" rounded={true}>Add Student</Button>
+		</div>
+		<div style="float: right;">
+			<Button variant="primary" size="md" rounded={true}>Remove Student</Button>
+		</div>
 	</div>
 </main>
 
 <style>
-    .teacher-header {
+	.teacher-header {
 		background-color: var(--background-green);
 		color: white;
 		padding: 1rem 2rem;
@@ -73,7 +74,7 @@
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	}
 
-    .logo {
+	.logo {
 		font-family: 'NovaFlat-Book', sans-serif;
 		font-size: 2rem;
 		font-weight: 700;
@@ -115,7 +116,7 @@
 		opacity: 0.9;
 	}
 
-    .teacher-content {
+	.teacher-content {
 		flex: 1;
 		padding: 2rem;
 		max-width: 1200px;
@@ -123,16 +124,14 @@
 		width: 100%;
 	}
 
-    .welcome-message {
+	.welcome-message {
 		font-size: 1.1rem;
 		color: #666;
 		margin-bottom: 2rem;
 		line-height: 1.5;
 	}
 
-	
-    @media (max-width: 768px) {
-
+	@media (max-width: 768px) {
 		.teacher-header {
 			padding: 1rem;
 			flex-direction: column;
@@ -144,22 +143,21 @@
 		}
 	}
 
-
 	table {
-        width: 100%;
-        border-collapse: collapse;
-      }
+		width: 100%;
+		border-collapse: collapse;
+	}
 
-      th,
-      td {
-        padding: 8px;
-        border: 1px solid #ddd;
-        text-align: left;
-      }
+	th,
+	td {
+		padding: 8px;
+		border: 1px solid #ddd;
+		text-align: left;
+	}
 
-      th {
-        background-color: var(--background-green);
+	th {
+		background-color: var(--background-green);
 		text-align: center;
 		color: white;
-      }
+	}
 </style>

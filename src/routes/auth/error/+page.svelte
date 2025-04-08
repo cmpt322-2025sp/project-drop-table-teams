@@ -5,28 +5,32 @@
 <div class="error-container">
 	<div class="error-card">
 		<div class="error-icon">
-			<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+			<svg
+				width="64"
+				height="64"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
 				<circle cx="12" cy="12" r="10"></circle>
 				<line x1="12" y1="8" x2="12" y2="12"></line>
 				<line x1="12" y1="16" x2="12.01" y2="16"></line>
 			</svg>
 		</div>
-		
+
 		<h1 class="error-title">Authentication Error</h1>
-		
+
 		<p class="error-message">
-			We couldn't log you in. This might be due to incorrect credentials or a temporary issue with our service.
+			We couldn't log you in. This might be due to incorrect credentials or a temporary issue with
+			our service.
 		</p>
-		
+
 		<div class="error-actions">
 			<a href="/auth">
-				<Button 
-					variant="primary" 
-					size="md" 
-					rounded={true}
-				>
-					Back to Login
-				</Button>
+				<Button variant="primary" size="md" rounded={true}>Back to Login</Button>
 			</a>
 		</div>
 	</div>

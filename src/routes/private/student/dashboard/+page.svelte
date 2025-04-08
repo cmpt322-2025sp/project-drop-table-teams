@@ -52,7 +52,7 @@
 	<div class="view-progress-button">
 		<Button variant="secondary" size="md" rounded={true}>View Progress</Button>
 	</div>
-	
+
 	<div class="logout-button">
 		<form action="/auth/signout" method="POST">
 			<Button type="submit" variant="secondary" size="sm" rounded={true}>Logout</Button>
@@ -146,7 +146,7 @@
 		margin-top: calc(var(--dashboard-spacing) * 0.5);
 		animation: fadeIn 2s ease;
 	}
-	
+
 	.logout-button {
 		position: absolute;
 		bottom: 1rem;

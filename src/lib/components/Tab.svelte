@@ -17,8 +17,8 @@
 		border-bottom: none;
 	}
 
-    .tab.active {
-        background-color: #103e5d;
-        color: white;
-    }
+	.tab.active {
+		background-color: #103e5d;
+		color: white;
+	}
 </style>

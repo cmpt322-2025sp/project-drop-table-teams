@@ -3,36 +3,35 @@
 </script>
 
 <header class="teacher-header">
-    <div class="logo">Math Maze</div>
-    <div class="user-info">
-        <div class="user-avatar">
-            <svg
-                viewBox="0 0 24 24"
-                width="24"
-                height="24"
-                stroke="currentColor"
-                stroke-width="2"
-                fill="none"
-            >
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-            </svg>
-        </div>
-        <div class="user-details">
-            <div class="user-name">Teacher Account</div>
-            <div class="user-role">Administrator</div>
-        </div>
-    </div>
+	<div class="logo">Math Maze</div>
+	<div class="user-info">
+		<div class="user-avatar">
+			<svg
+				viewBox="0 0 24 24"
+				width="24"
+				height="24"
+				stroke="currentColor"
+				stroke-width="2"
+				fill="none"
+			>
+				<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+				<circle cx="12" cy="7" r="4" />
+			</svg>
+		</div>
+		<div class="user-details">
+			<div class="user-name">Teacher Account</div>
+			<div class="user-role">Administrator</div>
+		</div>
+	</div>
 </header>
 
 <main class="teacher-content">
-    <p class="welcome-message">Customize game difficulty and math problems.</p>
+	<p class="welcome-message">Customize game difficulty and math problems.</p>
 	<p>This will allow the teacher to customize the problem sets for thier students</p>
 </main>
 
-
 <style>
-    .teacher-header {
+	.teacher-header {
 		background-color: var(--background-green);
 		color: white;
 		padding: 1rem 2rem;
@@ -42,7 +41,7 @@
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	}
 
-    .logo {
+	.logo {
 		font-family: 'NovaFlat-Book', sans-serif;
 		font-size: 2rem;
 		font-weight: 700;
@@ -84,7 +83,7 @@
 		opacity: 0.9;
 	}
 
-    .teacher-content {
+	.teacher-content {
 		flex: 1;
 		padding: 2rem;
 		max-width: 1200px;
@@ -92,16 +91,14 @@
 		width: 100%;
 	}
 
-    .welcome-message {
+	.welcome-message {
 		font-size: 1.1rem;
 		color: #666;
 		margin-bottom: 2rem;
 		line-height: 1.5;
 	}
 
-	
-    @media (max-width: 768px) {
-
+	@media (max-width: 768px) {
 		.teacher-header {
 			padding: 1rem;
 			flex-direction: column;
@@ -112,5 +109,4 @@
 			padding: 1.5rem;
 		}
 	}
-
 </style>
