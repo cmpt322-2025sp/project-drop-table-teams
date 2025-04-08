@@ -100,9 +100,6 @@
 
 	<footer class="teacher-footer">
 		<p>Math Maze Teacher Portal &copy; 2025</p>
-		<form action="/auth/signout" method="POST">
-			<Button type="submit" variant="secondary" size="sm" rounded={true}>Logout</Button>
-		</form>
 	</footer>
 </div>
 
