@@ -70,7 +70,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
 	if (!event.locals.session && event.url.pathname.startsWith('/private')) {
 		redirect(303, '/auth');
 	}
-	
+
 	// Check role-based access for authenticated users
 	if (event.locals.session && event.url.pathname.startsWith('/private')) {
 		// Get the user's role from profiles
@@ -79,11 +79,11 @@ const authGuard: Handle = async ({ event, resolve }) => {
 			.select('role')
 			.eq('id', event.locals.user.id)
 			.single();
-		
+
 		// Store the role in locals for use in routes
 		const role = profileData?.role || event.locals.user.user_metadata?.role || 'student';
 		event.locals.userRole = role;
-		
+
 		// Prevent students from accessing teacher routes
 		if (role === 'student' && event.url.pathname.startsWith('/private/teacher')) {
 			redirect(303, '/private/student/dashboard');

@@ -19,7 +19,7 @@ export interface ShowMathProblemEvent {
 }
 
 export interface GoalReachedEvent {
-	// No additional data needed for now
+	success: boolean; // Include at least one property to avoid empty interface
 }
 
 export interface MazeSceneReadyEvent {

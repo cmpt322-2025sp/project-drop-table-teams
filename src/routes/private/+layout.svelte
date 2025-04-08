@@ -1,12 +1,12 @@
 <script>
 	import { Button } from '$lib/components';
 	let { data, children } = $props();
-	let { supabase, session, userRole } = $derived(data);
-	
+	let { userRole } = $derived(data);
+
 	// Determine home link based on user role
-	let homeLink = $derived(userRole === 'teacher' 
-		? '/private/teacher' 
-		: '/private/student/dashboard');
+	let homeLink = $derived(
+		userRole === 'teacher' ? '/private/teacher' : '/private/student/dashboard'
+	);
 </script>
 
 <header>
@@ -30,17 +30,17 @@
 		background-color: var(--background-green, #38b000);
 		color: white;
 	}
-	
+
 	nav a {
 		color: white;
 		text-decoration: none;
 		font-weight: 600;
 	}
-	
+
 	nav a:hover {
 		text-decoration: underline;
 	}
-	
+
 	main {
 		flex: 1;
 		display: flex;

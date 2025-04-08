@@ -1,5 +1,6 @@
 <script context="module" lang="ts">
 	import type { MazeScene } from './MazeScene';
+	import type Phaser from 'phaser';
 
 	export type TPhaserRef = {
 		game: Phaser.Game | null;

@@ -2,10 +2,8 @@
 	import { Button } from '$lib/components';
 	import './vars.css';
 	import './style.css';
-	import { goto } from '$app/navigation';
-
 	let { data } = $props();
-	let { user, userRole, profile } = $derived(data);
+	let { user, profile } = $derived(data);
 
 	// Use real user data or fallback to mock data
 	let studentData = $derived({
@@ -13,12 +11,12 @@
 		level: profile?.level || 1,
 		points: profile?.points || 0
 	});
-	
+
 	// Navigation with server-side redirect
 	function navigateToGame() {
 		// Use our dedicated server-side redirect endpoint
 		// This forces a proper redirect through the server
-		window.location.href = "/private/student/dashboard/game-redirect";
+		window.location.href = '/private/student/dashboard/game-redirect';
 	}
 </script>
 
@@ -59,7 +57,6 @@
 	<div class="view-progress-button">
 		<Button variant="secondary" size="md" rounded={true}>View Progress</Button>
 	</div>
-
 </div>
 
 <style>
@@ -148,7 +145,6 @@
 		margin-top: calc(var(--dashboard-spacing) * 0.5);
 		animation: fadeIn 2s ease;
 	}
-
 
 	/* Simple animations */
 	@keyframes fadeIn {

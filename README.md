@@ -5,16 +5,16 @@ and Bun.
 
 ## Table of Contents
 
--   [Project Overview](#project-overview)
--   [Features](#features)
--   [Prerequisites](#prerequisites)
--   [Setup](#setup)
--   [Development](#development)
--   [Git Workflow](#git-workflow)
--   [VS Code Extensions](#vs-code-extensions)
--   [Project Structure](#project-structure)
--   [Environment Variables](#environment-variables)
--   [Contributing](#contributing)
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Setup](#setup)
+- [Development](#development)
+- [Git Workflow](#git-workflow)
+- [VS Code Extensions](#vs-code-extensions)
+- [Project Structure](#project-structure)
+- [Environment Variables](#environment-variables)
+- [Contributing](#contributing)
 
 ## Project Overview
 
@@ -25,30 +25,30 @@ to student view to experience the game from a student's perspective.
 
 ## Features
 
--   **User Authentication**: Secure login/registration system for students and
-    teachers
--   **Role-based Access**: Different interfaces for students and teachers
--   **Interactive Maze Game**: Navigate through mazes using keyboard controls
--   **Math Challenges**: Solve age-appropriate math problems to progress
--   **Multiple Themes**: Space, Ocean, Jungle, and Candy themes with unique
-    visual elements
--   **Responsive Design**: Adapts to different screen sizes
--   **Teacher Dashboard**: View student progress and switch to student view
--   **Student Dashboard**: Access games and view achievements
+- **User Authentication**: Secure login/registration system for students and
+  teachers
+- **Role-based Access**: Different interfaces for students and teachers
+- **Interactive Maze Game**: Navigate through mazes using keyboard controls
+- **Math Challenges**: Solve age-appropriate math problems to progress
+- **Multiple Themes**: Space, Ocean, Jungle, and Candy themes with unique
+  visual elements
+- **Responsive Design**: Adapts to different screen sizes
+- **Teacher Dashboard**: View student progress and switch to student view
+- **Student Dashboard**: Access games and view achievements
 
 ## Prerequisites
 
--   **Homebrew:** Install from [brew.sh](https://brew.sh) if you haven't
-    already.
--   **Bun:** JavaScript runtime; installable via Homebrew.
--   **Git:** For version control.
--   **VS Code:** (Optional, but recommended for development)
+- **Homebrew:** Install from [brew.sh](https://brew.sh) if you haven't
+  already.
+- **Bun:** JavaScript runtime; installable via Homebrew.
+- **Git:** For version control.
+- **VS Code:** (Optional, but recommended for development)
 
 ## Setup
 
 1.  **Clone the Repository:**
 
-``` bash
+```bash
 git clone https://github.com/cmpt322-2025sp/project-drop-table-teams.git
 cd project-drop-table-teams
 ```
@@ -58,19 +58,19 @@ cd project-drop-table-teams
 There is a `Brewfile` for convenience. Run the following command to install
 required tools (like Bun and Git):
 
-``` bash
+```bash
 brew bundle
 ```
 
 3.  **Install Project Dependencies:**
 
-``` bash
+```bash
 bun install
 ```
 
 4.  **Configure Environment Variables:**
 
-``` bash
+```bash
 cp .env.example .env
 ```
 
@@ -81,43 +81,43 @@ dependencies with bun, and sets up necessary configurations.
 
 ## Development
 
--   Run the Development Server:
+- Run the Development Server:
 
-``` bash
+```bash
 bun run dev
 ```
 
--   Build the Project:
+- Build the Project:
 
-``` bash
+```bash
 bun run build
 ```
 
--   Preview Production Build:
+- Preview Production Build:
 
-``` bash
+```bash
 bun run preview
 ```
 
--   Type Checking:
+- Type Checking:
 
-``` bash
+```bash
 bun run check
 ```
 
--   Linting and Formatting:
+- Linting and Formatting:
 
-``` bash
+```bash
 bun run lint
 ```
 
-``` bash
+```bash
 bun run format
 ```
 
--   Running Tests:
+- Running Tests:
 
-``` bash
+```bash
 bun test
 ```
 
@@ -125,27 +125,27 @@ bun test
 
 Follow these guidelines for contributing:
 
--   Branching:
+- Branching:
 
-    -   Create a new branch for each feature or bug fix:
+  - Create a new branch for each feature or bug fix:
 
-    ``` bash
-    git checkout -b feature-branch
-    ```
+  ```bash
+  git checkout -b feature-branch
+  ```
 
--   Committing:
+- Committing:
 
-    -   Commit small, focused changes with clear commit messages.
-    -   Push your branch.
-    -   Allow Josh to merge the branch into main.
+  - Commit small, focused changes with clear commit messages.
+  - Push your branch.
+  - Allow Josh to merge the branch into main.
 
 ## VS Code Extensions
 
 Recommended VS Code extensions:
 
--   Svelte for VS Code (`svelte.svelte-vscode`)
--   Prettier - Code formatter (`esbenp.prettier-vscode`)
--   ESLint (`dbaeumer.vscode-eslint`)
+- Svelte for VS Code (`svelte.svelte-vscode`)
+- Prettier - Code formatter (`esbenp.prettier-vscode`)
+- ESLint (`dbaeumer.vscode-eslint`)
 
 You can install these manually or use the provided `.vscode/extensions.json`
 file for recommendations.
@@ -179,6 +179,5 @@ development.
 
 ## Contributing
 
--   Create a new branch for your feature/bug fix.
--   Make your changes and commit them with clear messages.
-
+- Create a new branch for your feature/bug fix.
+- Make your changes and commit them with clear messages.

@@ -683,7 +683,7 @@ export class MazeScene extends Phaser.Scene {
 				// Check if player reached the goal
 				if (nextCell.isGoal) {
 					// Emit goal reached event
-					const goalEvent: GoalReachedEvent = {};
+					const goalEvent: GoalReachedEvent = { success: true };
 					EventBus.emit('goal-reached', goalEvent);
 				}
 

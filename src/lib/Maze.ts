@@ -118,7 +118,6 @@ export function generateMaze(rows: number, cols: number): { maze: Cell[][]; goal
 	}
 
 	// After generating the maze, randomly select a border cell for the goal.
-	let goal: Cell;
 	const borderCells: Cell[] = [];
 
 	// Collect border cells
@@ -133,7 +132,7 @@ export function generateMaze(rows: number, cols: number): { maze: Cell[][]; goal
 
 	// Randomly select a border cell as the goal
 	const randomIndex = Math.floor(Math.random() * borderCells.length);
-	goal = borderCells[randomIndex];
+	const goal = borderCells[randomIndex];
 	goal.isGoal = true; // Mark the goal cell
 
 	// Identify intersections (cells with 3 or more passages)

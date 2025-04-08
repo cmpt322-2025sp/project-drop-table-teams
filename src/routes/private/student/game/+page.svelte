@@ -36,9 +36,7 @@
 	let problemResult: 'correct' | 'incorrect' | null = null;
 	let answerInput: HTMLInputElement;
 
-	// Player starting position (center of maze for now)
-	let targetRow = Math.floor(rows / 2);
-	let targetCol = Math.floor(cols / 2);
+	// Player starting position (handled in MazeScene.ts)
 
 	// Add movement buttons for kids (in addition to keyboard controls)
 	let showControls = true;
@@ -105,7 +103,7 @@
 			});
 
 			// Connect goal reached events
-			EventBus.on('goal-reached', (_data: GoalReachedEvent) => {
+			EventBus.on('goal-reached', ({ success }: GoalReachedEvent) => {
 				console.log('Goal reached!');
 				// Count how many math problems were solved
 				let solvedProblems = 0;
@@ -127,7 +125,7 @@
 				showCelebration = true;
 
 				// Update the celebration message based on solved problems
-				if (solvedProblems === totalProblems) {
+				if (success && solvedProblems === totalProblems) {
 					celebrationMessage = `Perfect! You solved all ${totalProblems} math problems!`;
 				} else {
 					celebrationMessage = `Good job! You solved ${solvedProblems} out of ${totalProblems} math problems.`;
@@ -263,9 +261,6 @@
 	function changeTheme() {
 		console.log('Changing theme from:', currentTheme);
 
-		// Store current theme
-		const oldTheme = currentTheme;
-
 		// Update the theme in the store
 		nextTheme();
 
@@ -350,6 +345,8 @@
 					Solve to Continue!
 				</h2>
 				{#if currentProblem}
+					<!-- Using {@html} is needed for formatting math problems -->
+					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 					<p class="question">{@html currentProblem.question}</p>
 
 					{#if currentProblem.answer === 'ones' || currentProblem.answer === 'tens' || currentProblem.answer === 'hundreds' || currentProblem.answer === 'thousands'}

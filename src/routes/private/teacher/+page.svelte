@@ -1,18 +1,16 @@
 <script lang="ts">
 	import { Button } from '$lib/components';
-	import { goto } from '$app/navigation';
-	
 	let { data } = $props();
-	let { user, userRole } = $derived(data);
-	
+	let { user } = $derived(data);
+
 	// Extract username from email or use default
 	let teacherName = $derived(user?.email?.split('@')[0] || 'Teacher Account');
-	
+
 	// Navigation with server-side redirect
 	function navigateToStudentView() {
 		// Use our dedicated server-side redirect endpoint
 		// This forces a proper redirect through the server
-		window.location.href = "/private/teacher/student-redirect";
+		window.location.href = '/private/teacher/student-redirect';
 	}
 </script>
 
@@ -48,19 +46,14 @@
 		</p>
 
 		<div class="action-buttons">
-			<Button 
-				variant="secondary" 
-				size="md" 
-				rounded={true}
-				onClick={navigateToStudentView}
-			>
+			<Button variant="secondary" size="md" rounded={true} onClick={navigateToStudentView}>
 				<div class="button-content">
-					<svg 
-						width="20" 
-						height="20" 
-						viewBox="0 0 24 24" 
-						fill="none" 
-						stroke="currentColor" 
+					<svg
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
 						stroke-width="2"
 						class="button-icon"
 					>
@@ -223,19 +216,19 @@
 		margin-bottom: 2rem;
 		line-height: 1.5;
 	}
-	
+
 	.action-buttons {
 		margin-bottom: 2rem;
 		display: flex;
 		gap: 1rem;
 	}
-	
+
 	.button-content {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
 	}
-	
+
 	.button-icon {
 		margin-right: 0.25rem;
 	}

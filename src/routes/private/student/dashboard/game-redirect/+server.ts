@@ -5,12 +5,12 @@ import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ locals }) => {
-  // Ensure user is authenticated
-  if (!locals.user) {
-    redirect(303, '/auth');
-  }
-  
-  // Perform a server-side 303 redirect to the game page
-  // This ensures a full page reload
-  redirect(303, '/private/student/game');
+	// Ensure user is authenticated
+	if (!locals.user) {
+		redirect(303, '/auth');
+	}
+
+	// Perform a server-side 303 redirect to the game page
+	// This ensures a full page reload
+	redirect(303, '/private/student/game');
 };
