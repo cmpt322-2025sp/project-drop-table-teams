@@ -116,7 +116,7 @@ export class MazeScene extends Phaser.Scene {
 		// Simplified version - no decorative elements
 	}
 
-	// Theme background decoration methods removed for simplicity
+	// Theme is now entirely managed through the EventBus system
 
 	update(time: number, delta: number): void {
 		// Handle animations and smooth movement

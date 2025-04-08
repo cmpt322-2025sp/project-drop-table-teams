@@ -292,7 +292,7 @@
 	</Button>
 
 	<!-- Phaser game container -->
-	<div class="viewport {currentTheme}-viewport">
+	<div class="viewport">
 		<!-- PhaserGame Svelte component -->
 		<PhaserGameComponent bind:phaserRef onSceneReady={handleSceneReady} />
 
@@ -539,25 +539,25 @@
 	}
 
 	/* Theme-specific viewport enhancements */
-	.space-viewport {
+	.space-theme .viewport {
 		box-shadow:
 			0 8px 24px rgba(0, 0, 0, 0.5),
 			0 0 40px rgba(41, 121, 255, 0.4);
 	}
 
-	.ocean-viewport {
+	.ocean-theme .viewport {
 		box-shadow:
 			0 8px 24px rgba(0, 0, 0, 0.5),
 			0 0 40px rgba(0, 188, 212, 0.4);
 	}
 
-	.jungle-viewport {
+	.jungle-theme .viewport {
 		box-shadow:
 			0 8px 24px rgba(0, 0, 0, 0.5),
 			0 0 40px rgba(139, 195, 74, 0.4);
 	}
 
-	.candy-viewport {
+	.candy-theme .viewport {
 		box-shadow:
 			0 8px 24px rgba(0, 0, 0, 0.5),
 			0 0 40px rgba(233, 30, 99, 0.4);
