@@ -52,6 +52,14 @@
 		{/each}
 	</table>
 
+	<br>
+	<div>
+		<Button variant="primary" size="md" rounded={true}>Add Student</Button>
+	</div>
+	<br>
+	<div>
+		<Button variant="primary" size="md" rounded={true}>Remove Student</Button>
+	</div>
 </main>
 
 <style>
