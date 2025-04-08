@@ -31,12 +31,26 @@
 <main class="teacher-content">
     <p class="welcome-message">Add, edit, or remove students from your class.</p>
 
-	<ul>
-		<li>{"First Name"} {"Last Name"} {"Email"} {"Level"} {"Points"}</li>
+	<table>
+		<thead>
+		<tr>
+			<th scope="col">First Name</th>
+			<th scope="col">Last Name</th>
+			<th scope="col">Email</th>
+			<th scope="col">Level</th>
+			<th scope="col">Points</th>
+		</tr>
+	</thead>
 		{#each Students as Student}
-			<li>{Student.first_name} {Student.last_name} {Student.profile_email} {Student.level} {Student.points}</li>
+			<tr>
+				<td>{Student.first_name}</td>
+				<td>{Student.last_name}</td>
+				<td>{Student.profile_email}</td> 
+				<td>{Student.level}</td> 
+				<td>{Student.points}</td>
+			</tr>
 		{/each}
-	</ul>
+	</table>
 </main>
 
 <style>
