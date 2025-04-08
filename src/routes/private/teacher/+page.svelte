@@ -76,7 +76,7 @@
 				<h2>Game Settings</h2>
 				<p>Customize game difficulty and math problems.</p>
 				<div>
-					<a href="/private/teacher/game">
+					<a href="/private/teacher/setting">
 					<Button variant="primary" size="md" rounded={true}>Configure</Button>
 					</a>
 				</div>

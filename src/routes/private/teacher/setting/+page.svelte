@@ -26,13 +26,8 @@
 </header>
 
 <main class="teacher-content">
-    <p class="welcome-message">Customize and test game difficulty and math problems.</p>
-
-    <div>
-        <a href="/private/student/game">
-        <Button variant="primary" size="md" rounded={true}>Test Game</Button>
-        </a>
-    </div>
+    <p class="welcome-message">Customize game difficulty and math problems.</p>
+	<p>This will allow the teacher to customize the problem sets for thier students</p>
 </main>
 
 
