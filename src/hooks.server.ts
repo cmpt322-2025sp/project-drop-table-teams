@@ -72,7 +72,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
 	}
 
 	// Check role-based access for authenticated users
-	if (event.locals.session && event.url.pathname.startsWith('/private')) {
+	if (event.locals.session && event.url.pathname.startsWith('/private') && event.locals.user) {
 		// Get the user's role from profiles
 		const { data: profileData } = await event.locals.supabase
 			.from('profiles')
@@ -90,7 +90,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
 		}
 	}
 
-	if (event.locals.session && event.url.pathname === '/auth') {
+	if (event.locals.session && event.url.pathname === '/auth' && event.locals.user) {
 		// Get the user role to determine where to redirect
 		const { data: profileData } = await event.locals.supabase
 			.from('profiles')
