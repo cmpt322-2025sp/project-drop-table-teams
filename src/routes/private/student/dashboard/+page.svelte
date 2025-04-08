@@ -2,6 +2,7 @@
 	import { Button } from '$lib/components';
 	import './vars.css';
 	import './style.css';
+	import { goto } from '$app/navigation';
 
 	let { data } = $props();
 	let { user, userRole, profile } = $derived(data);
@@ -12,6 +13,13 @@
 		level: profile?.level || 1,
 		points: profile?.points || 0
 	});
+	
+	// Navigation with server-side redirect
+	function navigateToGame() {
+		// Use our dedicated server-side redirect endpoint
+		// This forces a proper redirect through the server
+		window.location.href = "/private/student/dashboard/game-redirect";
+	}
 </script>
 
 <div class="dashboard-container">
@@ -38,15 +46,14 @@
 	<div class="logo">Math Maze</div>
 
 	<div class="start-button">
-		<a href="/private/student/game">
-			<Button
-				variant="primary"
-				size="lg"
-				style="width: var(--dashboard-button-width); height: var(--dashboard-button-height); font-size: var(--dashboard-button-font-size);"
-			>
-				START GAME
-			</Button>
-		</a>
+		<Button
+			variant="primary"
+			size="lg"
+			style="width: var(--dashboard-button-width); height: var(--dashboard-button-height); font-size: var(--dashboard-button-font-size);"
+			onClick={navigateToGame}
+		>
+			START GAME
+		</Button>
 	</div>
 
 	<div class="view-progress-button">

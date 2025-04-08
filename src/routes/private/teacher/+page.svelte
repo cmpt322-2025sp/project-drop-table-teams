@@ -1,5 +1,19 @@
-<script>
+<script lang="ts">
 	import { Button } from '$lib/components';
+	import { goto } from '$app/navigation';
+	
+	let { data } = $props();
+	let { user, userRole } = $derived(data);
+	
+	// Extract username from email or use default
+	let teacherName = $derived(user?.email?.split('@')[0] || 'Teacher Account');
+	
+	// Navigation with server-side redirect
+	function navigateToStudentView() {
+		// Use our dedicated server-side redirect endpoint
+		// This forces a proper redirect through the server
+		window.location.href = "/private/teacher/student-redirect";
+	}
 </script>
 
 <div class="teacher-dashboard">
@@ -20,7 +34,7 @@
 				</svg>
 			</div>
 			<div class="user-details">
-				<div class="user-name">Teacher Account</div>
+				<div class="user-name">{teacherName}</div>
 				<div class="user-role">Administrator</div>
 			</div>
 		</div>
@@ -32,6 +46,31 @@
 			Welcome to the Math Maze Teacher Portal! Here you can manage your students and view their
 			progress.
 		</p>
+
+		<div class="action-buttons">
+			<Button 
+				variant="secondary" 
+				size="md" 
+				rounded={true}
+				onClick={navigateToStudentView}
+			>
+				<div class="button-content">
+					<svg 
+						width="20" 
+						height="20" 
+						viewBox="0 0 24 24" 
+						fill="none" 
+						stroke="currentColor" 
+						stroke-width="2"
+						class="button-icon"
+					>
+						<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+						<circle cx="12" cy="12" r="3"></circle>
+					</svg>
+					Student View
+				</div>
+			</Button>
+		</div>
 
 		<div class="dashboard-cards">
 			<div class="card">
@@ -183,6 +222,22 @@
 		color: #666;
 		margin-bottom: 2rem;
 		line-height: 1.5;
+	}
+	
+	.action-buttons {
+		margin-bottom: 2rem;
+		display: flex;
+		gap: 1rem;
+	}
+	
+	.button-content {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+	
+	.button-icon {
+		margin-right: 0.25rem;
 	}
 
 	.dashboard-cards {
