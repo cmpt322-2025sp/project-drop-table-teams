@@ -4,14 +4,14 @@
 	import './style.css';
 
 	let { data } = $props();
-	let { user, userRole } = $derived(data);
+	let { user, userRole, profile } = $derived(data);
 
 	// Use real user data or fallback to mock data
-	const studentData = {
+	let studentData = $derived({
 		name: user?.email?.split('@')[0] || 'Student',
-		level: 3,
-		points: 120
-	};
+		level: profile?.level || 1,
+		points: profile?.points || 0
+	});
 </script>
 
 <div class="dashboard-container">
@@ -52,7 +52,7 @@
 	<div class="view-progress-button">
 		<Button variant="secondary" size="md" rounded={true}>View Progress</Button>
 	</div>
-	
+
 	<div class="logout-button">
 		<form action="/auth/signout" method="POST">
 			<Button type="submit" variant="secondary" size="sm" rounded={true}>Logout</Button>
@@ -146,7 +146,7 @@
 		margin-top: calc(var(--dashboard-spacing) * 0.5);
 		animation: fadeIn 2s ease;
 	}
-	
+
 	.logout-button {
 		position: absolute;
 		bottom: 1rem;

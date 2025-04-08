@@ -6,11 +6,11 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const email = formData.get('email') as string;
 		const password = formData.get('password') as string;
-		const role = formData.get('role') as string || 'student';
+		const role = (formData.get('role') as string) || 'student';
 
 		// First create the user in auth.users
-		const { data: authData, error: authError } = await supabase.auth.signUp({ 
-			email, 
+		const { data: authData, error: authError } = await supabase.auth.signUp({
+			email,
 			password,
 			options: {
 				data: {
@@ -26,15 +26,13 @@ export const actions: Actions = {
 
 		// If user was created successfully, insert profile data
 		if (authData.user) {
-			const { error: profileError } = await supabase
-				.from('profiles')
-				.insert({
-					id: authData.user.id,
-					email,
-					role,
-					level: 1,
-					points: 0
-				});
+			const { error: profileError } = await supabase.from('profiles').insert({
+				id: authData.user.id,
+				email,
+				role,
+				level: 1,
+				points: 0
+			});
 
 			if (profileError) {
 				console.error('Profile error:', profileError);
@@ -46,21 +44,21 @@ export const actions: Actions = {
 
 		redirect(303, '/');
 	},
-	
+
 	login: async ({ request, locals: { supabase } }) => {
 		const formData = await request.formData();
 		const email = formData.get('email') as string;
 		const password = formData.get('password') as string;
 
-		const { data, error } = await supabase.auth.signInWithPassword({ 
-			email, 
-			password 
+		const { data, error } = await supabase.auth.signInWithPassword({
+			email,
+			password
 		});
 
 		if (error) {
 			console.error(error);
 			redirect(303, '/auth/error');
-		} 
+		}
 
 		// Fetch user profile to determine role
 		if (data.user) {
@@ -79,7 +77,10 @@ export const actions: Actions = {
 
 			// Redirect based on role
 			if (profileData) {
-				redirect(303, profileData.role === 'teacher' ? '/private/teacher' : '/private/student/dashboard');
+				redirect(
+					303,
+					profileData.role === 'teacher' ? '/private/teacher' : '/private/student/dashboard'
+				);
 			}
 		}
 

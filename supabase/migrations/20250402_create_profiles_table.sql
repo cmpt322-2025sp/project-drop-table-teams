@@ -24,10 +24,7 @@ CREATE POLICY "Teachers can view all profiles"
   ON public.profiles 
   FOR SELECT 
   USING (
-    EXISTS (
-      SELECT 1 FROM public.profiles 
-      WHERE id = auth.uid() AND role = 'teacher'
-    )
+    auth.jwt() ->> 'role' = 'teacher'
   );
 
 -- 3. Allow users to update their own profile

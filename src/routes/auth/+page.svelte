@@ -10,76 +10,62 @@
 <div class="auth-container">
 	<div class="auth-card">
 		<div class="logo">Math Maze</div>
-		
+
 		<h1 class="auth-title">{isLogin ? 'Welcome Back!' : 'Create Account'}</h1>
-		
+
 		<form method="POST" action={isLogin ? '?/login' : '?/signup'}>
 			<div class="form-group">
 				<label for="email">Email</label>
-				<input 
+				<input
 					id="email"
-					name="email" 
-					type="email" 
+					name="email"
+					type="email"
 					placeholder="Enter your email"
 					required
 					bind:value={email}
 				/>
 			</div>
-			
+
 			<div class="form-group">
 				<label for="password">Password</label>
-				<input 
+				<input
 					id="password"
-					name="password" 
-					type="password" 
+					name="password"
+					type="password"
 					placeholder="Enter your password"
 					required
 					bind:value={password}
 				/>
 			</div>
-			
+
 			{#if !isLogin}
 				<div class="form-group">
 					<label>Account Type</label>
 					<div class="role-options">
 						<label class="role-option">
-							<input 
-								type="radio" 
-								name="role" 
-								value="student" 
-								bind:group={role}
-							/>
+							<input type="radio" name="role" value="student" bind:group={role} />
 							<span class="role-label">Student</span>
 						</label>
 						<label class="role-option">
-							<input 
-								type="radio" 
-								name="role" 
-								value="teacher" 
-								bind:group={role}
-							/>
+							<input type="radio" name="role" value="teacher" bind:group={role} />
 							<span class="role-label">Teacher</span>
 						</label>
 					</div>
 				</div>
 			{/if}
-			
+
 			<div class="auth-actions">
-				<Button 
+				<Button
 					type="submit"
-					variant="primary" 
-					size="lg" 
+					variant="primary"
+					size="lg"
 					rounded={true}
 					style="width: 100%; margin-bottom: 1rem;"
 				>
 					{isLogin ? 'Login' : 'Sign Up'}
 				</Button>
-				
-				<button 
-					type="button" 
-					class="switch-mode" 
-					on:click={() => isLogin = !isLogin}
-				>
+
+				<button type="button" class="switch-mode" on:click={() => (isLogin = !isLogin)}>
 					{isLogin ? 'Need an account? Sign up' : 'Already have an account? Login'}
 				</button>
 			</div>
@@ -141,8 +127,8 @@
 		font-size: 0.9rem;
 	}
 
-	input[type="email"],
-	input[type="password"] {
+	input[type='email'],
+	input[type='password'] {
 		width: 100%;
 		padding: 0.9rem 1rem;
 		border: 2px solid #e0e0e0;
@@ -153,8 +139,8 @@
 		font-family: inherit;
 	}
 
-	input[type="email"]:focus,
-	input[type="password"]:focus {
+	input[type='email']:focus,
+	input[type='password']:focus {
 		border-color: var(--button-orange);
 		box-shadow: 0 0 0 2px rgba(255, 157, 0, 0.2);
 	}
@@ -181,11 +167,11 @@
 		background-color: #eeeeee;
 	}
 
-	input[type="radio"] {
+	input[type='radio'] {
 		cursor: pointer;
 	}
 
-	.role-option input[type="radio"]:checked + .role-label {
+	.role-option input[type='radio']:checked + .role-label {
 		font-weight: 600;
 		color: var(--button-orange);
 	}
