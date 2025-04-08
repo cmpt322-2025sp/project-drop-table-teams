@@ -28,7 +28,26 @@
 <main class="teacher-content">
 	<h1>Game Settings</h1>
 	<p class="welcome-message">Customize game difficulty and math problems.</p>
-	<p>This will allow the teacher to customize the problem sets for thier students</p>
+
+	<div class="action-buttons">
+		<Button variant="secondary" size="md" rounded={true}>
+			<div class="button-content">
+				<svg
+					width="20"
+					height="20"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					class="button-icon"
+				>
+					<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+					<circle cx="12" cy="12" r="3"></circle>
+				</svg>
+				Student View
+			</div>
+		</Button>
+	</div>
 </main>
 
 <style>
