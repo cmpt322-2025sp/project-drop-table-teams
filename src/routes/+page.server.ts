@@ -1,5 +1,7 @@
+import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-export const load: PageServerLoad = async ({ locals: { supabase } }) => {
-	const { data: colors } = await supabase.from('colors').select('name').limit(5).order('name');
-	return { colors: colors ?? [] };
+
+export const load: PageServerLoad = async () => {
+  // Redirect from root to auth page
+  redirect(303, '/auth');
 };
