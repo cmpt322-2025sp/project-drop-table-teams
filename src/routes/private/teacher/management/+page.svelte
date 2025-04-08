@@ -51,6 +51,7 @@
 			</tr>
 		{/each}
 	</table>
+
 </main>
 
 <style>
