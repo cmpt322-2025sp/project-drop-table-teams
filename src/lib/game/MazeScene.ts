@@ -78,10 +78,10 @@ export class MazeScene extends Phaser.Scene {
 	 * Create a background that matches the current theme
 	 */
 	private createThemeBackground(): void {
-		// We need to create a background that extends beyond the maze bounds
+		// Create a background that extends beyond the maze bounds
 		// to fill the entire visible area
 
-		// Clear any existing background graphics first - safely check if children exists
+		// Clear any existing background graphics
 		if (this.children && typeof this.children.getAll === 'function') {
 			this.children.getAll().forEach((child) => {
 				if (child && child.name === 'theme-background') {
@@ -90,7 +90,7 @@ export class MazeScene extends Phaser.Scene {
 			});
 		}
 
-		// Calculate dimensions safely
+		// Calculate dimensions
 		let worldWidth = 2000;
 		let worldHeight = 2000;
 
@@ -99,24 +99,14 @@ export class MazeScene extends Phaser.Scene {
 			worldHeight = this.cameras.main.height * 2 || 2000;
 		}
 
-		// Get the theme colors
+		// Create background with theme color
 		const colors = this.getThemeColors();
-
-		// Create a background graphics object
 		const bg = this.add.graphics();
-		bg.name = 'theme-background'; // Set a name for later reference
-
-		// Fill with the theme background color with reduced opacity to make maze visible
+		bg.name = 'theme-background';
 		bg.fillStyle(colors.backgroundColor, 0.2);
 		bg.fillRect(0, 0, worldWidth, worldHeight);
-
-		// Set to the back of the display list so it doesn't overlap other elements
 		bg.setDepth(-100);
-
-		// Simplified version - no decorative elements
 	}
-
-	// Theme is now entirely managed through the EventBus system
 
 	update(time: number, delta: number): void {
 		// Handle animations and smooth movement
