@@ -29,6 +29,7 @@
 </header>
 
 <main class="teacher-content">
+	<h1>Student Management</h1>
 	<p class="welcome-message">Add, edit, or remove students from your class.</p>
 
 	<table>
@@ -122,6 +123,12 @@
 		max-width: 1200px;
 		margin: 0 auto;
 		width: 100%;
+	}
+	
+	h1 {
+		color: #333;
+		font-size: 2rem;
+		margin-bottom: 1rem;
 	}
 
 	.welcome-message {

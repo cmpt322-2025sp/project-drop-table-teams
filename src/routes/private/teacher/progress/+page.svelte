@@ -26,6 +26,7 @@
 </header>
 
 <main class="teacher-content">
+	<h1>Progress Tracking</h1>
 	<p class="welcome-message">View detailed performance reports for your students.</p>
 	<p>This will display a report of the statistics for the class.</p>
 </main>
@@ -91,6 +92,12 @@
 		width: 100%;
 	}
 
+	h1 {
+		color: #333;
+		font-size: 2rem;
+		margin-bottom: 1rem;
+	}
+	
 	.welcome-message {
 		font-size: 1.1rem;
 		color: #666;

@@ -26,6 +26,7 @@
 </header>
 
 <main class="teacher-content">
+	<h1>Game Settings</h1>
 	<p class="welcome-message">Customize game difficulty and math problems.</p>
 	<p>This will allow the teacher to customize the problem sets for thier students</p>
 </main>
@@ -89,6 +90,12 @@
 		max-width: 1200px;
 		margin: 0 auto;
 		width: 100%;
+	}
+
+	h1 {
+		color: #333;
+		font-size: 2rem;
+		margin-bottom: 1rem;
 	}
 
 	.welcome-message {
