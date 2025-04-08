@@ -1,12 +1,17 @@
 <script>
 	import { Button } from '$lib/components';
 	let { data, children } = $props();
-	let { supabase } = $derived(data);
+	let { supabase, session, userRole } = $derived(data);
+	
+	// Determine home link based on user role
+	let homeLink = $derived(userRole === 'teacher' 
+		? '/private/teacher' 
+		: '/private/student/dashboard');
 </script>
 
 <header>
 	<nav>
-		<a href="/">Home</a>
+		<a href={homeLink}>Home</a>
 	</nav>
 	<form action="/auth/signout" method="POST">
 		<Button type="submit" variant="secondary" size="sm" rounded={true}>Logout</Button>
