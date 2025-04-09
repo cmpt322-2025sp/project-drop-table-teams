@@ -44,7 +44,6 @@
 			Welcome to the Math Maze Teacher Portal! Here you can manage your students and view their
 			progress.
 		</p>
-
 		<div class="action-buttons">
 			<Button variant="secondary" size="md" rounded={true} onClick={navigateToStudentView}>
 				<div class="button-content">
@@ -84,7 +83,11 @@
 				</div>
 				<h2>Student Management</h2>
 				<p>Add, edit, or remove students from your class.</p>
-				<Button variant="primary" size="md" rounded={true}>Manage Students</Button>
+				<div>
+					<a href="/private/teacher/management">
+						<Button variant="primary" size="md" rounded={true}>Manage Students</Button>
+					</a>
+				</div>
 			</div>
 
 			<div class="card">
@@ -104,7 +107,11 @@
 				</div>
 				<h2>Progress Tracking</h2>
 				<p>View detailed performance reports for your students.</p>
-				<Button variant="primary" size="md" rounded={true}>View Reports</Button>
+				<div>
+					<a href="/private/teacher/progress">
+						<Button variant="primary" size="md" rounded={true}>View Reports</Button>
+					</a>
+				</div>
 			</div>
 
 			<div class="card">
@@ -125,7 +132,11 @@
 				</div>
 				<h2>Game Settings</h2>
 				<p>Customize game difficulty and math problems.</p>
-				<Button variant="primary" size="md" rounded={true}>Configure</Button>
+				<div>
+					<a href="/private/teacher/setting">
+						<Button variant="primary" size="md" rounded={true}>Configure</Button>
+					</a>
+				</div>
 			</div>
 		</div>
 	</main>
