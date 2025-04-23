@@ -8,13 +8,26 @@ export interface MathProblem {
 	answer: number | string;
 }
 
+//Define a diffiuclty level type
+export type DifficultyLevel = '1' | '2' | '3';
+
+
 /**
  * Generates an addition problem.
  * @param min - The minimum number to add (default is 0).
  * @param max - The maximum number to add (default is 100).
  * @returns A MathProblem with a question and the correct answer.
  */
-export function generateAdditionProblem(min = 0, max = 100): MathProblem {
+export function generateAdditionProblem(level: DifficultyLevel = '1'): MathProblem {
+	let min = 0;
+	let max = 10;
+
+	if (level === '2') {
+		max = 50;
+	} else if (level === '3') {
+		max = 200;
+	}
+
 	const a = Math.floor(Math.random() * (max - min + 1)) + min;
 	const b = Math.floor(Math.random() * (max - min + 1)) + min;
 	return {
@@ -23,37 +36,61 @@ export function generateAdditionProblem(min = 0, max = 100): MathProblem {
 	};
 }
 
+
 /**
  * Generates a subtraction problem.
  * @param min - The minimum number (default is 0).
  * @param max - The maximum number (default is 100).
  * @returns A MathProblem with a question and the correct answer.
  */
-export function generateSubtractionProblem(min = 0, max = 100): MathProblem {
-	// Ensure we subtract the smaller number from the larger one.
+export function generateSubtractionProblem(level: DifficultyLevel = '1'): MathProblem {
+	let min = 0;
+	let max = 10;
+
+	if (level === '2') {
+		max = 50;
+	} else if (level === '3') {
+		max = 200;
+	}
+
 	let a = Math.floor(Math.random() * (max - min + 1)) + min;
 	let b = Math.floor(Math.random() * (max - min + 1)) + min;
 	if (a < b) [a, b] = [b, a];
+
 	return {
 		question: `${a} - ${b} = ?`,
 		answer: a - b
 	};
 }
 
+
 /**
  * Generates a random math problem (either addition or subtraction).
  * @returns A MathProblem with a question and the correct answer.
  */
-export function generateRandomProblem(): MathProblem {
-	return Math.random() < 0.5 ? generateAdditionProblem() : generateSubtractionProblem();
+export function generateRandomProblem(level: DifficultyLevel = '1'): MathProblem {
+	return Math.random() < 0.5
+		? generateAdditionProblem(level)
+		: generateSubtractionProblem(level);
 }
+
 /**
  * Generates either a place value problem or a number place identification problem.
  * @param min - The minimum number (default is 10).
  * @param max - The maximum number (default is 999).
  * @returns A MathProblem object.
  */
-export function generateRandomPlaceValueProblem(min = 10, max = 999): MathProblem {
+export function generateRandomPlaceValueProblem(level: DifficultyLevel = '1'): MathProblem {
+	let min = 10;
+	let max = 999;
+
+	if (level === '2') {
+		max = 9999;
+	} else if (level === '3') {
+		max = 99999;
+	}
+
+
 	const number = Math.floor(Math.random() * (max - min + 1)) + min;
 	const numberStr = number.toString();
 	const placeValues = ['ones', 'tens', 'hundreds', 'thousands'];
@@ -119,4 +156,5 @@ ${numberStr
 			answer: place // Answer is "ones", "tens", "hundreds", or "thousands"
 		};
 	}
+
 }
