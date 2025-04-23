@@ -93,7 +93,7 @@ export function generateRandomPlaceValueProblem(level: DifficultyLevel = '1'): M
 
 	const number = Math.floor(Math.random() * (max - min + 1)) + min;
 	const numberStr = number.toString();
-	const placeValues = ['ones', 'tens', 'hundreds', 'thousands'];
+	const placeValues = ['ones', 'tens', 'hundreds', 'thousands', 'ten thousands'];
 
 	if (Math.random() < 0.5) {
 		// Place value question (What is the digit in the X place?)
@@ -115,6 +115,9 @@ export function generateRandomPlaceValueProblem(level: DifficultyLevel = '1'): M
 				break;
 			case 'thousands':
 				answer = Math.floor((number / 1000) % 10);
+				break;
+			case 'ten thousands':
+				answer = Math.floor((number / 10000) % 10);
 				break;
 		}
 
@@ -153,7 +156,7 @@ ${numberStr
 
 		return {
 			question: `What number place is this?\n${alignedDisplay}`,
-			answer: place // Answer is "ones", "tens", "hundreds", or "thousands"
+			answer: place // Answer is "ones", "tens", "hundreds", "thousands" or "ten thousands"
 		};
 	}
 

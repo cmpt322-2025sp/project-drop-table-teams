@@ -130,6 +130,20 @@ test('generateRandomProblem returns hard problems within range', () => {
 		expect(numbers.every((n) => n >= 0 && n <= 200)).toBe(true);
 	}
 });
+test('generateRandomPlaceValueProblem uses larger numbers for harder levels', () => {
+	const levels = {
+		'1': 999,
+		'2': 9999,
+		'3': 99999
+	};
+
+	for (const level in levels) {
+		const problem = generateRandomPlaceValueProblem(level as '1' | '2' | '3');
+		const number = parseInt(problem.question.match(/\d+/)?.[0] || '0');
+
+		expect(number).toBeLessThanOrEqual(levels[level as '1' | '2' | '3']);
+	}
+});
 
 
 
