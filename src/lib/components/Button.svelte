@@ -37,11 +37,11 @@
 		.join(' ');
 </script>
 
-<button 
-	class={classes} 
-	{type} 
-	{disabled} 
-	style={inlineStyle} 
+<button
+	class={classes}
+	{type}
+	{disabled}
+	style={inlineStyle}
 	on:click={onClick || undefined}
 	{...$$restProps}
 >

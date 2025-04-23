@@ -15,7 +15,7 @@
 </script>
 
 <div class="app-container">
-  {@render children()}
+	{@render children()}
 </div>
 
 <style>

@@ -8,6 +8,7 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			supabase: SupabaseClient<Database>;
+			supabaseAdmin: SupabaseClient<Database>; // Admin client with service role
 			safeGetSession: () => Promise<{ session: Session | null; user: User | null }>;
 			session: Session | null;
 			user: User | null;

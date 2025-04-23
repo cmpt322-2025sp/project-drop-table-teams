@@ -3,6 +3,7 @@ import { type Handle, redirect } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+import { SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
 
 const supabase: Handle = async ({ event, resolve }) => {
 	/**
@@ -10,6 +11,7 @@ const supabase: Handle = async ({ event, resolve }) => {
 	 *
 	 * The Supabase client gets the Auth token from the request cookies.
 	 */
+	// Regular auth client for standard operations
 	event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
 		cookies: {
 			getAll: () => event.cookies.getAll(),
@@ -23,6 +25,19 @@ const supabase: Handle = async ({ event, resolve }) => {
 					event.cookies.set(name, value, { ...options, path: '/' });
 				});
 			}
+		}
+	});
+
+	// Admin client with service role for bypassing RLS
+	event.locals.supabaseAdmin = createServerClient(PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+		auth: {
+			autoRefreshToken: false,
+			persistSession: false
+		},
+		cookies: {
+			// Mock cookie implementation since we're not using cookies for the admin client
+			getAll: () => [],
+			setAll: () => {}
 		}
 	});
 
