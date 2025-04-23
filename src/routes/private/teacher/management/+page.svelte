@@ -149,8 +149,6 @@
 					{/each}
 				</div>
 			</div>
-		{:else}
-			<p class="no-available">All students are already enrolled in this class.</p>
 		{/if}
 	{:else}
 		<div class="no-classes">
@@ -252,11 +250,18 @@
 		line-height: 1.5;
 	}
 
+	label {
+		margin-bottom: 1.5rem;
+	}
+
 	.class-selector {
+		font-size: 1.1rem;
+		display: flex;
 		margin-bottom: 1.5rem;
 	}
 
 	.class-selector select {
+		font-size: .75rem;
 		padding: 0.5rem;
 		margin-left: 0.5rem;
 		border-radius: 4px;
@@ -332,7 +337,7 @@
 
 	.action-buttons {
 		display: flex;
-		justify-content: center;
+		justify-content: left;
 		margin-top: 2rem;
 	}
 
