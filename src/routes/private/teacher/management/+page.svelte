@@ -158,10 +158,13 @@
 
 	<br />
 	<div class="action-buttons">
-		<div>
+		<div style="padding: 1rem">
+			<Button variant="primary" size="md" rounded={true}>Add New Student</Button>
+		</div>
+		<div style="padding: 1rem">
 			<Button variant="primary" size="md" rounded={true}>Create New Class</Button>
 		</div>
-	</div>
+	</div>	
 </main>
 
 <style>
@@ -256,17 +259,60 @@
 
 	.class-selector {
 		font-size: 1.1rem;
+		font-family: 'NovaFlat-Book', sans-serif;
+		text-align: center;
 		display: flex;
 		margin-bottom: 1.5rem;
+		width: 250px;
+		height: 40px;
+	}
+
+	.class-selector label {
+		font-size: 1.1rem;
+		font-family: 'NovaFlat-Book', sans-serif;
+		text-align: left;
+		width: 250px;
 	}
 
 	.class-selector select {
-		font-size: .75rem;
-		padding: 0.5rem;
-		margin-left: 0.5rem;
-		border-radius: 4px;
+		appearance: none;
+		width: 100%;
+		font-size: .85rem;
+		font-family: 'NovaFlat-Book', sans-serif;
+		font-weight: bold;
+		text-align: center;
+		padding: 0.5rem 1rem;
+		background-color: #FF9D00;
 		border: 1px solid #ddd;
+		border-radius: 50px;
+		color: #000;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.3s ease;
+		position: relative;
+		z-index: 1;
+		box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 	}
+
+	.class-selector select::after {
+		border-radius: 50px;
+	}
+
+	.class-selector select::after {
+		content: '';
+		position: absolute;
+		background: rgba(255, 255, 255, 0.3);
+		width: 100%;
+		height: 100%;
+		left: -100%;
+		top: 0;
+		border-radius: 8px;
+		z-index: -1;
+		transition: all 0.4s ease;
+	}
+
 
 	.class-info {
 		margin-bottom: 1.5rem;
@@ -353,6 +399,11 @@
 		}
 
 		.action-buttons {
+			flex-direction: column;
+			gap: 1rem;
+		}
+
+		.class-selector select {
 			flex-direction: column;
 			gap: 1rem;
 		}
