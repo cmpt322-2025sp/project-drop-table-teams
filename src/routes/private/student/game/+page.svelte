@@ -23,7 +23,7 @@
 	// Maze settings
 	const rows = 6;
 	const cols = 6;
-	const level = 1; // Default level for now, can be made dynamic later
+	let level = 1; // Will be set from the user's profile
 
 	let goalCell: Cell;
 	let maze: Cell[][] = [];
@@ -37,6 +37,9 @@
 	let attemptedCell: Cell | null = null;
 	let problemResult: 'correct' | 'incorrect' | null = null;
 	let answerInput: HTMLInputElement;
+	
+	// Get data from the server including user's profile
+	export let data;
 
 	// Player starting position (handled in MazeScene.ts)
 
@@ -179,6 +182,14 @@
 			// Start tracking game time
 			gameStartTime = Date.now();
 			
+			// Get the user's level from their profile
+			if (data?.profile?.level) {
+				level = data.profile.level;
+				console.log(`Using player's current level: ${level}`);
+			} else {
+				console.log(`No level found in profile, using default level: ${level}`);
+			}
+			
 			// Generate the maze
 			const mazeData = generateMaze(rows, cols);
 			maze = mazeData.maze;
@@ -214,6 +225,8 @@
 	// Generate a math problem for the intersection
 	function generateMathProblem(): MathProblem {
 		// Randomly choose between regular math problems and place value problems
+		// The level variable will be used by the math problems library in the future
+		// for adjusting difficulty based on the player's level
 		return Math.random() < 0.5 ? generateRandomProblem() : generateRandomPlaceValueProblem();
 	}
 
