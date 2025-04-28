@@ -28,6 +28,7 @@ export class MazeScene extends Phaser.Scene {
 	private targetCol: number = 0;
 	private displayedRow: number = 0;
 	private displayedCol: number = 0;
+	private wasMoving: boolean = false; // Track previous movement state
 
 	// Theme properties
 	private currentTheme: string = '';
@@ -122,6 +123,12 @@ export class MazeScene extends Phaser.Scene {
 
 		// Check if player is moving (displayedRow/Col different from targetRow/Col)
 		const isMoving = this.displayedRow !== this.targetRow || this.displayedCol !== this.targetCol;
+		
+		// Check if player just finished moving (was moving previously but now arrived)
+		const justFinishedMoving = !isMoving && this.wasMoving;
+		
+		// Store current moving state for next frame
+		this.wasMoving = isMoving;
 
 		if (isMoving) {
 			// Calculate the movement speed (cells per second)
@@ -143,6 +150,15 @@ export class MazeScene extends Phaser.Scene {
 
 			// Redraw player at new position
 			this.drawPlayer();
+		} else if (justFinishedMoving) {
+			// Player just arrived at the destination
+			// Now we can check if the cell has an unsolved math problem
+			const currentCell = this.maze[this.targetRow][this.targetCol];
+			if (currentCell.isIntersection && !currentCell.mathProblemSolved) {
+				// Emit an event to show the math problem in the Svelte UI
+				const mathProblemEvent: ShowMathProblemEvent = { cell: currentCell };
+				EventBus.emit('show-math-problem', mathProblemEvent);
+			}
 		}
 	}
 
@@ -675,12 +691,8 @@ export class MazeScene extends Phaser.Scene {
 				this.targetRow = nextRow;
 				this.targetCol = nextCol;
 
-				// Check if the cell is an intersection with an unsolved math problem
-				if (nextCell.isIntersection && !nextCell.mathProblemSolved) {
-					// Emit an event to show the math problem in the Svelte UI
-					const mathProblemEvent: ShowMathProblemEvent = { cell: nextCell };
-					EventBus.emit('show-math-problem', mathProblemEvent);
-				}
+				// Store math problem check for later (after animation completes)
+				// We don't want to show math problems immediately anymore
 
 				// Check if player reached the goal
 				if (nextCell.isGoal) {
