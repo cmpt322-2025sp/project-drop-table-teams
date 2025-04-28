@@ -97,7 +97,7 @@
 		font-size: 2rem;
 		margin-bottom: 1rem;
 	}
-	
+
 	.welcome-message {
 		font-size: 1.1rem;
 		color: #666;

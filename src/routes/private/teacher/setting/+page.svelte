@@ -29,7 +29,7 @@
 	<h1>Game Settings</h1>
 	<p class="welcome-message">Customize game difficulty and math problems.</p>
 
-<!-- 
+	<!-- 
 	add to script later
 	// Navigation with server-side redirect
     function navigateToStudentView() {
