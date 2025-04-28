@@ -89,7 +89,7 @@
 
 	<div class="class-selector">
 		<label for="class-select">Select Class:</label>
-		<select id="class-select" bind:value={selectedClass}>
+		<select id="class-select" class="custom-select btn-primary btn-round" bind:value={selectedClass}>
 			{#each classes as cls}
 				<option value={cls}>{cls.name}</option>
 			{/each}
@@ -274,43 +274,32 @@
 		width: 250px;
 	}
 
-	.class-selector select {
+	.class-selector select.custom-select {
 		appearance: none;
-		width: 100%;
-		font-size: .85rem;
+		background-color: var(--button-orange);
+		border: none;
+		border-radius: 50px;
+		color: var(--text-color);
+		cursor: pointer;
+		padding: 0.5rem 1.5rem;
 		font-family: 'NovaFlat-Book', sans-serif;
 		font-weight: bold;
+		font-size: 0.85rem;
 		text-align: center;
-		padding: 0.5rem 1rem;
-		background-color: #FF9D00;
-		border: 1px solid #ddd;
-		border-radius: 50px;
-		color: #000;
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
+		box-shadow: var(--button-shadow);
 		transition: all 0.3s ease;
-		position: relative;
-		z-index: 1;
-		box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-	}
-
-	.class-selector select::after {
-		border-radius: 50px;
-	}
-
-	.class-selector select::after {
-		content: '';
-		position: absolute;
-		background: rgba(255, 255, 255, 0.3);
 		width: 100%;
-		height: 100%;
-		left: -100%;
-		top: 0;
-		border-radius: 8px;
-		z-index: -1;
-		transition: all 0.4s ease;
+		position: relative;
+		overflow: hidden;
+	}
+	
+	.class-selector select.custom-select:hover {
+		transform: translateY(-3px);
+		box-shadow: var(--button-shadow-hover);
+	}
+	
+	.class-selector select.custom-select:focus {
+		outline: none;
 	}
 
 
@@ -403,9 +392,8 @@
 			gap: 1rem;
 		}
 
-		.class-selector select {
-			flex-direction: column;
-			gap: 1rem;
+		.class-selector select.custom-select {
+			width: 100%;
 		}
 
 		.student-list {
