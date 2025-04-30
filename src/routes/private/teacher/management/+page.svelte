@@ -104,14 +104,23 @@
 	}
 
 	// Start editing a student's level
-	function startEditing(student: Student) {
+	function startEditingLevel(student: Student) {
 		editingStudentLevel = student;
 		editLevel = student.level;
 	}
 
+	// Start editing a student's enrollment
+	function startEditingClass(student: Student) {
+		editingStudentClass = student;
+	}
+
 	// Cancel editing
-	function cancelEditing() {
+	function cancelEditingLevel() {
 		editingStudentLevel = null;
+	}
+
+	function cancelEditingClass() {
+		editingStudentClass = null;
 	}
 
 	// Save student level
@@ -158,6 +167,31 @@
 		}
 	}
 	
+	// Save student class enrollment
+	async function saveStudentClass() {
+		if (!editingStudentClass || isUpdating) return;
+
+		try {
+			// Prevent multiple submissions
+			isUpdating = true;
+			
+			const response = await fetch('/api/teacher/update-student-enrollment', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					studentId: editingStudentClass.id
+				})
+
+			});
+		} catch (error) {
+			console.error('Error updating student level:', error);
+		} finally {
+			isUpdating = false;
+		}
+	}
+
 	// Handle class selection event
 	function onClassSelectChange(event: Event) {
 	  const select = event.target as HTMLSelectElement;
@@ -252,7 +286,7 @@
 												variant="secondary" 
 												size="sm" 
 												rounded={true} 
-												onClick={cancelEditing}
+												onClick={cancelEditingLevel}
 												disabled={isUpdating}
 											>
 												Cancel
@@ -266,7 +300,7 @@
 											variant="primary" 
 											size="sm" 
 											rounded={true} 
-											onClick={() => startEditing(student)}
+											onClick={() => startEditingLevel(student)}
 										>
 											Edit
 										</Button>
@@ -275,7 +309,36 @@
 							</td>
 							<td>{student.points}</td>
 							<td>
-								<Button variant="secondary" size="sm" rounded={true}>Remove</Button>
+								{#if editingStudentClass && editingStudentClass.id === student.id}
+								<div class="edit-buttons">
+									<Button 
+										variant="primary" 
+										size="sm" 
+										rounded={true} 
+										onClick={saveStudentClass}
+										disabled={isUpdating}
+									>
+										{isUpdating ? 'Saving...' : 'Confirm'}
+									</Button>
+									<Button 
+										variant="secondary" 
+										size="sm" 
+										rounded={true} 
+										onClick={cancelEditingClass}
+										disabled={isUpdating}
+									>
+										Cancel
+									</Button>
+								</div>
+								{:else}
+								<Button variant="secondary" 
+										size="sm" 
+										rounded={true}
+										onClick={() => startEditingClass(student)}
+									>
+										Remove
+								</Button>
+								{/if}
 							</td>
 						</tr>
 					{/each}
