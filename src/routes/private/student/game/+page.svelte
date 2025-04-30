@@ -18,10 +18,12 @@
 	import PhaserGameComponent from '$lib/game/PhaserGame.svelte';
 	import type { TPhaserRef } from '$lib/game/PhaserGame.svelte';
 	import { theme, nextTheme, getThemeColors } from '$lib/stores/theme';
+	import { enhance } from '$app/forms';
 
 	// Maze settings
 	const rows = 6;
 	const cols = 6;
+	let level = 1; // Will be set from the user's profile
 
 	let goalCell: Cell;
 	let maze: Cell[][] = [];
@@ -35,6 +37,9 @@
 	let attemptedCell: Cell | null = null;
 	let problemResult: 'correct' | 'incorrect' | null = null;
 	let answerInput: HTMLInputElement;
+	
+	// Get data from the server including user's profile
+	export let data;
 
 	// Player starting position (handled in MazeScene.ts)
 
@@ -47,6 +52,18 @@
 
 	// Theme comes from the Svelte store
 	let currentTheme: string; // For binding the UI
+
+	// Game statistics tracking
+	let gameStartTime: number;
+	let gameStats = {
+		wrong_addition: 0,
+		wrong_subtraction: 0,
+		wrong_place: 0,
+		problems_total: 0,
+		problems_solved: 0,
+		time_spent_seconds: 0,
+		completed: false
+	};
 
 	// Subscribe to theme changes
 	const unsubscribeTheme = theme.subscribe((value) => {
@@ -121,6 +138,28 @@
 					}
 				}
 
+				// Record final game stats
+				gameStats.problems_total = totalProblems;
+				gameStats.problems_solved = solvedProblems;
+				gameStats.completed = true;
+				
+				// Calculate time spent
+				const gameEndTime = Date.now();
+				gameStats.time_spent_seconds = Math.floor((gameEndTime - gameStartTime) / 1000);
+				
+				console.log('Final game stats before saving:', {
+					problems_total: gameStats.problems_total,
+					problems_solved: gameStats.problems_solved,
+					wrong_addition: gameStats.wrong_addition,
+					wrong_subtraction: gameStats.wrong_subtraction,
+					wrong_place: gameStats.wrong_place,
+					time_spent_seconds: gameStats.time_spent_seconds,
+					completed: gameStats.completed
+				});
+
+				// Save game stats to database
+				saveGameStats();
+
 				// Always show celebration when goal is reached
 				showCelebration = true;
 
@@ -140,6 +179,17 @@
 
 	onMount(() => {
 		if (typeof window !== 'undefined') {
+			// Start tracking game time
+			gameStartTime = Date.now();
+			
+			// Get the user's level from their profile
+			if (data?.profile?.level) {
+				level = data.profile.level;
+				console.log(`Using player's current level: ${level}`);
+			} else {
+				console.log(`No level found in profile, using default level: ${level}`);
+			}
+			
 			// Generate the maze
 			const mazeData = generateMaze(rows, cols);
 			maze = mazeData.maze;
@@ -175,6 +225,8 @@
 	// Generate a math problem for the intersection
 	function generateMathProblem(): MathProblem {
 		// Randomly choose between regular math problems and place value problems
+		// The level variable will be used by the math problems library in the future
+		// for adjusting difficulty based on the player's level
 		return Math.random() < 0.5 ? generateRandomProblem() : generateRandomPlaceValueProblem();
 	}
 
@@ -218,6 +270,15 @@
 			}
 		} else {
 			problemResult = 'incorrect';
+			
+			// Track wrong answer stats
+			if (currentProblem.type === 'addition') {
+				gameStats.wrong_addition++;
+			} else if (currentProblem.type === 'subtraction') {
+				gameStats.wrong_subtraction++;
+			} else if (currentProblem.type === 'placevalue') {
+				gameStats.wrong_place++;
+			}
 
 			// Show the correct answer and generate a new problem after a delay
 			setTimeout(() => {
@@ -267,6 +328,37 @@
 		// Don't directly call scene methods - scene may not be fully initialized
 		// Just let the subscription in PhaserGame handle the update
 		console.log('Theme updated in store, PhaserGame will handle the update');
+	}
+
+	// Save game stats to database
+	function saveGameStats() {
+		console.log('Saving game stats:', gameStats);
+		
+		// Directly update the hidden form fields before submitting
+		const form = document.querySelector('form[action="?/saveGameStats"]') as HTMLFormElement;
+		if (form) {
+			// Update all form fields with current values
+			const wrongAddInput = form.querySelector('input[name="wrong_addition"]') as HTMLInputElement;
+			const wrongSubInput = form.querySelector('input[name="wrong_subtraction"]') as HTMLInputElement;
+			const wrongPlaceInput = form.querySelector('input[name="wrong_place"]') as HTMLInputElement;
+			const totalInput = form.querySelector('input[name="problems_total"]') as HTMLInputElement;
+			const solvedInput = form.querySelector('input[name="problems_solved"]') as HTMLInputElement;
+			const timeInput = form.querySelector('input[name="time_spent_seconds"]') as HTMLInputElement;
+			const completedInput = form.querySelector('input[name="completed"]') as HTMLInputElement;
+			
+			if (wrongAddInput) wrongAddInput.value = gameStats.wrong_addition.toString();
+			if (wrongSubInput) wrongSubInput.value = gameStats.wrong_subtraction.toString();
+			if (wrongPlaceInput) wrongPlaceInput.value = gameStats.wrong_place.toString();
+			if (totalInput) totalInput.value = gameStats.problems_total.toString();
+			if (solvedInput) solvedInput.value = gameStats.problems_solved.toString();
+			if (timeInput) timeInput.value = gameStats.time_spent_seconds.toString();
+			if (completedInput) completedInput.value = gameStats.completed.toString();
+			
+			console.log('Form values updated, submitting form');
+			form.requestSubmit();
+		} else {
+			console.error('Could not find the game stats form to submit');
+		}
 	}
 </script>
 
@@ -443,6 +535,18 @@
 			onButtonClick={() => window.location.reload()}
 		/>
 	</div>
+
+	<!-- Hidden form to submit game stats to the server -->
+	<form method="POST" action="?/saveGameStats" use:enhance>
+		<input type="hidden" name="level" value={level} />
+		<input type="hidden" name="wrong_addition" value={gameStats.wrong_addition} />
+		<input type="hidden" name="wrong_subtraction" value={gameStats.wrong_subtraction} />
+		<input type="hidden" name="wrong_place" value={gameStats.wrong_place} />
+		<input type="hidden" name="problems_total" value={gameStats.problems_total} />
+		<input type="hidden" name="problems_solved" value={gameStats.problems_solved} />
+		<input type="hidden" name="time_spent_seconds" value={gameStats.time_spent_seconds} />
+		<input type="hidden" name="completed" value={gameStats.completed.toString()} />
+	</form>
 </div>
 
 <style>

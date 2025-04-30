@@ -6,6 +6,7 @@
 export interface MathProblem {
 	question: string;
 	answer: number | string;
+	type?: 'addition' | 'subtraction' | 'placevalue';
 }
 
 /**
@@ -19,7 +20,8 @@ export function generateAdditionProblem(min = 0, max = 100): MathProblem {
 	const b = Math.floor(Math.random() * (max - min + 1)) + min;
 	return {
 		question: `${a} + ${b} = ?`,
-		answer: a + b
+		answer: a + b,
+		type: 'addition'
 	};
 }
 
@@ -36,7 +38,8 @@ export function generateSubtractionProblem(min = 0, max = 100): MathProblem {
 	if (a < b) [a, b] = [b, a];
 	return {
 		question: `${a} - ${b} = ?`,
-		answer: a - b
+		answer: a - b,
+		type: 'subtraction'
 	};
 }
 
@@ -83,7 +86,8 @@ export function generateRandomPlaceValueProblem(min = 10, max = 999): MathProble
 
 		return {
 			question: `What is the digit in the ${place} place of ${number}?`,
-			answer: answer.toString()
+			answer: answer.toString(),
+			type: 'placevalue'
 		};
 	} else {
 		// Number place identification question (What number place is this?)
@@ -116,7 +120,8 @@ ${numberStr
 
 		return {
 			question: `What number place is this?\n${alignedDisplay}`,
-			answer: place // Answer is "ones", "tens", "hundreds", or "thousands"
+			answer: place, // Answer is "ones", "tens", "hundreds", or "thousands"
+			type: 'placevalue'
 		};
 	}
 }
