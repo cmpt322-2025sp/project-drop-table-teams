@@ -1,62 +1,167 @@
-<script>
+<script lang="ts">
 	import { Button } from '$lib/components';
+	import { onMount } from 'svelte';
+
+	interface Student {
+		id: string;
+		email: string;
+		level: number;
+		points: number;
+		role: string;
+		created_at: string;
+	}
+
+	interface Class {
+		id: string;
+		name: string;
+		description?: string;
+		students: Student[];
+	}
+
+	interface Enrollment {
+		id: string;
+		class_id: string;
+		student_id: string;
+	}
 
 	let { data } = $props();
-	let { classes, students, enrollments } = $derived(data);
-	let selectedClass = $state(null);
-	let filteredStudents = $state([]);
-	let availableStudents = $state([]);
+	let { classes, students, enrollments } = $derived(data as { 
+		classes: Class[]; 
+		students: Student[]; 
+		enrollments: Enrollment[] 
+	});
+	
+	let selectedClass = $state<Class | null>(null);
+	let filteredStudents = $state<Student[]>([]);
+	let availableStudents = $state<Student[]>([]);
+	let editingStudent = $state<Student | null>(null);
+	let editLevel = $state<number>(1);
+	let isUpdating = $state<boolean>(false);
+	let initialized = $state<boolean>(false);
 
-	// Process data when it changes
-	$effect(() => {
-		// Process data for each class
-		if (classes && students && enrollments) {
-			// Create a map of enrolled students by class
-			const classEnrollments = new Map();
+	// Initialize data on mount instead of using $effect to avoid recursion
+	onMount(() => {
+		initializeData();
+	});
 
-			// Initialize each class's students array
-			classes.forEach((cls) => {
-				classEnrollments.set(cls.id, []);
-			});
+	// Initialize data without reactive effects
+	function initializeData() {
+		if (!initialized && classes && students && enrollments) {
+			// Process data for each class
+			if (classes && students && enrollments) {
+				// Create a map of enrolled students by class
+				const classEnrollments = new Map<string, Student[]>();
 
-			// Populate the map with enrolled students for each class
-			enrollments.forEach((enrollment) => {
-				const classStudents = classEnrollments.get(enrollment.class_id) || [];
-				const student = students.find((s) => s.id === enrollment.student_id);
-				if (student) {
-					classStudents.push(student);
+				// Initialize each class's students array
+				classes.forEach((cls) => {
+					classEnrollments.set(cls.id, []);
+				});
+
+				// Populate the map with enrolled students for each class
+				enrollments.forEach((enrollment) => {
+					const classStudents = classEnrollments.get(enrollment.class_id) || [];
+					const student = students.find((s) => s.id === enrollment.student_id);
+					if (student) {
+						classStudents.push(student);
+					}
+				});
+
+				// Assign the students to each class
+				classes.forEach((cls) => {
+					cls.students = classEnrollments.get(cls.id) || [];
+				});
+
+				// Set initial selected class if needed
+				if (classes.length > 0 && !selectedClass) {
+					selectedClass = classes[0];
+					
+					if (selectedClass.students) {
+						filteredStudents = [...selectedClass.students];
+						
+						// Calculate students not in this class
+						const enrolledIds = new Set(filteredStudents.map((s) => s.id));
+						availableStudents = students.filter((student) => !enrolledIds.has(student.id));
+					}
 				}
-			});
-
-			// Assign the students to each class
-			classes.forEach((cls) => {
-				cls.students = classEnrollments.get(cls.id) || [];
-			});
-
-			// Set initial selected class if needed
-			if (classes.length > 0 && !selectedClass) {
-				selectedClass = classes[0];
-				updateFilteredStudents();
 			}
+			
+			initialized = true;
 		}
-	});
+	}
 
-	// Update the filtered students when selected class changes
-	$effect(() => {
-		if (selectedClass) {
-			updateFilteredStudents();
-		}
-	});
-
-	// Function to update filtered students
-	function updateFilteredStudents() {
+	// Handle class selection change
+	function handleClassChange(newClass: Class) {
+		selectedClass = newClass;
+		
 		if (selectedClass && selectedClass.students) {
 			filteredStudents = [...selectedClass.students];
-
+			
 			// Calculate students not in this class
 			const enrolledIds = new Set(filteredStudents.map((s) => s.id));
 			availableStudents = students.filter((student) => !enrolledIds.has(student.id));
 		}
+	}
+
+	// Start editing a student's level
+	function startEditing(student: Student) {
+		editingStudent = student;
+		editLevel = student.level;
+	}
+
+	// Cancel editing
+	function cancelEditing() {
+		editingStudent = null;
+	}
+
+	// Save student level
+	async function saveStudentLevel() {
+		if (!editingStudent || isUpdating) return;
+		
+		try {
+			// Prevent multiple submissions
+			isUpdating = true;
+			
+			const response = await fetch('/api/teacher/update-student-level', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					studentId: editingStudent.id,
+					level: editLevel
+				})
+			});
+			
+			if (response.ok) {
+				// Update the student in the UI
+				const updatedStudent = await response.json();
+				
+				// Update just the specific student in our filtered list
+				const updatedFilteredStudents = filteredStudents.map(student => 
+					student.id === editingStudent?.id 
+						? { ...student, level: updatedStudent.level } 
+						: student
+				);
+				filteredStudents = updatedFilteredStudents;
+				
+				// Reset editing state
+				editingStudent = null;
+			} else {
+				const error = await response.json();
+				console.error('Failed to update student level:', error);
+			}
+		} catch (error) {
+			console.error('Error updating student level:', error);
+		} finally {
+			isUpdating = false;
+		}
+	}
+	
+	// Handle class selection event
+	function onClassSelectChange(event: Event) {
+	  const select = event.target as HTMLSelectElement;
+	  const newClass = classes.find(c => c.id === select.value) || classes[0];
+	  handleClassChange(newClass);
 	}
 </script>
 
@@ -89,9 +194,13 @@
 
 	<div class="class-selector">
 		<label for="class-select">Select Class:</label>
-		<select id="class-select" class="custom-select btn-primary btn-round" bind:value={selectedClass}>
+		<select 
+			id="class-select" 
+			class="custom-select btn-primary btn-round" 
+			onchange={onClassSelectChange}
+		>
 			{#each classes as cls}
-				<option value={cls}>{cls.name}</option>
+				<option value={cls.id} selected={selectedClass?.id === cls.id}>{cls.name}</option>
 			{/each}
 		</select>
 	</div>
@@ -118,7 +227,51 @@
 					{#each filteredStudents as student}
 						<tr>
 							<td>{student.email}</td>
-							<td>{student.level}</td>
+							<td>
+								{#if editingStudent && editingStudent.id === student.id}
+									<div class="level-editor">
+										<input 
+											type="number" 
+											min="1" 
+											max="10"
+											bind:value={editLevel}
+											class="level-input"
+										/>
+										<div class="edit-buttons">
+											<Button 
+												variant="primary" 
+												size="sm" 
+												rounded={true} 
+												onClick={saveStudentLevel}
+												disabled={isUpdating}
+											>
+												{isUpdating ? 'Saving...' : 'Save'}
+											</Button>
+											<Button 
+												variant="secondary" 
+												size="sm" 
+												rounded={true} 
+												onClick={cancelEditing}
+												disabled={isUpdating}
+											>
+												Cancel
+											</Button>
+										</div>
+									</div>
+								{:else}
+									<div class="level-display">
+										{student.level}
+										<Button 
+											variant="primary" 
+											size="sm" 
+											rounded={true} 
+											onClick={() => startEditing(student)}
+										>
+											Edit
+										</Button>
+									</div>
+								{/if}
+							</td>
 							<td>{student.points}</td>
 							<td>
 								<Button variant="secondary" size="sm" rounded={true}>Remove</Button>
@@ -308,8 +461,7 @@
 	}
 
 	.no-students,
-	.no-classes,
-	.no-available {
+	.no-classes {
 		text-align: center;
 		padding: 2rem;
 		color: #666;
@@ -332,6 +484,30 @@
 		background-color: var(--background-green);
 		text-align: center;
 		color: white;
+	}
+
+	.level-display {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.level-editor {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.level-input {
+		width: 60px;
+		padding: 4px;
+		border: 1px solid #ddd;
+		border-radius: 4px;
+	}
+
+	.edit-buttons {
+		display: flex;
+		gap: 0.5rem;
 	}
 
 	.available-students {
