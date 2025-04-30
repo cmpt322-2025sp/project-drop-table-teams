@@ -34,7 +34,8 @@
 	let selectedClass = $state<Class | null>(null);
 	let filteredStudents = $state<Student[]>([]);
 	let availableStudents = $state<Student[]>([]);
-	let editingStudent = $state<Student | null>(null);
+	let editingStudentLevel = $state<Student | null>(null);
+	let editingStudentClass = $state<Student | null>(null);
 	let editLevel = $state<number>(1);
 	let isUpdating = $state<boolean>(false);
 	let initialized = $state<boolean>(false);
@@ -104,18 +105,18 @@
 
 	// Start editing a student's level
 	function startEditing(student: Student) {
-		editingStudent = student;
+		editingStudentLevel = student;
 		editLevel = student.level;
 	}
 
 	// Cancel editing
 	function cancelEditing() {
-		editingStudent = null;
+		editingStudentLevel = null;
 	}
 
 	// Save student level
 	async function saveStudentLevel() {
-		if (!editingStudent || isUpdating) return;
+		if (!editingStudentLevel || isUpdating) return;
 		
 		try {
 			// Prevent multiple submissions
@@ -127,7 +128,7 @@
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					studentId: editingStudent.id,
+					studentId: editingStudentLevel.id,
 					level: editLevel
 				})
 			});
@@ -138,14 +139,14 @@
 				
 				// Update just the specific student in our filtered list
 				const updatedFilteredStudents = filteredStudents.map(student => 
-					student.id === editingStudent?.id 
+					student.id === editingStudentLevel?.id 
 						? { ...student, level: updatedStudent.level } 
 						: student
 				);
 				filteredStudents = updatedFilteredStudents;
 				
 				// Reset editing state
-				editingStudent = null;
+				editingStudentLevel = null;
 			} else {
 				const error = await response.json();
 				console.error('Failed to update student level:', error);
@@ -228,12 +229,12 @@
 						<tr>
 							<td>{student.email}</td>
 							<td>
-								{#if editingStudent && editingStudent.id === student.id}
+								{#if editingStudentLevel && editingStudentLevel.id === student.id}
 									<div class="level-editor">
 										<input 
 											type="number" 
 											min="1" 
-											max="10"
+											max="3"
 											bind:value={editLevel}
 											class="level-input"
 										/>
