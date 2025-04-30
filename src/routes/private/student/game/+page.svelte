@@ -23,7 +23,7 @@
 	// Maze settings
 	const rows = 6;
 	const cols = 6;
-	let level = 1; // Will be set from the user's profile
+	let level = 1; // Default level, will be updated from the user's profile
 
 	let goalCell: Cell;
 	let maze: Cell[][] = [];
@@ -184,8 +184,14 @@
 			
 			// Get the user's level from their profile
 			if (data?.profile?.level) {
-				level = data.profile.level;
-				console.log(`Using player's current level: ${level}`);
+				// Ensure level is a valid integer between 1-3
+				const profileLevel = parseInt(data.profile.level);
+				if (!isNaN(profileLevel) && profileLevel >= 1 && profileLevel <= 3) {
+					level = profileLevel;
+					console.log(`Using player's current level: ${level}`);
+				} else {
+					console.log(`Invalid level in profile (${data.profile.level}), using default level: ${level}`);
+				}
 			} else {
 				console.log(`No level found in profile, using default level: ${level}`);
 			}
@@ -222,12 +228,16 @@
 		EventBus.removeAllListeners('goal-reached');
 	});
 
-	// Generate a math problem for the intersection
+	// Generate a math problem for the intersection using player's level
 	function generateMathProblem(): MathProblem {
+		// Convert numerical level to DifficultyLevel type (1, 2, or 3)
+		const difficultyLevel = level.toString() as '1' | '2' | '3';
+		
 		// Randomly choose between regular math problems and place value problems
-		// The level variable will be used by the math problems library in the future
-		// for adjusting difficulty based on the player's level
-		return Math.random() < 0.5 ? generateRandomProblem() : generateRandomPlaceValueProblem();
+		// Pass the player's level to adjust difficulty
+		return Math.random() < 0.5 
+			? generateRandomProblem(difficultyLevel) 
+			: generateRandomPlaceValueProblem(difficultyLevel);
 	}
 
 	// Check the user's answer to the math problem
