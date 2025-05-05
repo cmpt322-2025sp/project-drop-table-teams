@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import type { Cell } from '$lib/Maze';
+import { get } from 'svelte/store';
+import { theme } from '$lib/stores/theme'; // adjust this path as needed
 import {
 	EventBus,
 	type PlayerMovedEvent,
@@ -561,12 +563,15 @@ export class MazeScene extends Phaser.Scene {
 	/**
 	 * Draw the player character
 	 */
+
+
 	private drawPlayer(): void {
 		if (!this.playerGraphics) return;
 
-		const colors = this.getThemeColors();
+		const currentTheme = get(theme); // get active theme from Svelte store
+		const playerSize = this.cellSize * 0.6;
 
-		// Compute player position in pixels
+	// Compute player position
 		const x =
 			this.wallThickness +
 			this.displayedCol * (this.cellSize + this.wallThickness) +
@@ -576,34 +581,195 @@ export class MazeScene extends Phaser.Scene {
 			this.displayedRow * (this.cellSize + this.wallThickness) +
 			this.cellSize / 2;
 
-		// Clear previous player
 		this.playerGraphics.clear();
-
-		// Make sure the player is drawn above everything else
 		this.playerGraphics.setDepth(10);
 
-		// Draw player based on theme
-		const playerSize = this.cellSize * 0.6;
+	// === Themed Player Drawing Functions ===
+	
+	function drawAstronaut(g: Phaser.GameObjects.Graphics, x: number, y: number, size: number) {
+		const helmetRadius = size * 0.5;
+	
+		// --- Glow Halo ---
+		g.fillStyle(0xfff59d, 0.2);
+		g.fillCircle(x, y, helmetRadius + 6);
+	
+		// --- Helmet Shell ---
+		g.fillStyle(0xffffff); // outer shell
+		g.fillCircle(x, y, helmetRadius);
+	
+		// --- Helmet Outline ---
+		g.lineStyle(2, 0xaaaaaa, 1);
+		g.strokeCircle(x, y, helmetRadius);
+	
+		// --- Blue Visor ---
+		g.fillStyle(0x3333ff);
+		g.fillEllipse(x, y - size * 0.05, size * 0.5, size * 0.3);
+	
+		// --- Reflection Highlight ---
+		g.fillStyle(0xffffff);
+		g.beginPath();
+		g.moveTo(x - size * 0.15, y - size * 0.1);
+		g.arc(x - size * 0.15, y - size * 0.1, size * 0.05, 0, Math.PI * 2);
+		g.fillPath();
+	
+		// --- Side Antennas ---
+		g.lineStyle(2, 0x999999, 1);
+		g.beginPath();
+		g.moveTo(x - helmetRadius, y);
+		g.lineTo(x - helmetRadius - 8, y - 10);
+		g.strokePath();
+	
+		g.beginPath();
+		g.moveTo(x + helmetRadius, y);
+		g.lineTo(x + helmetRadius + 8, y - 10);
+		g.strokePath();
+	
+		// Antenna tips
+		g.fillStyle(0xff5555);
+		g.fillCircle(x - helmetRadius - 8, y - 10, 2);
+		g.fillCircle(x + helmetRadius + 8, y - 10, 2);
+	}
+	
+	
+	
+	
 
-		// Draw with a bright color to ensure visibility
-		this.playerGraphics.fillStyle(colors.playerColor, 1);
-		this.playerGraphics.fillCircle(x, y, playerSize / 2);
+	function drawDiver(g: Phaser.GameObjects.Graphics, x: number, y: number, size: number) {
+		const bodyLength = size * 0.9;
+		const bodyHeight = size * 0.5;
+	
+		// Body
+		g.fillStyle(0x0099cc); // bright ocean blue
+		g.fillEllipse(x, y, bodyLength, bodyHeight);
+	
+		// Tail
+		const tailWidth = size * 0.3;
+		const tailHeight = size * 0.3;
+		g.fillStyle(0x0077aa);
+		g.beginPath();
+		g.moveTo(x - bodyLength / 2, y);
+		g.lineTo(x - bodyLength / 2 - tailWidth, y - tailHeight);
+		g.lineTo(x - bodyLength / 2 - tailWidth, y + tailHeight);
+		g.closePath();
+		g.fillPath();
+	
+		// Eye
+		g.fillStyle(0xffffff);
+		g.fillCircle(x + bodyLength * 0.25, y - bodyHeight * 0.1, size * 0.08);
+		g.fillStyle(0x000000);
+		g.fillCircle(x + bodyLength * 0.25, y - bodyHeight * 0.1, size * 0.04);
+	
+		// Fin on top
+		g.fillStyle(0x00bbdd);
+		g.beginPath();
+		g.moveTo(x, y - bodyHeight / 2);
+		g.lineTo(x - size * 0.05, y - bodyHeight / 2 - size * 0.2);
+		g.lineTo(x + size * 0.05, y - bodyHeight / 2 - size * 0.2);
+		g.closePath();
+		g.fillPath();
+	}
+	function drawFrog(g: Phaser.GameObjects.Graphics, x: number, y: number, size: number) {
+		const bodyRadius = size * 0.4;
+		const eyeRadius = size * 0.1;
+		const pupilRadius = size * 0.04;
+		const outlineColor = 0x2e7d32; // dark green
+	
+		// === Body ===
+		g.fillStyle(0x4CAF50); // frog green
+		g.fillCircle(x, y, bodyRadius);
+		g.lineStyle(2, outlineColor);
+		g.strokeCircle(x, y, bodyRadius);
+	
+		// === Eyes ===
+		const eyeOffsetX = size * 0.18;
+		const eyeOffsetY = size * -0.3;
+		const eyeY = y + eyeOffsetY;
+	
+		// Left eye
+		g.fillStyle(0xffffff);
+		g.fillCircle(x - eyeOffsetX, eyeY, eyeRadius);
+		g.lineStyle(1.5, outlineColor);
+		g.strokeCircle(x - eyeOffsetX, eyeY, eyeRadius);
+	
+		g.fillStyle(0x000000);
+		g.fillCircle(x - eyeOffsetX, eyeY, pupilRadius);
+	
+		// Right eye
+		g.fillStyle(0xffffff);
+		g.fillCircle(x + eyeOffsetX, eyeY, eyeRadius);
+		g.lineStyle(1.5, outlineColor);
+		g.strokeCircle(x + eyeOffsetX, eyeY, eyeRadius);
+	
+		g.fillStyle(0x000000);
+		g.fillCircle(x + eyeOffsetX, eyeY, pupilRadius);
+	
+		// === Mouth ===
+		g.lineStyle(2, 0x000000);
+		g.beginPath();
+		g.arc(x, y + size * 0.1, size * 0.15, Phaser.Math.DegToRad(20), Phaser.Math.DegToRad(160));
+		g.strokePath();
+	
+		// === Feet ===
+		const footOffsetX = size * 0.25;
+		const footOffsetY = size * 0.35;
+	
+		g.fillStyle(0x388E3C); // darker green for feet
+		g.fillCircle(x - footOffsetX, y + footOffsetY, size * 0.08);
+		g.lineStyle(1.5, outlineColor);
+		g.strokeCircle(x - footOffsetX, y + footOffsetY, size * 0.08);
+	
+		g.fillCircle(x + footOffsetX, y + footOffsetY, size * 0.08);
+		g.lineStyle(1.5, outlineColor);
+		g.strokeCircle(x + footOffsetX, y + footOffsetY, size * 0.08);
+	}	
+	
+	
+	
+	
+	function drawCandyCreature(g, x, y, size) {
+		g.fillStyle(0xff66cc);
+		g.fillCircle(x, y, size * 0.4);
 
-		// Add a white glow effect to make the player stand out
-		// First a larger soft outline in white
-		this.playerGraphics.lineStyle(3, 0xffffff, 0.3);
-		this.playerGraphics.strokeCircle(x, y, playerSize / 2 + 2);
+		g.fillStyle(0xffffff);
+		g.fillCircle(x - size * 0.15, y - size * 0.1, size * 0.08);
+		g.fillCircle(x + size * 0.15, y - size * 0.1, size * 0.08);
 
-		// Then a smaller, sharper black outline
-		this.playerGraphics.lineStyle(2, 0x000000, 0.5);
-		this.playerGraphics.strokeCircle(x, y, playerSize / 2);
+		g.fillStyle(0x000000);
+		g.fillCircle(x - size * 0.15, y - size * 0.1, size * 0.04);
+		g.fillCircle(x + size * 0.15, y - size * 0.1, size * 0.04);
 
-		// Center camera on player and ensure zoom is applied
-		if (this.cameras && this.cameras.main) {
-			this.cameras.main.setZoom(2.5); // Set higher zoom level
+		g.fillStyle(0xffffff);
+		g.fillRect(x - size * 0.05, y + size * 0.4, size * 0.1, size * 0.3);
+	}
+	
+
+	// === Select and Draw Character ===
+		switch (currentTheme) {
+			case 'space':
+				drawAstronaut(this.playerGraphics, x, y, playerSize);
+				break;
+			case 'ocean':
+				drawDiver(this.playerGraphics, x, y, playerSize);
+				break;
+			case 'jungle':
+				drawFrog(this.playerGraphics, x, y, playerSize);
+				break;
+			case 'candy':
+				drawCandyCreature(this.playerGraphics, x, y, playerSize);
+				break;
+			default:
+			// fallback circle
+				this.playerGraphics.fillStyle(0xff0000);
+				this.playerGraphics.fillCircle(x, y, playerSize / 2);
+		}
+
+	// Center camera on player
+		if (this.cameras?.main) {
+			this.cameras.main.setZoom(2.5);
 			this.cameras.main.centerOn(x, y);
 		}
 	}
+
 
 	/**
 	 * Setup keyboard input for player movement
