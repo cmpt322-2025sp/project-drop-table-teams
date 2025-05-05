@@ -167,9 +167,9 @@
 		}
 	}
 	
-	// Save student class enrollment
+	// Save student class enrollment (remove a student)
 	async function saveStudentClass() {
-		if (!editingStudentClass || isUpdating) return;
+		if (!editingStudentClass || !selectedClass || isUpdating) return;
 
 		try {
 			// Prevent multiple submissions
@@ -181,12 +181,62 @@
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					studentId: editingStudentClass.id
+					studentId: editingStudentClass.id,
+					classId: selectedClass.id,
+					action: 'remove'
 				})
-
 			});
+			
+			if (response.ok) {
+				// Update the UI - remove student from filtered list, add to available
+				filteredStudents = filteredStudents.filter(student => student.id !== editingStudentClass?.id);
+				if (editingStudentClass) {
+					availableStudents = [...availableStudents, editingStudentClass];
+				}
+				
+				// Reset editing state
+				editingStudentClass = null;
+			} else {
+				const error = await response.json();
+				console.error('Failed to remove student from class:', error);
+			}
 		} catch (error) {
-			console.error('Error updating student level:', error);
+			console.error('Error removing student from class:', error);
+		} finally {
+			isUpdating = false;
+		}
+	}
+	
+	// Add a student to the class
+	async function addStudentToClass(student: Student) {
+		if (!selectedClass || isUpdating) return;
+		
+		try {
+			// Prevent multiple submissions
+			isUpdating = true;
+			
+			const response = await fetch('/api/teacher/update-student-enrollment', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					studentId: student.id,
+					classId: selectedClass.id,
+					action: 'add'
+				})
+			});
+			
+			if (response.ok) {
+				// Update the UI - add student to filtered list, remove from available
+				filteredStudents = [...filteredStudents, student];
+				availableStudents = availableStudents.filter(s => s.id !== student.id);
+			} else {
+				const error = await response.json();
+				console.error('Failed to add student to class:', error);
+			}
+		} catch (error) {
+			console.error('Error adding student to class:', error);
 		} finally {
 			isUpdating = false;
 		}
@@ -361,7 +411,15 @@
 								<div class="student-name">{student.email}</div>
 								<div class="student-details">Level: {student.level} | Points: {student.points}</div>
 							</div>
-							<Button variant="primary" size="sm" rounded={true}>Add</Button>
+							<Button 
+								variant="primary" 
+								size="sm" 
+								rounded={true}
+								onClick={() => addStudentToClass(student)}
+								disabled={isUpdating}
+							>
+								{isUpdating ? 'Adding...' : 'Add'}
+							</Button>
 						</div>
 					{/each}
 				</div>
