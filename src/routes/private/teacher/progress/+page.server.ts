@@ -18,8 +18,7 @@ export const load: PageServerLoad = async ({ locals: { supabaseAdmin, user } }) 
     // Get all game session data
     const { data: games } = await supabaseAdmin
         .from('game_sessions')
-        .select('student_id, wrong_addition, wrong_subtraction, wrong_place, problems_total, problems_solved, time_spent_seconds, completed, created_at')
-        .eq('role', 'student');
+        .select('student_id, wrong_addition, wrong_subtraction, wrong_place, problems_total, problems_solved, time_spent_seconds, completed, created_at');
 
     // Get enrollments for this teacher's classes
 	const { data: enrollments } = await supabaseAdmin

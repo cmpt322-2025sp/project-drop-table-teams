@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { Button } from '$lib/components';
-	import { FacebookInstantGamesPlugin } from 'phaser';
 	import { onMount } from 'svelte';
 	
 	interface Class {
@@ -180,17 +179,23 @@
 				{#if filteredStudents && filteredStudents.length > 0}
 					{#each filteredStudents as student}
 						{#if games && games.length > 0}
-							{#each games as game}
+							{@const studentGames = games.filter(game => game.student_id === student.id)}
+							{#if studentGames.length > 0}
+								{#each studentGames as game}
+									<tr>
+										<td>{student.email}</td> 
+										<td>{game.wrong_addition}</td>
+										<td>{game.wrong_subtraction}</td>
+										<td>{game.wrong_place}</td>
+										<td>{game.problems_solved}</td>
+										<td>{game.time_spent_seconds}</td>
+									</tr>
+								{/each}
+							{:else}
 								<tr>
-									<td>{student.email}</td> 
-									<td>{game.wrong_addition}</td>
-									<td>{game.wrong_subtraction}</td>
-									<td>{game.wrong_place}</td>
-									<td>{game.problems_solved}</td>
-									<td>{game.time_spent_seconds}</td>
+									<td colspan="6" class="missing-data">There is no game data for this student yet: {student.email}</td>
 								</tr>
-							
-							{/each}
+							{/if}
 						{:else}
 							<tr>
 								<td colspan="6" class="missing-data">There is no game data for this student yet: {student.email}</td>
