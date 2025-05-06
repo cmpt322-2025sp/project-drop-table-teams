@@ -205,7 +205,7 @@
 			</tbody>
 		</table>
 	{:else}
-		<div class="no-classes">
+		<div class="missing-data">
 			<p>You don't have any classes yet. Create a class to get to see students progress.</p>
 		</div>
 	{/if}
