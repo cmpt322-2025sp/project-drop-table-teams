@@ -2,6 +2,13 @@
 	import { Button } from '$lib/components';
 	import { onMount } from 'svelte';
 	
+	interface Class {
+		id: string;
+		name: string;
+		description?: string;
+		students: Student[];
+	}
+	
 	interface Student {
 		id: string;
 		email: string;
@@ -24,7 +31,8 @@
 	}
 
 	let { data } = $props();
-	let { students, games } = $derived(data as { 
+	let { classes, students, games } = $derived(data as { 
+		classes: Class[];
 		students: Student[]; 
 		games: Game[];
 	});
