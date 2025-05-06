@@ -21,9 +21,16 @@ export const load: PageServerLoad = async ({ locals: { supabaseAdmin, user } }) 
         .select('student_id, wrong_addition, wrong_subtraction, wrong_place, problems_total, problems_solved, time_spent_seconds, completed, created_at')
         .eq('role', 'student');
 
+    // Get enrollments for this teacher's classes
+	const { data: enrollments } = await supabaseAdmin
+    .from('class_enrollments')
+    .select('id, class_id, student_id')
+    .in('class_id', classes?.map((c) => c.id) || []);
+
     return {
         classes: classes ?? [],
         students: students ?? [],
-        games: games ?? []
+        games: games ?? [],
+        enrollments: enrollments ?? []
     };
 };
