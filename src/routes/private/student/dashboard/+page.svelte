@@ -18,6 +18,11 @@
 		// This forces a proper redirect through the server
 		window.location.href = '/private/student/dashboard/game-redirect';
 	}
+	
+	// Navigate to stats page
+	function navigateToStats() {
+		window.location.href = '/private/student/stats';
+	}
 </script>
 
 <div class="dashboard-container">
@@ -55,7 +60,7 @@
 	</div>
 
 	<div class="view-progress-button">
-		<Button variant="secondary" size="md" rounded={true}>View Progress</Button>
+		<Button variant="secondary" size="md" rounded={true} onClick={navigateToStats}>View Progress</Button>
 	</div>
 </div>
 
