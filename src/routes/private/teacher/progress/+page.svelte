@@ -1,5 +1,33 @@
-<script>
+<script lang="ts">
 	import { Button } from '$lib/components';
+	import { onMount } from 'svelte';
+	
+	interface Student {
+		id: string;
+		email: string;
+		level: number;
+		points: number;
+		role: string;
+		created_at: string;
+	}
+
+	interface Game {
+		student_id: string;
+		wrong_addition: number;
+		wrong_subtraction: number;
+		wrong_place: number;
+		problems_total: number;
+		problems_solved: number;
+		time_spent_seconds: number;
+		completed: boolean;
+		created_at: string;
+	}
+
+	let { data } = $props();
+	let { students, games } = $derived(data as { 
+		students: Student[]; 
+		games: Game[];
+	});
 </script>
 
 <header class="teacher-header">
@@ -29,6 +57,31 @@
 	<h1>Progress Tracking</h1>
 	<p class="welcome-message">View detailed performance reports for your students.</p>
 	<p>This will display a report of the statistics for the class.</p>
+
+	<table>
+		<thead>
+			<tr>
+				<th scope="col">Email</th>
+				<th scope="col">Wrong Addition</th>
+				<th scope="col">Wrong Subtraction</th>
+				<th scope="col">Wrong Number Placement</th>
+				<th scope="col">Problems Solved</th>
+				<th scope="col">Time Played</th>
+			</tr>
+		</thead>
+		<tbody>
+			{#each games as game}
+				<tr>
+					<td>{game.student_id}</td>
+					<td>{game.wrong_addition}</td>
+					<td>{game.wrong_subtraction}</td>
+					<td>{game.wrong_place}</td>
+					<td>{game.problems_solved}</td>
+					<td>{game.time_spent_seconds}</td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
 </main>
 
 <style>
@@ -104,6 +157,26 @@
 		margin-bottom: 2rem;
 		line-height: 1.5;
 	}
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		margin-bottom: 1.5rem;
+	}
+
+	th,
+	td {
+		padding: 8px;
+		border: 1px solid #ddd;
+		text-align: left;
+	}
+
+	th {
+		background-color: var(--background-green);
+		text-align: center;
+		color: white;
+	}
+
 
 	@media (max-width: 768px) {
 		.teacher-header {
