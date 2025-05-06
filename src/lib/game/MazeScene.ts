@@ -123,10 +123,10 @@ export class MazeScene extends Phaser.Scene {
 
 		// Check if player is moving (displayedRow/Col different from targetRow/Col)
 		const isMoving = this.displayedRow !== this.targetRow || this.displayedCol !== this.targetCol;
-		
+
 		// Check if player just finished moving (was moving previously but now arrived)
 		const justFinishedMoving = !isMoving && this.wasMoving;
-		
+
 		// Store current moving state for next frame
 		this.wasMoving = isMoving;
 

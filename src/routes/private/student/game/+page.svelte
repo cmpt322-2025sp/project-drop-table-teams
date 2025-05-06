@@ -37,7 +37,7 @@
 	let attemptedCell: Cell | null = null;
 	let problemResult: 'correct' | 'incorrect' | null = null;
 	let answerInput: HTMLInputElement;
-	
+
 	// Get data from the server including user's profile
 	export let data;
 
@@ -142,11 +142,11 @@
 				gameStats.problems_total = totalProblems;
 				gameStats.problems_solved = solvedProblems;
 				gameStats.completed = true;
-				
+
 				// Calculate time spent
 				const gameEndTime = Date.now();
 				gameStats.time_spent_seconds = Math.floor((gameEndTime - gameStartTime) / 1000);
-				
+
 				console.log('Final game stats before saving:', {
 					problems_total: gameStats.problems_total,
 					problems_solved: gameStats.problems_solved,
@@ -181,7 +181,7 @@
 		if (typeof window !== 'undefined') {
 			// Start tracking game time
 			gameStartTime = Date.now();
-			
+
 			// Get the user's level from their profile
 			if (data?.profile?.level) {
 				level = data.profile.level;
@@ -189,7 +189,7 @@
 			} else {
 				console.log(`No level found in profile, using default level: ${level}`);
 			}
-			
+
 			// Generate the maze
 			const mazeData = generateMaze(rows, cols);
 			maze = mazeData.maze;
@@ -270,7 +270,7 @@
 			}
 		} else {
 			problemResult = 'incorrect';
-			
+
 			// Track wrong answer stats
 			if (currentProblem.type === 'addition') {
 				gameStats.wrong_addition++;
@@ -333,19 +333,21 @@
 	// Save game stats to database
 	function saveGameStats() {
 		console.log('Saving game stats:', gameStats);
-		
+
 		// Directly update the hidden form fields before submitting
 		const form = document.querySelector('form[action="?/saveGameStats"]') as HTMLFormElement;
 		if (form) {
 			// Update all form fields with current values
 			const wrongAddInput = form.querySelector('input[name="wrong_addition"]') as HTMLInputElement;
-			const wrongSubInput = form.querySelector('input[name="wrong_subtraction"]') as HTMLInputElement;
+			const wrongSubInput = form.querySelector(
+				'input[name="wrong_subtraction"]'
+			) as HTMLInputElement;
 			const wrongPlaceInput = form.querySelector('input[name="wrong_place"]') as HTMLInputElement;
 			const totalInput = form.querySelector('input[name="problems_total"]') as HTMLInputElement;
 			const solvedInput = form.querySelector('input[name="problems_solved"]') as HTMLInputElement;
 			const timeInput = form.querySelector('input[name="time_spent_seconds"]') as HTMLInputElement;
 			const completedInput = form.querySelector('input[name="completed"]') as HTMLInputElement;
-			
+
 			if (wrongAddInput) wrongAddInput.value = gameStats.wrong_addition.toString();
 			if (wrongSubInput) wrongSubInput.value = gameStats.wrong_subtraction.toString();
 			if (wrongPlaceInput) wrongPlaceInput.value = gameStats.wrong_place.toString();
@@ -353,7 +355,7 @@
 			if (solvedInput) solvedInput.value = gameStats.problems_solved.toString();
 			if (timeInput) timeInput.value = gameStats.time_spent_seconds.toString();
 			if (completedInput) completedInput.value = gameStats.completed.toString();
-			
+
 			console.log('Form values updated, submitting form');
 			form.requestSubmit();
 		} else {

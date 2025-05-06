@@ -25,12 +25,14 @@
 	}
 
 	let { data } = $props();
-	let { classes, students, enrollments } = $derived(data as { 
-		classes: Class[]; 
-		students: Student[]; 
-		enrollments: Enrollment[] 
-	});
-	
+	let { classes, students, enrollments } = $derived(
+		data as {
+			classes: Class[];
+			students: Student[];
+			enrollments: Enrollment[];
+		}
+	);
+
 	let selectedClass = $state<Class | null>(null);
 	let filteredStudents = $state<Student[]>([]);
 	let availableStudents = $state<Student[]>([]);
@@ -75,17 +77,17 @@
 				// Set initial selected class if needed
 				if (classes.length > 0 && !selectedClass) {
 					selectedClass = classes[0];
-					
+
 					if (selectedClass.students) {
 						filteredStudents = [...selectedClass.students];
-						
+
 						// Calculate students not in this class
 						const enrolledIds = new Set(filteredStudents.map((s) => s.id));
 						availableStudents = students.filter((student) => !enrolledIds.has(student.id));
 					}
 				}
 			}
-			
+
 			initialized = true;
 		}
 	}
@@ -93,10 +95,10 @@
 	// Handle class selection change
 	function handleClassChange(newClass: Class) {
 		selectedClass = newClass;
-		
+
 		if (selectedClass && selectedClass.students) {
 			filteredStudents = [...selectedClass.students];
-			
+
 			// Calculate students not in this class
 			const enrolledIds = new Set(filteredStudents.map((s) => s.id));
 			availableStudents = students.filter((student) => !enrolledIds.has(student.id));
@@ -126,11 +128,11 @@
 	// Save student level
 	async function saveStudentLevel() {
 		if (!editingStudentLevel || isUpdating) return;
-		
+
 		try {
 			// Prevent multiple submissions
 			isUpdating = true;
-			
+
 			const response = await fetch('/api/teacher/update-student-level', {
 				method: 'POST',
 				headers: {
@@ -141,19 +143,19 @@
 					level: editLevel
 				})
 			});
-			
+
 			if (response.ok) {
 				// Update the student in the UI
 				const updatedStudent = await response.json();
-				
+
 				// Update just the specific student in our filtered list
-				const updatedFilteredStudents = filteredStudents.map(student => 
-					student.id === editingStudentLevel?.id 
-						? { ...student, level: updatedStudent.level } 
+				const updatedFilteredStudents = filteredStudents.map((student) =>
+					student.id === editingStudentLevel?.id
+						? { ...student, level: updatedStudent.level }
 						: student
 				);
 				filteredStudents = updatedFilteredStudents;
-				
+
 				// Reset editing state
 				editingStudentLevel = null;
 			} else {
@@ -166,7 +168,7 @@
 			isUpdating = false;
 		}
 	}
-	
+
 	// Save student class enrollment (remove a student)
 	async function saveStudentClass() {
 		if (!editingStudentClass || !selectedClass || isUpdating) return;
@@ -174,7 +176,7 @@
 		try {
 			// Prevent multiple submissions
 			isUpdating = true;
-			
+
 			const response = await fetch('/api/teacher/update-student-enrollment', {
 				method: 'POST',
 				headers: {
@@ -186,14 +188,16 @@
 					action: 'remove'
 				})
 			});
-			
+
 			if (response.ok) {
 				// Update the UI - remove student from filtered list, add to available
-				filteredStudents = filteredStudents.filter(student => student.id !== editingStudentClass?.id);
+				filteredStudents = filteredStudents.filter(
+					(student) => student.id !== editingStudentClass?.id
+				);
 				if (editingStudentClass) {
 					availableStudents = [...availableStudents, editingStudentClass];
 				}
-				
+
 				// Reset editing state
 				editingStudentClass = null;
 			} else {
@@ -206,15 +210,15 @@
 			isUpdating = false;
 		}
 	}
-	
+
 	// Add a student to the class
 	async function addStudentToClass(student: Student) {
 		if (!selectedClass || isUpdating) return;
-		
+
 		try {
 			// Prevent multiple submissions
 			isUpdating = true;
-			
+
 			const response = await fetch('/api/teacher/update-student-enrollment', {
 				method: 'POST',
 				headers: {
@@ -226,11 +230,11 @@
 					action: 'add'
 				})
 			});
-			
+
 			if (response.ok) {
 				// Update the UI - add student to filtered list, remove from available
 				filteredStudents = [...filteredStudents, student];
-				availableStudents = availableStudents.filter(s => s.id !== student.id);
+				availableStudents = availableStudents.filter((s) => s.id !== student.id);
 			} else {
 				const error = await response.json();
 				console.error('Failed to add student to class:', error);
@@ -244,9 +248,9 @@
 
 	// Handle class selection event
 	function onClassSelectChange(event: Event) {
-	  const select = event.target as HTMLSelectElement;
-	  const newClass = classes.find(c => c.id === select.value) || classes[0];
-	  handleClassChange(newClass);
+		const select = event.target as HTMLSelectElement;
+		const newClass = classes.find((c) => c.id === select.value) || classes[0];
+		handleClassChange(newClass);
 	}
 </script>
 
@@ -279,9 +283,9 @@
 
 	<div class="class-selector">
 		<label for="class-select">Select Class:</label>
-		<select 
-			id="class-select" 
-			class="custom-select btn-primary btn-round" 
+		<select
+			id="class-select"
+			class="custom-select btn-primary btn-round"
 			onchange={onClassSelectChange}
 		>
 			{#each classes as cls}
@@ -315,27 +319,27 @@
 							<td>
 								{#if editingStudentLevel && editingStudentLevel.id === student.id}
 									<div class="level-editor">
-										<input 
-											type="number" 
-											min="1" 
+										<input
+											type="number"
+											min="1"
 											max="3"
 											bind:value={editLevel}
 											class="level-input"
 										/>
 										<div class="edit-buttons">
-											<Button 
-												variant="primary" 
-												size="sm" 
-												rounded={true} 
+											<Button
+												variant="primary"
+												size="sm"
+												rounded={true}
 												onClick={saveStudentLevel}
 												disabled={isUpdating}
 											>
 												{isUpdating ? 'Saving...' : 'Save'}
 											</Button>
-											<Button 
-												variant="secondary" 
-												size="sm" 
-												rounded={true} 
+											<Button
+												variant="secondary"
+												size="sm"
+												rounded={true}
 												onClick={cancelEditingLevel}
 												disabled={isUpdating}
 											>
@@ -346,10 +350,10 @@
 								{:else}
 									<div class="level-display">
 										{student.level}
-										<Button 
-											variant="primary" 
-											size="sm" 
-											rounded={true} 
+										<Button
+											variant="primary"
+											size="sm"
+											rounded={true}
 											onClick={() => startEditingLevel(student)}
 										>
 											Edit
@@ -360,34 +364,35 @@
 							<td>{student.points}</td>
 							<td>
 								{#if editingStudentClass && editingStudentClass.id === student.id}
-								<div class="edit-buttons">
-									<Button 
-										variant="primary" 
-										size="sm" 
-										rounded={true} 
-										onClick={saveStudentClass}
-										disabled={isUpdating}
-									>
-										{isUpdating ? 'Saving...' : 'Confirm'}
-									</Button>
-									<Button 
-										variant="secondary" 
-										size="sm" 
-										rounded={true} 
-										onClick={cancelEditingClass}
-										disabled={isUpdating}
-									>
-										Cancel
-									</Button>
-								</div>
+									<div class="edit-buttons">
+										<Button
+											variant="primary"
+											size="sm"
+											rounded={true}
+											onClick={saveStudentClass}
+											disabled={isUpdating}
+										>
+											{isUpdating ? 'Saving...' : 'Confirm'}
+										</Button>
+										<Button
+											variant="secondary"
+											size="sm"
+											rounded={true}
+											onClick={cancelEditingClass}
+											disabled={isUpdating}
+										>
+											Cancel
+										</Button>
+									</div>
 								{:else}
-								<Button variant="secondary" 
-										size="sm" 
+									<Button
+										variant="secondary"
+										size="sm"
 										rounded={true}
 										onClick={() => startEditingClass(student)}
 									>
 										Remove
-								</Button>
+									</Button>
 								{/if}
 							</td>
 						</tr>
@@ -411,9 +416,9 @@
 								<div class="student-name">{student.email}</div>
 								<div class="student-details">Level: {student.level} | Points: {student.points}</div>
 							</div>
-							<Button 
-								variant="primary" 
-								size="sm" 
+							<Button
+								variant="primary"
+								size="sm"
 								rounded={true}
 								onClick={() => addStudentToClass(student)}
 								disabled={isUpdating}
@@ -439,7 +444,7 @@
 		<div style="padding: 1rem">
 			<Button variant="primary" size="md" rounded={true}>Create New Class</Button>
 		</div>
-	</div>	
+	</div>
 </main>
 
 <style>
@@ -567,16 +572,15 @@
 		position: relative;
 		overflow: hidden;
 	}
-	
+
 	.class-selector select.custom-select:hover {
 		transform: translateY(-3px);
 		box-shadow: var(--button-shadow-hover);
 	}
-	
+
 	.class-selector select.custom-select:focus {
 		outline: none;
 	}
-
 
 	.class-info {
 		margin-bottom: 1.5rem;

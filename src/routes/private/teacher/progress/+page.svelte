@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { Button, Table } from '$lib/components';
 	import { onMount } from 'svelte';
-	
+
 	interface Class {
 		id: string;
 		name: string;
 		description?: string;
 		students: Student[];
 	}
-	
+
 	interface Student {
 		id: string;
 		email: string;
@@ -53,12 +53,14 @@
 
 	// Classes will be used to allow teachers to sort the data per their class. Students is needed for their email.
 	let { data } = $props();
-	let { classes, students, games, enrollments } = $derived(data as { 
-		classes: Class[];
-		students: Student[]; 
-		games: Game[];
-		enrollments: Enrollment[]
-	});
+	let { classes, students, games, enrollments } = $derived(
+		data as {
+			classes: Class[];
+			students: Student[];
+			games: Game[];
+			enrollments: Enrollment[];
+		}
+	);
 
 	let selectedClass = $state<Class | null>(null);
 	let filteredStudents = $state<Student[]>([]);
@@ -115,20 +117,20 @@
 				// Set initial selected class if needed
 				if (classes.length > 0 && !selectedClass) {
 					selectedClass = classes[0];
-					
+
 					if (selectedClass.students) {
 						filteredStudents = [...selectedClass.students];
-						
+
 						// Calculate students not in this class
 						const enrolledIds = new Set(filteredStudents.map((s) => s.id));
 						availableStudents = students.filter((student) => !enrolledIds.has(student.id));
-						
+
 						// Generate student summaries
 						generateStudentSummaries();
 					}
 				}
 			}
-			
+
 			initialized = true;
 		}
 	}
@@ -136,38 +138,42 @@
 	// Generate summary statistics for each student
 	function generateStudentSummaries() {
 		if (!filteredStudents || !games) return;
-		
+
 		let summaries: StudentSummary[] = [];
 		let totalSuccessRate = 0;
 		let totalCompletionRate = 0;
 		let totalTimeSeconds = 0;
 		let totalSessionCount = 0;
-		
-		filteredStudents.forEach(student => {
-			const studentGames = games.filter(game => game.student_id === student.id);
-			
+
+		filteredStudents.forEach((student) => {
+			const studentGames = games.filter((game) => game.student_id === student.id);
+
 			if (studentGames.length > 0) {
 				const totalSessions = studentGames.length;
 				totalSessionCount += totalSessions;
-				
+
 				// Calculate averages
-				const avgWrongAddition = studentGames.reduce((sum, game) => sum + game.wrong_addition, 0) / totalSessions;
-				const avgWrongSubtraction = studentGames.reduce((sum, game) => sum + game.wrong_subtraction, 0) / totalSessions;
-				const avgWrongPlace = studentGames.reduce((sum, game) => sum + game.wrong_place, 0) / totalSessions;
-				
+				const avgWrongAddition =
+					studentGames.reduce((sum, game) => sum + game.wrong_addition, 0) / totalSessions;
+				const avgWrongSubtraction =
+					studentGames.reduce((sum, game) => sum + game.wrong_subtraction, 0) / totalSessions;
+				const avgWrongPlace =
+					studentGames.reduce((sum, game) => sum + game.wrong_place, 0) / totalSessions;
+
 				// Calculate totals
 				const totalProblems = studentGames.reduce((sum, game) => sum + game.problems_total, 0);
 				const totalSolved = studentGames.reduce((sum, game) => sum + game.problems_solved, 0);
 				const timeSpent = studentGames.reduce((sum, game) => sum + game.time_spent_seconds, 0);
-				
+
 				// Calculate rates
 				const successRate = totalProblems > 0 ? (totalSolved / totalProblems) * 100 : 0;
-				const completionRate = (studentGames.filter(game => game.completed).length / totalSessions) * 100;
-				
+				const completionRate =
+					(studentGames.filter((game) => game.completed).length / totalSessions) * 100;
+
 				totalSuccessRate += successRate;
 				totalCompletionRate += completionRate;
 				totalTimeSeconds += timeSpent;
-				
+
 				summaries.push({
 					id: student.id,
 					email: student.email,
@@ -200,7 +206,7 @@
 				});
 			}
 		});
-		
+
 		// Update class-wide stats
 		if (summaries.length > 0 && totalSessionCount > 0) {
 			classStats = {
@@ -210,24 +216,24 @@
 				avgTimePerSession: totalTimeSeconds / totalSessionCount
 			};
 		}
-		
+
 		// Sort summaries
 		sortSummaries(sortField, sortDirection);
-		
+
 		studentSummaries = summaries;
 	}
 
 	// Handle class selection change
 	function handleClassChange(newClass: Class) {
 		selectedClass = newClass;
-		
+
 		if (selectedClass && selectedClass.students) {
 			filteredStudents = [...selectedClass.students];
-			
+
 			// Calculate students not in this class
 			const enrolledIds = new Set(filteredStudents.map((s) => s.id));
 			availableStudents = students.filter((student) => !enrolledIds.has(student.id));
-			
+
 			// Regenerate summaries
 			generateStudentSummaries();
 		}
@@ -236,52 +242,56 @@
 	// Handle class selection event
 	function onClassSelectChange(event: Event) {
 		const select = event.target as HTMLSelectElement;
-		const newClass = classes.find(c => c.id === select.value) || classes[0];
+		const newClass = classes.find((c) => c.id === select.value) || classes[0];
 		handleClassChange(newClass);
 	}
-	
+
 	// Format time from seconds to human-readable
 	function formatTime(seconds: number): string {
 		// Round to integer first
 		seconds = Math.round(seconds);
-		
+
 		if (seconds < 60) return `${seconds}s`;
-		
+
 		const minutes = Math.floor(seconds / 60);
 		const remainingSeconds = Math.round(seconds % 60);
-		
+
 		if (minutes < 60) {
 			return `${minutes}m ${remainingSeconds}s`;
 		}
-		
+
 		const hours = Math.floor(minutes / 60);
 		const remainingMinutes = minutes % 60;
-		
+
 		return `${hours}h ${remainingMinutes}m ${remainingSeconds}s`;
 	}
-	
+
 	// Sort summaries
 	function sortSummaries(field: string, direction: 'asc' | 'desc') {
 		sortField = field;
 		sortDirection = direction;
-		
+
 		studentSummaries.sort((a, b) => {
 			let comparison = 0;
-			
+
 			// Handle numeric and string fields differently
 			if (typeof a[field as keyof StudentSummary] === 'number') {
-				comparison = (a[field as keyof StudentSummary] as number) - (b[field as keyof StudentSummary] as number);
+				comparison =
+					(a[field as keyof StudentSummary] as number) -
+					(b[field as keyof StudentSummary] as number);
 			} else {
-				comparison = String(a[field as keyof StudentSummary]).localeCompare(String(b[field as keyof StudentSummary]));
+				comparison = String(a[field as keyof StudentSummary]).localeCompare(
+					String(b[field as keyof StudentSummary])
+				);
 			}
-			
+
 			return direction === 'asc' ? comparison : -comparison;
 		});
-		
+
 		// Force reactivity
 		studentSummaries = [...studentSummaries];
 	}
-	
+
 	// Set sort field and toggle direction if clicking on the current sort field
 	function setSortField(field: string) {
 		if (field === sortField) {
@@ -290,15 +300,15 @@
 			sortField = field;
 			sortDirection = 'asc';
 		}
-		
+
 		sortSummaries(sortField, sortDirection);
 	}
-	
+
 	// Toggle view between table and card
 	function toggleView() {
 		view = view === 'table' ? 'card' : 'table';
 	}
-	
+
 	function handleHeaderClick(field: string) {
 		setSortField(field);
 	}
@@ -329,14 +339,17 @@
 
 <main class="teacher-content">
 	<h1>Progress Tracking</h1>
-	<p class="welcome-message">View detailed performance reports for your students. Choose a class to view students in that class.</p>
+	<p class="welcome-message">
+		View detailed performance reports for your students. Choose a class to view students in that
+		class.
+	</p>
 
 	<div class="controls">
 		<div class="class-selector">
 			<label for="class-select">Select Class:</label>
-			<select 
-				id="class-select" 
-				class="custom-select btn-primary btn-round" 
+			<select
+				id="class-select"
+				class="custom-select btn-primary btn-round"
 				onchange={onClassSelectChange}
 			>
 				{#each classes as cls}
@@ -344,7 +357,7 @@
 				{/each}
 			</select>
 		</div>
-		
+
 		<div class="view-controls">
 			<Button onclick={toggleView}>
 				{view === 'table' ? 'Switch to Card View' : 'Switch to Table View'}
@@ -372,30 +385,70 @@
 				<div class="stat-label">Avg Time per Session</div>
 			</div>
 		</div>
-		
+
 		<!-- Table view -->
 		{#if view === 'table'}
 			<div class="table-container">
 				<table>
 					<thead>
 						<tr>
-							<th scope="col" onclick={() => handleHeaderClick('email')} class:sorted={sortField === 'email'}>
+							<th
+								scope="col"
+								onclick={() => handleHeaderClick('email')}
+								class:sorted={sortField === 'email'}
+							>
 								Email {sortField === 'email' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
 							</th>
-							<th scope="col" onclick={() => handleHeaderClick('level')} class:sorted={sortField === 'level'}>
+							<th
+								scope="col"
+								onclick={() => handleHeaderClick('level')}
+								class:sorted={sortField === 'level'}
+							>
 								Level {sortField === 'level' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
 							</th>
-							<th scope="col" onclick={() => handleHeaderClick('totalSessions')} class:sorted={sortField === 'totalSessions'}>
-								Sessions {sortField === 'totalSessions' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+							<th
+								scope="col"
+								onclick={() => handleHeaderClick('totalSessions')}
+								class:sorted={sortField === 'totalSessions'}
+							>
+								Sessions {sortField === 'totalSessions'
+									? sortDirection === 'asc'
+										? '↑'
+										: '↓'
+									: ''}
 							</th>
-							<th scope="col" onclick={() => handleHeaderClick('successRate')} class:sorted={sortField === 'successRate'}>
-								Success Rate {sortField === 'successRate' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+							<th
+								scope="col"
+								onclick={() => handleHeaderClick('successRate')}
+								class:sorted={sortField === 'successRate'}
+							>
+								Success Rate {sortField === 'successRate'
+									? sortDirection === 'asc'
+										? '↑'
+										: '↓'
+									: ''}
 							</th>
-							<th scope="col" onclick={() => handleHeaderClick('completionRate')} class:sorted={sortField === 'completionRate'}>
-								Completion Rate {sortField === 'completionRate' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+							<th
+								scope="col"
+								onclick={() => handleHeaderClick('completionRate')}
+								class:sorted={sortField === 'completionRate'}
+							>
+								Completion Rate {sortField === 'completionRate'
+									? sortDirection === 'asc'
+										? '↑'
+										: '↓'
+									: ''}
 							</th>
-							<th scope="col" onclick={() => handleHeaderClick('totalTimeSeconds')} class:sorted={sortField === 'totalTimeSeconds'}>
-								Total Time {sortField === 'totalTimeSeconds' ? (sortDirection === 'asc' ? '↑' : '↓') : ''}
+							<th
+								scope="col"
+								onclick={() => handleHeaderClick('totalTimeSeconds')}
+								class:sorted={sortField === 'totalTimeSeconds'}
+							>
+								Total Time {sortField === 'totalTimeSeconds'
+									? sortDirection === 'asc'
+										? '↑'
+										: '↓'
+									: ''}
 							</th>
 						</tr>
 					</thead>
@@ -423,13 +476,16 @@
 							{/each}
 						{:else}
 							<tr>
-								<td colspan="6" class="missing-data">There are no students in this class. Add students to this class in the Student Management page.</td>
+								<td colspan="6" class="missing-data"
+									>There are no students in this class. Add students to this class in the Student
+									Management page.</td
+								>
 							</tr>
 						{/if}
 					</tbody>
 				</table>
 			</div>
-		<!-- Card view -->
+			<!-- Card view -->
 		{:else}
 			<div class="student-cards">
 				{#if studentSummaries && studentSummaries.length > 0}
@@ -437,7 +493,14 @@
 						<div class="student-card">
 							<div class="student-header">
 								<div class="student-avatar">
-									<svg viewBox="0 0 24 24" width="30" height="30" stroke="currentColor" stroke-width="2" fill="none">
+									<svg
+										viewBox="0 0 24 24"
+										width="30"
+										height="30"
+										stroke="currentColor"
+										stroke-width="2"
+										fill="none"
+									>
 										<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
 										<circle cx="12" cy="7" r="4" />
 									</svg>
@@ -447,7 +510,7 @@
 									<div class="student-level">Level {summary.level}</div>
 								</div>
 							</div>
-							
+
 							<div class="card-stats">
 								<div class="stat-row">
 									<div class="stat-label">Sessions:</div>
@@ -471,23 +534,32 @@
 									<div class="stat-value">{formatTime(summary.totalTimeSeconds)}</div>
 								</div>
 							</div>
-							
+
 							{#if summary.totalSessions > 0}
 								<div class="error-stats">
 									<h4>Wrong Answer Distribution</h4>
 									<div class="error-bars">
 										<div class="error-bar">
-											<div class="error-value" style="height: {Math.min(100, summary.avgWrongAddition * 10)}%"></div>
+											<div
+												class="error-value"
+												style="height: {Math.min(100, summary.avgWrongAddition * 10)}%"
+											></div>
 											<span class="error-label">Addition</span>
 											<span class="error-count">{summary.avgWrongAddition.toFixed(1)}</span>
 										</div>
 										<div class="error-bar">
-											<div class="error-value" style="height: {Math.min(100, summary.avgWrongSubtraction * 10)}%"></div>
+											<div
+												class="error-value"
+												style="height: {Math.min(100, summary.avgWrongSubtraction * 10)}%"
+											></div>
 											<span class="error-label">Subtraction</span>
 											<span class="error-count">{summary.avgWrongSubtraction.toFixed(1)}</span>
 										</div>
 										<div class="error-bar">
-											<div class="error-value" style="height: {Math.min(100, summary.avgWrongPlace * 10)}%"></div>
+											<div
+												class="error-value"
+												style="height: {Math.min(100, summary.avgWrongPlace * 10)}%"
+											></div>
 											<span class="error-label">Placement</span>
 											<span class="error-count">{summary.avgWrongPlace.toFixed(1)}</span>
 										</div>
@@ -499,7 +571,10 @@
 						</div>
 					{/each}
 				{:else}
-					<div class="missing-data">There are no students in this class. Add students to this class in the Student Management page.</div>
+					<div class="missing-data">
+						There are no students in this class. Add students to this class in the Student
+						Management page.
+					</div>
 				{/if}
 			</div>
 		{/if}
@@ -583,7 +658,7 @@
 		margin-bottom: 1.5rem;
 		line-height: 1.5;
 	}
-	
+
 	.controls {
 		display: flex;
 		justify-content: space-between;
@@ -625,16 +700,16 @@
 		position: relative;
 		overflow: hidden;
 	}
-	
+
 	.class-selector select.custom-select:hover {
 		transform: translateY(-3px);
 		box-shadow: var(--button-shadow-hover);
 	}
-	
+
 	.class-selector select.custom-select:focus {
 		outline: none;
 	}
-	
+
 	/* Stats cards */
 	.stats-cards {
 		display: flex;
@@ -642,7 +717,7 @@
 		gap: 20px;
 		margin-bottom: 2rem;
 	}
-	
+
 	.stat-card {
 		background-color: white;
 		border-radius: 10px;
@@ -652,11 +727,11 @@
 		text-align: center;
 		transition: transform 0.3s ease;
 	}
-	
+
 	.stat-card:hover {
 		transform: translateY(-5px);
 	}
-	
+
 	.stat-card .stat-value {
 		font-size: 2rem;
 		font-weight: bold;
@@ -664,7 +739,7 @@
 		line-height: 1;
 		margin-bottom: 0.5rem;
 	}
-	
+
 	.stat-card .stat-label {
 		font-size: 0.9rem;
 		color: #666;
@@ -679,7 +754,7 @@
 		border-radius: 10px;
 		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 	}
-	
+
 	table {
 		width: 100%;
 		border-collapse: collapse;
@@ -692,7 +767,7 @@
 		text-align: left;
 		border-bottom: 1px solid #eee;
 	}
-	
+
 	th {
 		background-color: var(--background-green);
 		color: white;
@@ -701,23 +776,23 @@
 		font-weight: 600;
 		font-size: 0.9rem;
 	}
-	
+
 	th.sorted {
 		background-color: #1a7e63;
 	}
-	
+
 	th:hover {
 		background-color: #1a7e63;
 	}
-	
+
 	tr:last-child td {
 		border-bottom: none;
 	}
-	
+
 	tr:hover {
 		background-color: #f9f9f9;
 	}
-	
+
 	/* Progress bars */
 	.progress-bar-container {
 		width: 100%;
@@ -727,13 +802,13 @@
 		overflow: hidden;
 		position: relative;
 	}
-	
+
 	.progress-bar {
 		height: 100%;
 		background-color: var(--background-green);
 		border-radius: 10px;
 	}
-	
+
 	.progress-bar-container span {
 		position: absolute;
 		top: 50%;
@@ -744,12 +819,12 @@
 		font-weight: 600;
 		mix-blend-mode: difference;
 	}
-	
+
 	/* Error distribution */
 	.error-distribution {
 		min-width: 120px;
 	}
-	
+
 	.error-bars {
 		display: flex;
 		justify-content: space-around;
@@ -758,14 +833,14 @@
 		padding-top: 10px; /* Add space at top */
 		padding-bottom: 5px; /* Add space at bottom */
 	}
-	
+
 	.error-bar {
 		display: flex;
 		flex-direction: column-reverse;
 		align-items: center;
 		width: 30px;
 	}
-	
+
 	.error-value {
 		width: 100%;
 		background-color: #ff6b6b;
@@ -773,18 +848,18 @@
 		border-radius: 3px 3px 0 0;
 		min-height: 2px; /* Ensures bars are always visible even with small values */
 	}
-	
+
 	.table-error-value {
 		width: 8px; /* More prominent width */
 	}
-	
+
 	.error-label {
 		font-size: 0.7rem;
 		text-align: center;
 		color: #666;
 		white-space: nowrap;
 	}
-	
+
 	/* Card view */
 	.student-cards {
 		display: grid;
@@ -792,7 +867,7 @@
 		gap: 20px;
 		margin-bottom: 2rem;
 	}
-	
+
 	.student-card {
 		background-color: white;
 		border-radius: 10px;
@@ -800,11 +875,11 @@
 		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 		transition: transform 0.3s ease;
 	}
-	
+
 	.student-card:hover {
 		transform: translateY(-5px);
 	}
-	
+
 	.student-header {
 		display: flex;
 		align-items: center;
@@ -812,7 +887,7 @@
 		padding-bottom: 1rem;
 		border-bottom: 1px solid #eee;
 	}
-	
+
 	.student-avatar {
 		width: 40px;
 		height: 40px;
@@ -824,73 +899,73 @@
 		margin-right: 1rem;
 		color: #666;
 	}
-	
+
 	.student-info h3 {
 		margin: 0;
 		font-size: 1.1rem;
 		margin-bottom: 0.3rem;
 	}
-	
+
 	.student-level {
 		font-size: 0.8rem;
 		color: #666;
 	}
-	
+
 	.card-stats {
 		margin-bottom: 1rem;
 	}
-	
+
 	.stat-row {
 		display: flex;
 		justify-content: space-between;
 		margin-bottom: 0.5rem;
 		font-size: 0.9rem;
 	}
-	
+
 	.stat-label {
 		color: #666;
 	}
-	
+
 	.error-stats {
 		margin-top: 1rem;
 		padding-top: 1rem;
 		border-top: 1px solid #eee;
 	}
-	
+
 	.error-stats h4 {
 		font-size: 0.9rem;
 		margin: 0 0 2rem 0; /* Increased bottom margin for more space */
 		text-align: center;
 		color: #666;
 	}
-	
+
 	.student-card .error-bars {
 		height: 80px;
 	}
-	
+
 	.student-card .error-bar {
 		position: relative;
 		height: 100%;
 		display: flex;
 		flex-direction: column-reverse;
 	}
-	
+
 	.student-card .error-value {
 		margin-bottom: 0;
 		width: 20px;
 	}
-	
+
 	.student-card .error-label {
 		margin-top: 5px;
 	}
-	
+
 	.student-card .error-count {
 		font-size: 0.7rem;
 		position: absolute;
 		top: -30px; /* Increased space above the count */
 		color: #333;
 	}
-	
+
 	.no-data {
 		text-align: center;
 		color: #999;
@@ -917,17 +992,17 @@
 		.teacher-content {
 			padding: 1.5rem;
 		}
-		
+
 		.controls {
 			flex-direction: column-reverse;
 			align-items: flex-start;
 			gap: 1rem;
 		}
-		
+
 		.stats-cards {
 			flex-direction: column-reverse;
 		}
-		
+
 		.student-cards {
 			grid-template-columns: 1fr;
 		}

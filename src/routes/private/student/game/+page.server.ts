@@ -36,7 +36,7 @@ export const actions: Actions = {
 		}
 
 		const data = await request.formData();
-		
+
 		// Log the raw form data for debugging
 		console.log('Form data received:', {
 			level: data.get('level'),
@@ -48,7 +48,7 @@ export const actions: Actions = {
 			time_spent_seconds: data.get('time_spent_seconds'),
 			completed: data.get('completed')
 		});
-		
+
 		const gameStats = {
 			student_id: locals.user.id,
 			level: parseInt(data.get('level') as string) || 1,
@@ -60,13 +60,13 @@ export const actions: Actions = {
 			time_spent_seconds: parseInt(data.get('time_spent_seconds') as string) || 0,
 			completed: data.get('completed') === 'true'
 		};
-		
+
 		// Log the processed game stats for debugging
 		console.log('Processed game stats:', gameStats);
 
 		try {
 			const { error } = await locals.supabase.from('game_sessions').insert([gameStats]);
-			
+
 			if (error) {
 				console.error('Error saving game stats:', error);
 				return { success: false, error: error.message };
