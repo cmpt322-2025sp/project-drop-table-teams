@@ -30,7 +30,7 @@
               eval "$(starship init bash)"
             '';
             packages = with pkgs; [
-              nodejs
+              # nodejs
               bun
               supabase-cli
               svelte-language-server
