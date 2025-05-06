@@ -30,6 +30,7 @@
 		created_at: string;
 	}
 
+	// Classes will be used to allow teachers to sort the data per their class. Students is needed for their email.
 	let { data } = $props();
 	let { classes, students, games } = $derived(data as { 
 		classes: Class[];
@@ -80,7 +81,7 @@
 		<tbody>
 			{#each games as game}
 				<tr>
-					<td>{game.student_id}</td>
+					<td>{game.student_id}</td> <!-- to be changed to students email once the data starts populating the table -->
 					<td>{game.wrong_addition}</td>
 					<td>{game.wrong_subtraction}</td>
 					<td>{game.wrong_place}</td>
