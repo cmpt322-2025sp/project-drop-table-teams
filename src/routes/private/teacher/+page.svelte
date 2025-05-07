@@ -115,10 +115,6 @@
 			</div>
 		</div>
 	</main>
-
-	<footer class="teacher-footer">
-		<p>Math Maze Teacher Portal &copy; 2025</p>
-	</footer>
 </div>
 
 <style>
