@@ -502,6 +502,9 @@ let isCreatingClass = $state<boolean>(false);
 	<br />
 	<div class="action-buttons">
 		<div style="padding: 1rem">
+			<Button variant="primary" size="md" rounded={true}>Add New Student</Button>
+		</div>
+		<div style="padding: 1rem">
 			<Button variant="primary" size="md" rounded={true} onClick={openCreateClassModal}>Create New Class</Button>
 		</div>
 	</div>
