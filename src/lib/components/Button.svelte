@@ -3,7 +3,7 @@
 	 * Reusable button component with various styles and variants
 	 */
 	export let type: 'button' | 'submit' | 'reset' = 'button';
-	export let variant: 'primary' | 'secondary' | 'default' = 'default';
+	export let variant: 'primary' | 'secondary' | 'default' | 'danger' = 'default';
 	export let size: 'sm' | 'md' | 'lg' = 'md';
 	export let rounded: boolean = false;
 	export let icon: boolean = false;

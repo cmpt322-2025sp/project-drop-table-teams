@@ -51,6 +51,11 @@ let newClassName = $state<string>('');
 let newClassDescription = $state<string>('');
 let isCreatingClass = $state<boolean>(false);
 
+// Delete class state
+let showDeleteConfirmation = $state<boolean>(false);
+let isDeleting = $state<boolean>(false);
+let deleteError = $state<string | null>(null);
+
 	// Initialize data on mount instead of using $effect to avoid recursion
 	onMount(() => {
 		initializeData();
@@ -315,6 +320,67 @@ let isCreatingClass = $state<boolean>(false);
 			isCreatingClass = false;
 		}
 	}
+	
+	// Show delete confirmation modal
+	function showDeleteClassConfirmation() {
+		// Reset any previous error
+		deleteError = null;
+		showDeleteConfirmation = true;
+	}
+	
+	// Hide delete confirmation modal
+	function hideDeleteClassConfirmation() {
+		showDeleteConfirmation = false;
+	}
+	
+	// Delete the currently selected class
+	async function deleteClass() {
+		if (!selectedClass || isDeleting) return;
+		
+		try {
+			isDeleting = true;
+			deleteError = null;
+			
+			const response = await fetch('/api/teacher/delete-class', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					classId: selectedClass.id
+				})
+			});
+			
+			if (response.ok) {
+				// Remove the class from the list
+				if (selectedClass) {
+					const classId = selectedClass.id;
+					classes = classes.filter(c => c.id !== classId);
+				}
+				
+				// Hide the confirmation modal
+				hideDeleteClassConfirmation();
+				
+				// Select another class if available
+				if (classes.length > 0) {
+					handleClassChange(classes[0]);
+				} else {
+					selectedClass = null;
+					filteredStudents = [];
+					availableStudents = [...students];
+				}
+			} else {
+				const errorData = await response.json();
+				deleteError = errorData.message || 'Failed to delete class. Make sure it has no students.';
+				console.error('Failed to delete class:', errorData);
+			}
+		} catch (error) {
+			console.error('Error deleting class:', error);
+			deleteError = 'An unexpected error occurred.';
+		} finally {
+			isDeleting = false;
+		}
+	}
 </script>
 
 <header class="teacher-header">
@@ -359,7 +425,19 @@ let isCreatingClass = $state<boolean>(false);
 
 	{#if selectedClass}
 		<div class="class-info">
-			<h2>{selectedClass.name}</h2>
+			<div class="class-header">
+				<h2>{selectedClass.name}</h2>
+				{#if filteredStudents.length === 0}
+					<Button 
+						variant="secondary" 
+						size="sm" 
+						rounded={true} 
+						onClick={showDeleteClassConfirmation}
+					>
+						Delete Class
+					</Button>
+				{/if}
+			</div>
 			{#if selectedClass.description}
 				<p>{selectedClass.description}</p>
 			{/if}
@@ -645,6 +723,13 @@ let isCreatingClass = $state<boolean>(false);
 	.class-info {
 		margin-bottom: 1.5rem;
 	}
+	
+	.class-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 0.5rem;
+	}
 
 	.no-students,
 	.no-classes {
@@ -817,6 +902,21 @@ let isCreatingClass = $state<boolean>(false);
 		color: #7f8c8d;
 		font-size: 0.9rem;
 	}
+	
+	.warning {
+		color: #e67e22;
+		font-weight: 600;
+		margin-top: 0.5rem;
+	}
+	
+	.error-message {
+		background-color: #ffecee;
+		border-left: 4px solid #e74c3c;
+		color: #c0392b;
+		padding: 0.75rem 1rem;
+		margin-top: 1rem;
+		border-radius: 4px;
+	}
 </style>
 
 <!-- Create Class Modal -->
@@ -865,6 +965,44 @@ let isCreatingClass = $state<boolean>(false);
 			disabled={!newClassName.trim() || isCreatingClass}
 		>
 			{isCreatingClass ? 'Creating...' : 'Create Class'}
+		</Button>
+	</div>
+</Modal>
+
+<!-- Delete Class Confirmation Modal -->
+<Modal show={showDeleteConfirmation} onClose={hideDeleteClassConfirmation} titleId="delete-class-title">
+	<div class="modal-header">
+		<h2 id="delete-class-title">Delete Class</h2>
+	</div>
+	<div class="modal-body">
+		{#if selectedClass}
+			<p>Are you sure you want to delete the class <strong>{selectedClass.name}</strong>?</p>
+			<p class="warning">This action cannot be undone.</p>
+			{#if deleteError}
+				<div class="error-message">
+					{deleteError}
+				</div>
+			{/if}
+		{/if}
+	</div>
+	<div class="modal-footer">
+		<Button
+			variant="secondary"
+			size="md"
+			rounded={true}
+			onClick={hideDeleteClassConfirmation}
+			disabled={isDeleting}
+		>
+			Cancel
+		</Button>
+		<Button
+			variant="danger"
+			size="md"
+			rounded={true}
+			onClick={deleteClass}
+			disabled={isDeleting}
+		>
+			{isDeleting ? 'Deleting...' : 'Delete Class'}
 		</Button>
 	</div>
 </Modal>

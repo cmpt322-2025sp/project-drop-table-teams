@@ -25,6 +25,7 @@
 		--background-green: #769576;
 		--button-orange: #ff9d00;
 		--button-secondary: #f38f47;
+		--button-danger: #e74c3c;
 		--text-color: #000000;
 
 		/* Shadows */
@@ -113,6 +114,13 @@
 	:global(.btn-secondary) {
 		background: var(--button-secondary);
 		color: var(--text-color);
+		font-family: 'CrimsonText-SemiBold', sans-serif;
+		font-weight: 600;
+	}
+	
+	:global(.btn-danger) {
+		background: var(--button-danger);
+		color: white;
 		font-family: 'CrimsonText-SemiBold', sans-serif;
 		font-weight: 600;
 	}
